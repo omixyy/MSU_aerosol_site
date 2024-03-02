@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <title>{% block title %}{% endblock title %}</title>
+</head>
+<header>{% include "includes/header.html" %}</header>
+<body>
+  {% block content %}
+  {% endblock content %}
+</body>
+<footer style="margin-top: 50px;">{% include "includes/footer.html" %}</footer>
+</html>

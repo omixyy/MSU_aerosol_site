@@ -1,0 +1,82 @@
+{
+  "AE33-S09-01249": {
+    "time_cols": "Datetime",
+    "cols": [
+      "BC1",
+      "BC2",
+      "BC3",
+      "BC4",
+      "BC5",
+      "BC6",
+      "BC7",
+      "BB(%)",
+      "BCbb",
+      "BCff"
+    ]
+  },
+  "LVS": {
+    "time_cols": "Date",
+    "cols": [
+      "Motorspeed(%)",
+      "Actual(m3/h)",
+      "Actual(Nm3/h)",
+      "Actual(m3)",
+      "Actual(Nm3)",
+      "Filter Press.(hPa)",
+      "Air Pressure(hPa)",
+      "Outdoor Temp.('C)",
+      "Filter Temp.('C)",
+      "Chamber Temp.('C)",
+      "Temperature orifice('C)",
+      "Rel.Humidity(%)",
+      "Magazine Position",
+      "Sample ID"
+    ]
+  },
+  "PNS": {
+    "time_cols": "Date",
+    "cols": [
+      "Motorspeed(%)",
+      "Actual(m3/h)",
+      "Actual(Nm3/h)",
+      "Actual(m3)",
+      "Actual(Nm3)",
+      "Filter Press.(hPa)",
+      "Air Pressure(hPa)",
+      "Outdoor Temp.('C)",
+      "Filter Temp.('C)",
+      "Chamber Temp.('C)",
+      "Temperature orifice('C)",
+      "Rel.Humidity(%)",
+      "Magazine Position",
+      "Sample ID"
+    ]
+  },
+  "TCA08": {
+    "time_cols": "EndTimeUTC",
+    "cols": [
+      "TCcounts",
+      "TCmass",
+      "TCconc",
+      "AE33_BC6",
+      "AE33_ValidData",
+      "AE33_b",
+      "OC",
+      "EC",
+      "CO2"
+    ]
+  },
+  "Web_MEM": {
+    "time_cols": "datetime",
+    "cols": [
+      "CH4",
+      "CO",
+      "NO",
+      "NO2",
+      "OZ",
+      "PM10",
+      "PM2.5",
+      "SO2"
+    ]
+  }
+}
