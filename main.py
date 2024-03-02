@@ -1,4 +1,4 @@
-from homepage.home import home_bp
+from views.homepage.home import home_bp
 from flask import Flask
 from config import STATIC_URL
 from graph_funcs import preprocessing_all_files, make_graph
