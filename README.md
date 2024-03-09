@@ -1,3 +1,3 @@
 # MSU_aerosol_site
 
-![workflow](https://github.com/github/docs/actions/workflows/python-package.yml/badge.svg)
+[![Python package](https://github.com/omixyy/MSU_aerosol_site/actions/workflows/python-package.yml/badge.svg)](https://github.com/omixyy/MSU_aerosol_site/actions/workflows/python-package.yml)
