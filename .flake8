@@ -1,0 +1,5 @@
+[flake8]
+application_import_names=homepage
+import-order-style=google
+inline-quotes=double
+exclude=.venv,venv,*/migrations/*,.git,__pycache__
