@@ -1,10 +1,19 @@
 import json
 import os
+from pathlib import Path
 import re
 
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
+
+__all__ = [
+    "load_json",
+    "load_graph",
+    "preprocessing_one_file",
+    "preprocessing_all_files",
+    "make_graph",
+]
 
 
 def load_json(path):
@@ -13,7 +22,7 @@ def load_json(path):
 
 def load_graph() -> None:
     data = pd.read_excel(
-        "data\\AE33-S09-01249\\2023_07_AE33-S09-01249.xlsx",
+        "data/AE33-S09-01249/2023_07_AE33-S09-01249.xlsx",
     )
     data["day"] = data["Datetime"].apply(
         lambda x: "-".join(x.split()[0].split(".")[::-1]) + " " + x.split()[1],
@@ -23,7 +32,7 @@ def load_graph() -> None:
         format="%Y-%m-%d %H:%M",
     )
     m = max(data["day"])
-    cols = list(set(data.columns.to_list()) - set(["Datetime", "date"]))
+    cols = list(set(data.columns.to_list()) - set("Datetime", "date"))
     last_48_hours = [m.replace(day=(m.day - 2)), max(data["day"])]
     fig = px.line(data, x="day", y=cols, range_x=last_48_hours)
     fig.update_layout(legend_itemclick="toggle")
@@ -59,8 +68,8 @@ def preprocessing_one_file(path):
     df = df.replace(',', '.', regex=True).astype(float)
     df.reset_index(inplace=True)"""
     name = re.split("[-_]", file_name)
-    if not os.path.exists(f"proc_data/{device}"):
-        os.makedirs(f"proc_data/{device}")
+    if not Path(f"proc_data/{device}").exists():
+        Path(f"proc_data/{device}").mkdir(parents=True)
     df.to_csv(f"proc_data/{device}/{name[0]}_{name[1]}.csv", index=False)
     return f"proc_data/{device}/{name[0]}_{name[1]}.csv"
 
