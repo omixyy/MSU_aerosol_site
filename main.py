@@ -1,4 +1,4 @@
-from config import STATIC_URL, DEBUG
+from config import DEBUG, STATIC_URL
 from flask import Flask
 from graph_funcs import make_graph, preprocessing_all_files
 
