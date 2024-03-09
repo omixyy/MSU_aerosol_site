@@ -16,13 +16,13 @@ __all__ = [
 ]
 
 
-def load_json(path):
+def load_json(path: str):
     return json.load(open(path, "r"))
 
 
 def load_graph() -> None:
     data = pd.read_excel(
-        "data/AE33-S09-01249/2023_07_AE33-S09-01249.xlsx",
+        "external_data/AE33-S09-01249/2023_07_AE33-S09-01249.xlsx",
     )
     data["day"] = data["Datetime"].apply(
         lambda x: "-".join(x.split()[0].split(".")[::-1]) + " " + x.split()[1],
@@ -75,10 +75,10 @@ def preprocessing_one_file(path):
 
 
 def preprocessing_all_files():
-    for path in os.listdir("data"):
-        for file in os.listdir(f"data/{path}"):
+    for path in os.listdir("external_data"):
+        for file in os.listdir(f"external_data/{path}"):
             if file.endswith(".csv"):
-                preprocessing_one_file(f"data/{path}/{file}")
+                preprocessing_one_file(f"external_data/{path}/{file}")
 
 
 def make_graph(device):
