@@ -1,23 +1,17 @@
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
-BASEDIR = os.path.abspath(os.path.dirname(__file__))
-STATIC_URL = BASEDIR + "/static_dev"
-
-
-class Config(object):
-    DEBUG = False
-    CSRF_ENABLED = True
-    WTF_CSRF_SECRET_KEY = "dsofpkoasodksap"
-    SECRET_KEY = "zxczxasdsad"
-    SQLALCHEMY_DATABASE_URI = (
-        "mysql+mysqlconnector://webuser:web_password@localhost/webuser_db",
-    )
+__all__ = ["load_env_var"]
 
 
-class ProductionConfig(Config):
-    DEBUG = False
+def load_env_var(value: str, default: bool) -> bool:
+    env_value = os.getenv(value, str(default)).lower()
+    return env_value in ("", "true", "yes", "1", "y")
 
 
-class DevelopConfig(Config):
-    DEBUG = True
-    ASSETS_DEBUG = True
+load_dotenv()
+
+BASEDIR = Path(os.path.dirname(__file__)).resolve()
+STATIC_URL = BASEDIR / "static_dev"
+DEBUG = load_env_var("DEBUG", "false")
