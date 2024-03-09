@@ -87,7 +87,7 @@ def make_graph(device):
         data = pd.read_csv(f"proc_data/{device}/{i}")
         combined_data = pd.concat(
             [combined_data, data],
-            ignore_index=True
+            ignore_index=True,
         )
         break
     time_col = json.load(open("config_devices.json", "r"))[device]["time_cols"]
