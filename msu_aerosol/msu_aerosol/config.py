@@ -13,7 +13,6 @@ def load_env_var(value: str, default: bool) -> bool:
 
 load_dotenv()
 
-BASEDIR = Path(os.path.dirname(__file__)).resolve()
+BASEDIR = Path(os.path.dirname(__file__)).resolve().parent
 STATIC_URL = BASEDIR / "static_dev"
 DEBUG = load_env_var("DEBUG", "false")
-SQLALCHEMY_DATABASE_URI = "sqlite:///homepage/db/blogs.db"

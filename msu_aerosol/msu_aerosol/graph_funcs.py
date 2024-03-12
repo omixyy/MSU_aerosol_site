@@ -47,7 +47,7 @@ def preprocessing_one_file(path):
     _, device, file_name = path.split("/")
     df = pd.read_csv(path, sep=None, engine="python")
 
-    time_col = load_json("config_devices.json")[device]["time_cols"]
+    time_col = load_json("msu_aerosol/config_devices.json")[device]["time_cols"]
     if device == "AE33-S09-01249":
         df[time_col] = pd.to_datetime(df[time_col], format="%d.%m.%Y %H:%M")
     if device == "LVS" or device == "PNS":
@@ -60,13 +60,10 @@ def preprocessing_one_file(path):
         df[time_col] = pd.to_datetime(df[time_col], format="%Y-%m-%d %H:%M:%S")
     if device == "Web_MEM":
         df[time_col] = pd.to_datetime(df[time_col], format="%d.%m.%Y %H:%M")
-    cols_to_draw = load_json("config_devices.json")[device]["cols"]
-    time_col = load_json("config_devices.json")[device]["time_cols"]
+    cols_to_draw = load_json("msu_aerosol/config_devices.json")[device]["cols"]
+    time_col = load_json("msu_aerosol/config_devices.json")[device]["time_cols"]
     df = df[cols_to_draw + [time_col]]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
-    """df.set_index(time_col, inplace=True)
-    df = df.replace(',', '.', regex=True).astype(float)
-    df.reset_index(inplace=True)"""
     name = re.split("[-_]", file_name)
     if not Path(f"proc_data/{device}").exists():
         Path(f"proc_data/{device}").mkdir(parents=True)
@@ -90,13 +87,13 @@ def make_graph(device):
             ignore_index=True,
         )
         break
-    time_col = json.load(open("config_devices.json", "r"))[device]["time_cols"]
+    time_col = json.load(open("msu_aerosol/config_devices.json", "r"))[device]["time_cols"]
     combined_data.set_index(time_col, inplace=True)
     combined_data = combined_data.replace(",", ".", regex=True).astype(float)
     combined_data.reset_index(inplace=True)
     m = pd.to_datetime(max(combined_data[time_col]))
     last_48_hours = [m.replace(day=(m.day - 2)), m]
-    cols_to_draw = json.load(open("config_devices.json", "r"))[device]["cols"]
+    cols_to_draw = json.load(open("msu_aerosol/config_devices.json", "r"))[device]["cols"]
     fig = px.line(
         combined_data,
         x=time_col,

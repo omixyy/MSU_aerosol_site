@@ -4,26 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-  <link rel="icon" type="image/x-icon" style="border-radius: 50px;" href="{{ url_for('static', filename='img/fav/favicon.ico') }}">
-  <link rel="apple-touch-icon" sizes="180x180" class="rounded-favicon" href="{{ url_for('static', filename='img/fav/apple-touch-icon.png') }}">
-  <link rel="icon" type="image/png" sizes="32x32" class="rounded-favicon" href="{{ url_for('static', filename='img/fav/favicon-32x32.png') }}">
-  <link rel="icon" type="image/png" sizes="16x16" class="rounded-favicon" href="{{ url_for('static', filename='img/fav/favicon-16x16.png') }}">
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/fav/favicon.ico') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/fav/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/fav/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/fav/favicon-16x16.png') }}">
   <link rel="manifest" href="{{ url_for('static', filename='img/fav/site.webmanifest') }}">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
-  <style>
-    .rounded-favicon {
-      width: 100px;
-      height: 100px;
-      border-radius: 50px;
-    }
-  </style>
   <title>{% block title %}{% endblock title %}</title>
 </head>
-<header>{% include "includes/header.html" %}</header>
+{% include "includes/header.html" %}
 <body>
   {% block content %}
   {% endblock content %}
+  {% include "includes/footer.html" %}
 </body>
-<footer style="margin-top: 50px;">{% include "includes/footer.html" %}</footer>
 </html>
