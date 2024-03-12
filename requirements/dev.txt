@@ -1,4 +1,5 @@
 -r prod.txt
+black==24.1.1
 flake8==7.0.0
 flake8-absolute-import==1.0.0.2
 flake8-commas==2.1.0
@@ -11,4 +12,3 @@ flake8-return==1.2.0
 flake8-use-pathlib==0.3.0
 parameterized==0.9.0
 pep8-naming==0.13.3
-black==24.1.1
