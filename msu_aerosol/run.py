@@ -1,5 +1,5 @@
-from msu_aerosol.config import DEBUG, STATIC_URL
 from flask import Flask
+from msu_aerosol.config import DEBUG, STATIC_URL
 from msu_aerosol.graph_funcs import make_graph, preprocessing_all_files
 
 from homepage.views import home_bp
