@@ -16,3 +16,4 @@ load_dotenv()
 BASEDIR = Path(os.path.dirname(__file__)).resolve().parent
 STATIC_URL = BASEDIR / "static_dev"
 DEBUG = load_env_var("DEBUG", "false")
+SECRET_KEY = os.getenv("SECRET_KEY", "SomeSecretKey")
