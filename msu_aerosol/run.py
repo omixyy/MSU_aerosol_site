@@ -24,12 +24,12 @@ app.register_blueprint(home_bp, name="home")
 
 
 def main() -> None:
-    # preprocessing_all_files()
-    # make_graph("AE33-S09-01249")
-    # make_graph("TCA08")
-    # make_graph("Web_MEM")
-    # make_graph("LVS")
-    # make_graph("PNS")
+    preprocessing_all_files()
+    make_graph("AE33-S09-01249")
+    make_graph("TCA08")
+    make_graph("Web_MEM")
+    make_graph("LVS")
+    make_graph("PNS")
     app.run()
 
 
