@@ -1,6 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 
-__all__ = ["Complex", "Device"]
+__all__ = [
+    "Complex",
+    "Device",
+    "db",
+]
 
 db = SQLAlchemy()
 
@@ -19,7 +23,7 @@ class Complex(db.Model):
     )
     devices = db.relationship(
         "Device",
-        backref="device",
+        backref="Complex",
         lazy=True,
         cascade="all, delete-orphan",
     )
