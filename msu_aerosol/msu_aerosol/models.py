@@ -24,6 +24,9 @@ class Complex(db.Model):
         cascade="all, delete-orphan",
     )
 
+    def __repr__(self):
+        return self.name
+
 
 class Device(db.Model):
     __tablename__ = "devices"
@@ -45,3 +48,6 @@ class Device(db.Model):
         db.ForeignKey("complexes.id"),
         nullable=True,
     )
+
+    def __repr__(self):
+        return self.name
