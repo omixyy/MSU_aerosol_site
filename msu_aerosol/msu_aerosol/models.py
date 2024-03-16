@@ -6,7 +6,7 @@ __all__ = [
     "db",
 ]
 
-db = SQLAlchemy()
+db: SQLAlchemy = SQLAlchemy()
 
 
 class Complex(db.Model):
