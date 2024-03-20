@@ -1,4 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_admin.contrib.sqla import ModelView
+from wtforms.fields import TextAreaField
 
 __all__ = [
     "Complex",
@@ -47,6 +49,9 @@ class Device(db.Model):
     serial_number = db.Column(
         db.String,
     )
+    description = db.Column(
+        db.Text,
+    )
     complex_id = db.Column(
         db.Integer,
         db.ForeignKey("complexes.id"),
@@ -55,3 +60,32 @@ class Device(db.Model):
 
     def __repr__(self):
         return self.name
+
+
+class TextFieldView(ModelView):
+    column_list = (
+        "id",
+        "name",
+        "description",
+        "serial_number",
+    )
+
+    form_overrides = {
+        "description": TextAreaField
+    }
+
+    form_widget_args = {
+        "description": {
+            "rows": 10,
+            "style": "width: 500px",
+        },
+    }
+
+    def description_formatter(self, context, model, name):
+        return model.description[:50] + '...' if len(
+            model.description,
+        ) > 50 else model.description
+    
+    column_formatters = {
+        "description": description_formatter,
+    }
