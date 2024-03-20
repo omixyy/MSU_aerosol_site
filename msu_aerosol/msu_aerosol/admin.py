@@ -1,13 +1,14 @@
 from flask import Flask
 from flask_admin import Admin
+from flask_admin import AdminIndexView
 from flask_admin.contrib.sqla import ModelView
+
 from msu_aerosol.models import (
     Complex,
     db,
     Device,
     TextFieldView,
 )
-from flask_admin import AdminIndexView
 
 __all__ = ["init_admin"]
 

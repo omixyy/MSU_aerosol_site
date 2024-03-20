@@ -1,10 +1,10 @@
 from flask import Flask
+
+from homepage.views import home_bp
 from msu_aerosol import config
 from msu_aerosol.admin import init_admin
 from msu_aerosol.graph_funcs import make_graph, preprocessing_all_files
 from msu_aerosol.models import db
-
-from homepage.views import home_bp
 
 __all__: list = []
 

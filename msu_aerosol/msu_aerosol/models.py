@@ -1,5 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
 from flask_admin.contrib.sqla import ModelView
+from flask_sqlalchemy import SQLAlchemy
 from wtforms.fields import TextAreaField
 
 __all__ = [
@@ -71,7 +71,7 @@ class TextFieldView(ModelView):
     )
 
     form_overrides = {
-        "description": TextAreaField
+        "description": TextAreaField,
     }
 
     form_widget_args = {
@@ -82,10 +82,10 @@ class TextFieldView(ModelView):
     }
 
     def description_formatter(self, context, model, name):
-        return model.description[:50] + '...' if len(
+        return model.description[:50] + "..." if len(
             model.description,
         ) > 50 else model.description
-    
+
     column_formatters = {
         "description": description_formatter,
     }
