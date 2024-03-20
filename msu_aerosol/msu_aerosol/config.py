@@ -6,9 +6,8 @@ from flask import Flask
 
 __all__: list = ["Config", "ProdConfig", "DevConfig"]
 
-
-basedir: Path = Path(os.path.dirname(__file__)).resolve().parent
 load_dotenv()
+basedir: Path = Path(os.path.dirname(__file__)).resolve().parent
 
 
 class Config:
