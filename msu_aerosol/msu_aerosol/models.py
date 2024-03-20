@@ -82,9 +82,14 @@ class TextFieldView(ModelView):
     }
 
     def description_formatter(self, context, model, name):
-        return model.description[:50] + "..." if len(
-            model.description,
-        ) > 50 else model.description
+        return (
+            model.description[:50] + "..."
+            if len(
+                model.description,
+            )
+            > 50
+            else model.description
+        )
 
     column_formatters = {
         "description": description_formatter,
