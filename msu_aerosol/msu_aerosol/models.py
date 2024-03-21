@@ -1,5 +1,6 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
+from jinja2.runtime import Context
 from wtforms.fields import TextAreaField
 
 __all__ = [
@@ -21,7 +22,6 @@ class Complex(db.Model):
     )
     name = db.Column(
         db.String,
-        nullable=True,
     )
     devices = db.relationship(
         "Device",
@@ -44,13 +44,16 @@ class Device(db.Model):
     )
     name = db.Column(
         db.String,
-        nullable=True,
     )
     serial_number = db.Column(
         db.String,
     )
     description = db.Column(
         db.Text,
+    )
+    name_on_disk = db.Column(
+        db.String,
+        nullable=True,
     )
     complex_id = db.Column(
         db.Integer,
@@ -81,7 +84,12 @@ class TextFieldView(ModelView):
         },
     }
 
-    def description_formatter(self, context, model, name):
+    def description_formatter(
+            self,
+            context: Context,
+            model: Device,
+            name: str,
+    ):
         return (
             model.description[:50] + "..."
             if len(
