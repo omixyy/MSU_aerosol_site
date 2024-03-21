@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ device }}{% endblock %}
+{% block content %}
+  <div class="mx-auto" style="width: 500px; text-align: center;">
+    <h1>Данные с прибора {{ device }}</h1>
+  </div>
+  <div style="text-align: left;">
+    <h3 style="margin-left: 50px; margin-top: 50px">{{ device.name }}, {{ device.serial_number }}</h3>
+    <h5 style="margin-left: 50px; margin-top: 30px">Состоит в комплексе "{{ complex }}"</h2>
+    <textarea style="margin-left: 50px; margin-top: 20px; margin-bottom: 20px" cols="60" rows="20" type="text" readonly disabled>{{ device.description }}</textarea>
+    <div style="width: 1200px; height: 400px; float: right; margin-right: 100px">
+      {% include "includes/devices/graph_" ~ device.name_on_disk ~ ".html"  %}
+    </div>
+  </div>
+{% endblock %}
+
