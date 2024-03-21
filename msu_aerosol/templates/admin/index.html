@@ -1,0 +1,22 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+<ol>
+  {% for user in all_users %}
+    <li>{{ user.username }} {{ user.posts }}
+      {% for tag in user.tags %}
+        {{ tag.name }}
+      {% endfor %}</li>
+  {% endfor %}
+</ol>
+<ul>
+  {% for post in all_posts %}
+  <li>{{ post.title }} {{ post.author.username }} {{ post.comments }}</li>
+  {% endfor %}
+</ul>
+
+<ul>
+  {% for comment in all_comments %}
+  <li>{{ comment.body }} {{ comment.id }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}
