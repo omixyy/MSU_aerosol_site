@@ -4,7 +4,7 @@ from flask import Blueprint, render_template
 
 from msu_aerosol import models
 
-__all__ = ["index"]
+__all__: list = []
 
 home_bp: Blueprint = Blueprint("home", __name__, url_prefix="/")
 
