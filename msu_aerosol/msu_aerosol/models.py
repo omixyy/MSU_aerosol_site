@@ -85,10 +85,10 @@ class TextFieldView(ModelView):
     }
 
     def description_formatter(
-            self,
-            context: Context,
-            model: Device,
-            name: str,
+        self,
+        context: Context,
+        model: Device,
+        name: str,
     ):
         return (
             model.description[:50] + "..."
