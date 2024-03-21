@@ -9,7 +9,7 @@ __all__: list = []
 device_bp: Blueprint = Blueprint("device", __name__, url_prefix="/")
 
 
-@device_bp.route("/devices/<device_id>")
+@device_bp.route("/devices/<int:device_id>")
 def device(device_id: int) -> str:
     device: models.Device = models.Device.query.get_or_404(device_id)
     complex: models.Complex = models.Complex.query.get(device.complex_id)
