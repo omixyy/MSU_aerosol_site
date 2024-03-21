@@ -11,6 +11,7 @@
   <link rel="manifest" href="{{ url_for('static', filename='img/fav/site.webmanifest') }}">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
+  <script defer src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
   <title>{% block title %}{% endblock title %}</title>
 </head>
 {% include "includes/header.html" %}
