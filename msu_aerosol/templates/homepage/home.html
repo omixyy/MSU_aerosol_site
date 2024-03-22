@@ -1,40 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Домашняя страница{% endblock title %}
 {% block content %}
-  <style>
-    .accordion-button:focus {
-      border-color: #000000;
-      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 0, 0, 0.6);
-    }
-    .accordion {
-      --bs-accordion-active-bg: #FFFFFF;
-    }
-  </style>
   <div class="mx-auto" style="width: 500px; text-align: center;">
     <h1 style="margin-top: 15px; margin-bottom: 50px;">Данные Аэрозольного комплекса МГУ</h1>
   </div>
-  <div class="col-md-5 mx-auto">
-    <div class="accordion" id="accordionExample">
-      {% for com, dev in complex_to_device.items() %}
-        <div class="accordion-item">
-          <h2 class="accordion-header" id={{ "heading" ~ com.id }}>
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target={{ "#collapse" ~ com.id }} aria-expanded="true" aria-controls={{ "collapse" ~ com.id }}>
-              {{ com.name }}
-            </button>
-          </h2>
-          <div id={{ "collapse" ~ com.id }} class="accordion-collapse collapse" aria-labelledby={{ "heading" ~ com.id }} data-bs-parent="#accordionExample">
-            {% for device in dev %}
-              <div class="accordion-body">
-                <div class="mx-auto" style="text-align: center;">
-                  <h5>{{ device.name }}</h5>
-                  {% include "includes/devices/graph_" ~ device.name_on_disk ~ ".html" %}
-                  <a class="btn btn-dark" style="width: 400px;" href="{{ url_for('device_details.device', device_id=device.id) }}">Подробнее</a>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-      {% endfor %}
+  {% for complex, devices in complex_to_device.items() %}
+    <div id="com{{ complex.id }}">
+      <h2 class="ms-3 mb-2">{{ complex }}</h2>
     </div>
-  </div>
+    <div class="pt-0 my-5 ms-3">
+      <div class="row"> 
+        {% for device in devices %}   
+          <div id="dev{{ device.id }}" style="width: 700px; height: 600px; text-align: center;">
+            <h4 style="margin-top: 15px; margin-bottom: 20px;">{{ device.name }}</h4>
+            <hr>
+            {% include "includes/devices/graph_" ~ device.name_on_disk ~ ".html" %}
+            <a class="btn btn-dark" style="width: 400px;" href="{{ url_for('device_details.device', device_id=device.id) }}">Подробнее</a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
 {% endblock %}
