@@ -89,7 +89,7 @@ class TextFieldView(ModelView):
         context: Context,
         model: Device,
         name: str,
-    ):
+    ) -> str:
         return (
             model.description[:50] + "..."
             if len(
