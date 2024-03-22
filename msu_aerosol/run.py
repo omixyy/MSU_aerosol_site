@@ -1,5 +1,4 @@
 from flask import Flask
-from users.views import register_bp
 
 from device.views import device_bp
 from homepage.views import home_bp
@@ -7,6 +6,7 @@ from msu_aerosol import config
 from msu_aerosol.admin import init_admin
 from msu_aerosol.graph_funcs import make_graph, preprocessing_all_files
 from msu_aerosol.models import db
+from users.views import register_bp
 
 __all__: list = []
 
