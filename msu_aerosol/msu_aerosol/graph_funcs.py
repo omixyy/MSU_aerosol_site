@@ -46,7 +46,6 @@ def load_graph() -> None:
 def preprocessing_one_file(path):
     _, device, file_name = path.split("/")
     df = pd.read_csv(path, sep=None, engine="python")
-
     time_col = load_json(
         "msu_aerosol/config_devices.json",
     )[
