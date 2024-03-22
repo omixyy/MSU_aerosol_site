@@ -1,4 +1,5 @@
 from flask import Flask
+from users.views import register_bp
 
 from device.views import device_bp
 from homepage.views import home_bp
@@ -12,6 +13,7 @@ __all__: list = []
 app: Flask = config.initialize_flask_app(__name__)
 app.register_blueprint(home_bp, name="home")
 app.register_blueprint(device_bp, name="device_details")
+app.register_blueprint(register_bp, name="registration")
 init_admin(app)
 db.init_app(app)
 
