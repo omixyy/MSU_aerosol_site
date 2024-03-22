@@ -21,6 +21,15 @@ admin: Admin = Admin(
 )
 
 
+def get_complexes_dict() -> dict:
+    return {
+        com: Device.query.filter(
+            Device.complex_id == com.id,
+        ).all()
+        for com in Complex.query.all()
+    }
+
+
 def init_admin(app: Flask):
     admin.init_app(app)
     admin.add_view(ModelView(Complex, db.session))
