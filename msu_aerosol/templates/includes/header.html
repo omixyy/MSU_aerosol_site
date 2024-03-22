@@ -18,11 +18,38 @@
           <a class="nav-link {% if view_name == 'about' %} active {% endif %}" href="#">О сайте</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if view_name == 'devices' %} active {% endif %}" href="#">Приборы</a>
+          <a class="nav-link {% if view_name == 'devices' %} active {% endif %}" href="#">Контакты</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link {% if view_name == 'contacts' %} active {% endif %}" href="#">Контакты</a>
-        </li>
+        <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Приборы
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
+                {% for _, devices in complex_to_device.items() %}
+                  {% for dev in devices %}
+                    <li><a class="dropdown-item" href="{% if view_name != 'homepage' %} {{ url_for('home.index') }}#dev{{ dev.id }} {% else %} #dev{{ dev.id }} {% endif %}">{{ dev }}</a></li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Комплексы
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
+                {% for com, _ in complex_to_device.items() %}
+                  <li><a class="dropdown-item" href="{% if view_name != 'homepage' %} {{ url_for('home.index') }}#com{{ com.id }} {% else %} #com{{ com.id }} {% endif %}">{{ com }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+          </ul>
+        </div>
       </ul>
     </div>
     <button type="button" class="btn btn-outline-dark" style="margin-right: 15px">Войти</button>
