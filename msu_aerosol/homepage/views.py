@@ -2,8 +2,8 @@ from datetime import datetime
 
 from flask import Blueprint, render_template
 
-from msu_aerosol.models import Complex, Device
 from msu_aerosol.admin import get_complexes_dict
+from msu_aerosol.models import Complex, Device
 
 __all__: list = []
 
