@@ -2,7 +2,8 @@ from datetime import datetime
 
 from flask import Blueprint, render_template
 
-from msu_aerosol import models
+from msu_aerosol.models import Complex, Device
+from msu_aerosol.admin import get_complexes_dict
 
 __all__: list = []
 
@@ -11,13 +12,7 @@ home_bp: Blueprint = Blueprint("home", __name__, url_prefix="/")
 
 @home_bp.route("/")
 def index() -> str:
-    all_complexes: list[models.Device] = models.Complex.query.all()
-    complex_to_device: dict[models.Complex, models.Device] = {
-        com: models.Device.query.filter(
-            models.Device.complex_id == com.id,
-        ).all()
-        for com in all_complexes
-    }
+    complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
     return render_template(
         "homepage/home.html",
         now=datetime.now(),
