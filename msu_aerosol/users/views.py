@@ -1,10 +1,10 @@
 from datetime import datetime
 
 from flask import Blueprint, redirect, render_template
-from users.forms import RegisterForm
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from msu_aerosol.admin import get_complexes_dict
+from users.forms import RegisterForm
 
 __all__: list = []
 
