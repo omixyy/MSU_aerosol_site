@@ -1,0 +1,30 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+<a href="{{ url_for('home.index') }}">На главную</a>
+<form method="POST">
+  {% for dev, tc in time_cols.items() %}
+    <h3>{{ dev }}</h3>
+    <h6>Выберите столбец со временем</h6>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="{{ dev }}" id="{{ "flexRadioDefault1" ~ dev ~ loop.index }}" {% if loop.first %} checked {% endif %}>
+      <label class="form-check-label" for={{ "flexRadioDefault1" ~ dev ~ loop.index }}>
+        {{ tc }} 
+      </label>
+    </div>
+    {% for device, columns in cols.items() %}
+      {% if device == dev %}
+        {% for col in columns %}
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name={{ col ~ "_" ~ dev }} id={{ "flexCheckDefault" ~ dev ~ loop.index }} checked>
+            <label class="form-check-label" for={{ "flexCheckDefault" ~ dev ~ loop.index }}>
+              {{ col }}
+            </label>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+    <br>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary" style="margin-top: 50px">Подтвердить</button>
+</form>
+{% endblock %}
