@@ -18,15 +18,15 @@ __all__ = []
 
 class AdminHomeView(AdminIndexView):
     def __init__(
-            self,
-            name=None,
-            category=None,
-            endpoint=None,
-            url=None,
-            template="admin/index.html",
-            menu_class_name=None,
-            menu_icon_type=None,
-            menu_icon_value=None,
+        self,
+        name=None,
+        category=None,
+        endpoint=None,
+        url=None,
+        template="admin/index.html",
+        menu_class_name=None,
+        menu_icon_type=None,
+        menu_icon_value=None,
     ) -> None:
         super().__init__(
             name,
@@ -42,10 +42,9 @@ class AdminHomeView(AdminIndexView):
     @expose("/", methods=["GET", "POST"])
     def create_settings_form(self) -> str:
         all_devices = Device.query.all()
-        with Path("msu_aerosol/config_devices.json", "r").open() as jsonf:
+        with Path("msu_aerosol/config_devices.json").open() as jsonf:
             data = json.load(jsonf)
             cols = {dev: data[dev]["cols"] for dev in data.keys()}
-            print(cols)
             time_cols = {dev: data[dev]["time_cols"] for dev in data.keys()}
         return self.render(
             "admin/admin_home.html",

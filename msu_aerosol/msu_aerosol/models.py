@@ -55,6 +55,10 @@ class Device(db.Model):
         db.Text,
         nullable=False,
     )
+    show = db.Column(
+        db.Boolean,
+        nullable=False,
+    )
     name_on_disk = db.Column(
         db.String,
         nullable=True,
