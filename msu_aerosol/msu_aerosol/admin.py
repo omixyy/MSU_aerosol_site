@@ -1,9 +1,10 @@
-from flask import Flask, request
+import json
+from pathlib import Path
+
+from flask import Flask
 from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
-
-import json
 
 from msu_aerosol.models import (
     Complex,
@@ -17,42 +18,41 @@ __all__ = []
 
 class AdminHomeView(AdminIndexView):
     def __init__(
-            self, 
-            name=None, 
-            category=None, 
-            endpoint=None, 
-            url=None, 
-            template='admin/index.html', 
-            menu_class_name=None, 
-            menu_icon_type=None, 
+            self,
+            name=None,
+            category=None,
+            endpoint=None,
+            url=None,
+            template="admin/index.html",
+            menu_class_name=None,
+            menu_icon_type=None,
             menu_icon_value=None,
-        ) -> None:
+    ) -> None:
         super().__init__(
-            name, 
-            category, 
-            endpoint, 
-            url, 
-            template, 
-            menu_class_name, 
-            menu_icon_type, 
+            name,
+            category,
+            endpoint,
+            url,
+            template,
+            menu_class_name,
+            menu_icon_type,
             menu_icon_value,
         )
 
     @expose("/", methods=["GET", "POST"])
     def create_settings_form(self) -> str:
-        if request.method == "GET":
-            all_devices = Device.query.all()
-            with open("msu_aerosol/config_devices.json", "r") as jsonf:
-                data = json.load(jsonf)
-                cols = {dev: data[dev]["cols"] for dev in data.keys()}
-                print(cols)
-                time_cols = {dev: data[dev]["time_cols"] for dev in data.keys()}
-            return self.render(
-                "admin/admin_home.html",
-                devices=all_devices,
-                time_cols=time_cols,
-                cols=cols,
-            )
+        all_devices = Device.query.all()
+        with Path("msu_aerosol/config_devices.json", "r").open() as jsonf:
+            data = json.load(jsonf)
+            cols = {dev: data[dev]["cols"] for dev in data.keys()}
+            print(cols)
+            time_cols = {dev: data[dev]["time_cols"] for dev in data.keys()}
+        return self.render(
+            "admin/admin_home.html",
+            devices=all_devices,
+            time_cols=time_cols,
+            cols=cols,
+        )
 
 
 admin: Admin = Admin(
