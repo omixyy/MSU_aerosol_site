@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask import Blueprint, redirect, render_template
+from flask_login import current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from msu_aerosol.admin import get_complexes_dict
@@ -44,4 +45,5 @@ def register():
         complex_to_device=complex_to_device,
         now=datetime.now(),
         view_name="registration",
+        user=current_user,
     )
