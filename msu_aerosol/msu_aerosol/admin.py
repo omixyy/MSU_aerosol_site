@@ -1,7 +1,9 @@
+import csv
 import json
+import os
 from pathlib import Path
 
-from flask import Flask
+from flask import Flask, request
 from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
@@ -41,16 +43,62 @@ class AdminHomeView(AdminIndexView):
 
     @expose("/", methods=["GET", "POST"])
     def create_settings_form(self) -> str:
-        all_devices = Device.query.all()
-        with Path("msu_aerosol/config_devices.json").open() as jsonf:
-            data = json.load(jsonf)
-            cols = {dev: data[dev]["cols"] for dev in data.keys()}
-            time_cols = {dev: data[dev]["time_cols"] for dev in data.keys()}
+        complex_to_devices: dict = get_complexes_dict()
+        device_to_cols: dict = {}
+        device_to_time_cols: dict = {}
+        for _, devices in complex_to_devices.items():
+            for dev in devices:
+                dialect = get_dialect(
+                    f"external_data/"
+                    f"{dev}/"
+                    f"{os.listdir(f'external_data/{dev}')[0]}",
+                )
+
+                with Path(
+                    f"external_data/"
+                    f"{dev}/"
+                    f"{os.listdir(f'external_data/{dev}')[0]}",
+                ).open("r") as csv_file:
+                    header = list(csv.reader(csv_file, dialect=dialect))[0]
+                    device_to_cols[dev] = list(
+                        filter(
+                            lambda x: "date" not in x.lower()
+                            and "time" not in x.lower(),
+                            header,
+                        ),
+                    )
+
+                    device_to_time_cols[dev] = list(
+                        filter(
+                            lambda x: "date" in x.lower()
+                            or "time" in x.lower(),
+                            header,
+                        ),
+                    )
+
+        if request.method == "GET":
+            with Path("msu_aerosol/config_devices.json").open("r") as config:
+                data = json.load(config)
+
+        elif request.method == "POST":
+            with Path("msu_aerosol/config_devices.json").open("w") as config:
+                data = {
+                    dev.name_on_disk: {
+                        "time_cols": request.form.get(f"{dev.name}_rb"),
+                        "cols": request.form.getlist(f"{dev.name}_cb"),
+                        "format": request.form.get(
+                            f"datetime_format_{dev.name}",
+                        ),
+                    }
+                    for dev in Device.query.all()
+                }
+                json.dump(data, config, indent=2)
+
         return self.render(
             "admin/admin_home.html",
-            devices=all_devices,
-            time_cols=time_cols,
-            cols=cols,
+            device_to_cols=device_to_cols,
+            device_to_time_cols=device_to_time_cols,
+            data=data,
         )
 
 
@@ -71,6 +119,11 @@ def get_complexes_dict() -> dict:
         ).all()
         for com in Complex.query.all()
     }
+
+
+def get_dialect(path: str) -> csv.Dialect:
+    with Path(path).open("r") as f:
+        return csv.Sniffer().sniff(f.readline())
 
 
 def init_admin(app: Flask):
