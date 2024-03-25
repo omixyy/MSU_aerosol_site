@@ -12,26 +12,40 @@
       "BB(%)",
       "BCbb",
       "BCff"
-    ]
+    ],
+    "format": "%d.%m.%Y %H:%M"
+  },
+  "TCA08": {
+    "time_cols": "EndTimeUTC",
+    "cols": [
+      "TCconc",
+      "AE33_BC6",
+      "AE33_ValidData",
+      "AE33_b",
+      "OC",
+      "CO2",
+      "Volume",
+      "Chamber"
+    ],
+    "format": "%Y-%m-%d %H:%M:%S"
   },
   "LVS": {
     "time_cols": "Date",
     "cols": [
-      "Motorspeed(%)",
-      "Actual(m3/h)",
       "Actual(Nm3/h)",
-      "Actual(m3)",
       "Actual(Nm3)",
-      "Filter Press.(hPa)",
-      "Air Pressure(hPa)",
-      "Outdoor Temp.('C)",
-      "Filter Temp.('C)",
-      "Chamber Temp.('C)",
-      "Temperature orifice('C)",
-      "Rel.Humidity(%)",
-      "Magazine Position",
-      "Sample ID"
-    ]
+      "Filter Press.(hPa)"
+    ],
+    "format": "%d.%m.%Y %H:%M:%S"
+  },
+  "Web_MEM": {
+    "time_cols": "datetime",
+    "cols": [
+      "CO",
+      "NO",
+      "NO2"
+    ],
+    "format": "%d.%m.%Y %H:%M"
   },
   "PNS": {
     "time_cols": "Date",
@@ -39,44 +53,10 @@
       "Motorspeed(%)",
       "Actual(m3/h)",
       "Actual(Nm3/h)",
-      "Actual(m3)",
-      "Actual(Nm3)",
-      "Filter Press.(hPa)",
-      "Air Pressure(hPa)",
-      "Outdoor Temp.('C)",
-      "Filter Temp.('C)",
       "Chamber Temp.('C)",
       "Temperature orifice('C)",
-      "Rel.Humidity(%)",
-      "Magazine Position",
-      "Sample ID"
-    ]
-  },
-  "TCA08": {
-    "time_cols": "EndTimeUTC",
-    "cols": [
-      "TCcounts",
-      "TCmass",
-      "TCconc",
-      "AE33_BC6",
-      "AE33_ValidData",
-      "AE33_b",
-      "OC",
-      "EC",
-      "CO2"
-    ]
-  },
-  "Web_MEM": {
-    "time_cols": "datetime",
-    "cols": [
-      "CH4",
-      "CO",
-      "NO",
-      "NO2",
-      "OZ",
-      "PM10",
-      "PM2.5",
-      "SO2"
-    ]
+      "Rel.Humidity(%)"
+    ],
+    "format": "%d.%m.%Y %H:%M:%S"
   }
 }
