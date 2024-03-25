@@ -2,6 +2,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 
 import pandas as pd
 import plotly.express as px
@@ -14,119 +15,95 @@ def load_json(path: str):
     return json.load(open(path, "r"))
 
 
-def load_graph() -> None:
-    data = pd.read_excel(
-        "external_data/AE33-S09-01249/2023_07_AE33-S09-01249.xlsx",
-    )
-    data["day"] = data["Datetime"].apply(
-        lambda x: "-".join(x.split()[0].split(".")[::-1]) + " " + x.split()[1],
-    )
-    data["day"] = pd.to_datetime(
-        data["day"],
-        format="%Y-%m-%d %H:%M",
-    )
-    m = max(data["day"])
-    cols = list(set(data.columns.to_list()) - set("Datetime", "date"))
-    last_48_hours = [m.replace(day=(m.day - 2)), max(data["day"])]
-    fig = px.line(data, x="day", y=cols, range_x=last_48_hours)
-    fig.update_layout(legend_itemclick="toggle")
-    offline.plot(
-        fig,
-        filename="templates/graph.html",
-        auto_open=False,
-    )
+config_devices_open = load_json("msu_aerosol/config_devices.json")
+list_devices = list(config_devices_open.keys())
+disk_path = "external_data"
+main_path = "data"
+
+
+def preprocessing_all_files():
+    for name_folder in list_devices:
+        for name_file in os.listdir(f"{disk_path}/{name_folder}"):
+            if name_file.endswith(".csv"):
+                if not Path(f"{main_path}/{name_folder}").exists():
+                    Path(f"{main_path}/{name_folder}").mkdir(parents=True)
+                shutil.copy(
+                    f"{disk_path}/{name_folder}/{name_file}",
+                    f"{main_path}/{name_folder}/{name_file}",
+                )
+    for name_folder in os.listdir(f"{main_path}"):
+        for name_file in os.listdir(f"{main_path}/{name_folder}"):
+            preprocessing_one_file(f"{main_path}/{name_folder}/{name_file}")
 
 
 def preprocessing_one_file(path):
     _, device, file_name = path.split("/")
-    df = pd.read_csv(path, sep=None, engine="python")
-    time_col = load_json(
-        "msu_aerosol/config_devices.json",
-    )[
-        device
-    ]["time_cols"]
-    if device == "AE33-S09-01249":
-        df[time_col] = pd.to_datetime(df[time_col], format="%d.%m.%Y %H:%M")
-    if device == "LVS" or device == "PNS":
-        col = list(df.columns)
-        df = df.drop("Error", axis=1)
-        col.remove("Time")
-        df.columns = col
-        df[time_col] = pd.to_datetime(df[time_col], format="%d.%m.%Y %H:%M:%S")
-    if device == "TCA08":
-        df[time_col] = pd.to_datetime(df[time_col], format="%Y-%m-%d %H:%M:%S")
-    if device == "Web_MEM":
-        df[time_col] = pd.to_datetime(
-            df[time_col],
-            format="%d.%m.%Y %H:%M",
-        )
-    cols_to_draw = load_json(
-        "msu_aerosol/config_devices.json",
-    )[
-        device
-    ]["cols"]
-    time_col = load_json(
-        "msu_aerosol/config_devices.json",
-    )[
-        device
-    ]["time_cols"]
-    df = df[cols_to_draw + [time_col]]
+    df = pd.read_csv(path, sep=None, engine="python", decimal=",")
+    config_device_open = config_devices_open[device]
+    time_col = config_device_open["time_cols"]
+    df = df[[time_col] + config_device_open["cols"]]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
-    name = re.split("[-_]", file_name)
     if not Path(f"proc_data/{device}").exists():
         Path(f"proc_data/{device}").mkdir(parents=True)
+    df[time_col] = pd.to_datetime(
+        df[time_col], format=config_device_open["format"],
+    )
+    df = df.sort_values(by=time_col)
+    diff_mode = df[time_col].diff().mode().values[0] * 1.1
+    new_rows = []
+    for i in range(len(df) - 1):
+        diff = df.loc[i + 1, time_col] - df.loc[i, time_col]
+        if diff > diff_mode:
+            new_date1 = df.loc[i, time_col] + pd.Timedelta(seconds=1)
+            new_date2 = df.loc[i + 1, time_col] - pd.Timedelta(seconds=1)
+            new_row1 = {time_col: new_date1}
+            new_row2 = {time_col: new_date2}
+            new_rows.extend([new_row1, new_row2])
+    df = pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True)
+    df = df.sort_values(by=time_col)
+    name = re.split("[-_]", file_name)
     df.to_csv(f"proc_data/{device}/{name[0]}_{name[1]}.csv", index=False)
     return f"proc_data/{device}/{name[0]}_{name[1]}.csv"
-
-
-def preprocessing_all_files():
-    for path in os.listdir("external_data"):
-        for file in os.listdir(f"external_data/{path}"):
-            if file.endswith(".csv"):
-                preprocessing_one_file(f"external_data/{path}/{file}")
 
 
 def make_graph(device):
     combined_data = pd.DataFrame()
     for i in os.listdir(f"proc_data/{device}"):
         data = pd.read_csv(f"proc_data/{device}/{i}")
-        combined_data = pd.concat(
-            [combined_data, data],
-            ignore_index=True,
-        )
-        break
-    time_col = json.load(
-        open(
-            "msu_aerosol/config_devices.json",
-            "r",
-        ),
-    )[
-        device
-    ]["time_cols"]
-    combined_data.set_index(time_col, inplace=True)
-    combined_data = combined_data.replace(
-        ",",
-        ".",
-        regex=True,
-    ).astype(float)
-    combined_data.reset_index(inplace=True)
+        combined_data = pd.concat([combined_data, data], ignore_index=True)
+    device_dict = load_json("msu_aerosol/config_devices.json")[device]
+    time_col = device_dict["time_cols"]
     m = pd.to_datetime(max(combined_data[time_col]))
     last_48_hours = [m.replace(day=(m.day - 2)), m]
-    cols_to_draw = json.load(
-        open(
-            "msu_aerosol/config_devices.json",
-            "r",
-        ),
-    )[
-        device
-    ]["cols"]
     fig = px.line(
         combined_data,
         x=time_col,
-        y=cols_to_draw,
+        y=device_dict["cols"],
         range_x=last_48_hours,
     )
-    fig.update_layout(legend_itemclick="toggle")
+    fig.update_layout(
+        title=str(device),
+        xaxis={"title": "Time"},
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        showlegend=True,
+    )
+    fig.update_traces(line={"width": 2})
+    fig.update_xaxes(
+        gridcolor="grey",
+        showline=True,
+        linewidth=1,
+        linecolor="black",
+        mirror=True,
+        tickformat="%d.%m.%Y",
+    )
+    fig.update_yaxes(
+        gridcolor="grey",
+        showline=True,
+        linewidth=1,
+        linecolor="black",
+        mirror=True,
+    )
     offline.plot(
         fig,
         filename=f"templates/includes/devices/graph_{device}.html",
