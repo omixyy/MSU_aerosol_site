@@ -46,7 +46,8 @@ def preprocessing_one_file(path):
     if not Path(f"proc_data/{device}").exists():
         Path(f"proc_data/{device}").mkdir(parents=True)
     df[time_col] = pd.to_datetime(
-        df[time_col], format=config_device_open["format"],
+        df[time_col],
+        format=config_device_open["format"],
     )
     df = df.sort_values(by=time_col)
     diff_mode = df[time_col].diff().mode().values[0] * 1.1
