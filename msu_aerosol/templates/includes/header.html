@@ -29,7 +29,9 @@
               <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
                 {% for _, devices in complex_to_device.items() %}
                   {% for dev in devices %}
-                    <li><a class="dropdown-item" href="{% if view_name != 'homepage' %} {{ url_for('home.index') }}#dev{{ dev.id }} {% else %} #dev{{ dev.id }} {% endif %}">{{ dev }}</a></li>
+                    {% if dev.show %}
+                      <li><a class="dropdown-item" href="{% if view_name != 'homepage' %} {{ url_for('home.index') }}#dev{{ dev.id }} {% else %} #dev{{ dev.id }} {% endif %}">{{ dev }}</a></li>
+                    {% endif %}
                   {% endfor %}
                 {% endfor %}
               </ul>

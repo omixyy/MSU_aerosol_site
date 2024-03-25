@@ -1,21 +1,39 @@
 {% extends 'admin/master.html' %}
 {% block body %}
 <a href="{{ url_for('home.index') }}">На главную</a>
+{% for dev, _ in device_to_time_cols.items() %}
+  <a href="#dev{{ dev.id }}">{{ dev }}</a>
+{% endfor %}
 <form method="POST">
-  {% for dev, tc in time_cols.items() %}
-    <h3>{{ dev }}</h3>
-    <h6>Выберите столбец со временем</h6>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="{{ dev }}" id="{{ "flexRadioDefault1" ~ dev ~ loop.index }}" {% if loop.first %} checked {% endif %}>
-      <label class="form-check-label" for={{ "flexRadioDefault1" ~ dev ~ loop.index }}>
-        {{ tc }} 
-      </label>
+  {% for dev, tc in device_to_time_cols.items() %}
+    <br>
+    <div id="dev{{ dev.id }}">
+      <h3>{{ dev }}</h3>
     </div>
-    {% for device, columns in cols.items() %}
+    <h6>Выберите столбец со временем</h6>
+    <div name={{ dev }}>
+      {% for col in tc %}
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name={{ dev.name ~ "_rb" }} id="{{ "flexRadioDefault1" ~ dev ~ loop.index }}" value="{{ col }}" {% if loop.first and not data[dev.name_on_disk]["time_cols"] %} checked {% elif data and data[dev.name_on_disk]["time_cols"] == col %} checked {% endif %}>
+          <label class="form-check-label" for={{ "flexRadioDefault1" ~ dev ~ loop.index }}>
+            {{ col }} 
+          </label>
+        </div>
+      {% endfor %}
+      </div>
+    <br>
+    <h6>Опишите формат времени в файлах с данными</h6>
+    <input type="datetime_format" class="form-control" name={{ "datetime_format_" ~ dev.name }} id={{ "datetime_format" ~ dev.id }} placeholder="Datetime format" style="width: 30%" value={% if not data[dev.name_on_disk]["format"] %} "" {% else %} "{{ data[dev.name_on_disk]["format"] }}" {% endif %}>
+    <label class="form-control-label mb-4" for={{ "datetime_format" ~ dev.id }} style="font-size:13px;">
+      Например dd-mm-YYYY HH:MM:SS
+    </label>
+    <br>
+    <h6>Выберите столбцы, которые будут отображаться на графике</h6>
+    {% for device, columns in device_to_cols.items() %}
       {% if device == dev %}
         {% for col in columns %}
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name={{ col ~ "_" ~ dev }} id={{ "flexCheckDefault" ~ dev ~ loop.index }} checked>
+            <input class="form-check-input" type="checkbox" name={{ dev.name ~ "_cb" }} id={{ "flexCheckDefault" ~ dev ~ loop.index }} value="{{ col }}" {% if data and col in data[dev.name_on_disk]["cols"] %} checked {% endif %}>
             <label class="form-check-label" for={{ "flexCheckDefault" ~ dev ~ loop.index }}>
               {{ col }}
             </label>
@@ -23,8 +41,8 @@
         {% endfor %}
       {% endif %}
     {% endfor %}
-    <br>
+    <hr>
   {% endfor %}
-  <button type="submit" class="btn btn-primary" style="margin-top: 50px">Подтвердить</button>
+  <button type="submit" class="btn btn-primary mb-3" style="margin-top: 50px">Подтвердить</button>
 </form>
 {% endblock %}
