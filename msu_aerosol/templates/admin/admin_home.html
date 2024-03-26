@@ -25,7 +25,7 @@
     <h6>Опишите формат времени в файлах с данными</h6>
     <input type="datetime_format" class="form-control" name={{ "datetime_format_" ~ dev.name }} id={{ "datetime_format" ~ dev.id }} placeholder="Datetime format" style="width: 30%" value={% if not data[dev.name_on_disk]["format"] %} "" {% else %} "{{ data[dev.name_on_disk]["format"] }}" {% endif %}>
     <label class="form-control-label mb-4" for={{ "datetime_format" ~ dev.id }} style="font-size:13px;">
-      Например dd-mm-YYYY HH:MM:SS
+      Например %d-%m-%Y %H:%M:%S
     </label>
     <br>
     <h6>Выберите столбцы, которые будут отображаться на графике</h6>
