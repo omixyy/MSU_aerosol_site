@@ -1,12 +1,18 @@
 from datetime import datetime
 
-from flask import Blueprint, redirect, render_template, url_for, request, session
+from flask import (
+    Blueprint,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from msu_aerosol.admin import get_complexes_dict
-from msu_aerosol.models import User, db
-from users.forms import RegisterForm, LoginForm
+from msu_aerosol.models import db, User
+from users.forms import LoginForm, RegisterForm
 
 __all__: list = []
 
@@ -38,6 +44,7 @@ def login() -> str:
             user=current_user,
         )
 
+    return redirect("home.index")
 
 
 @register_bp.route("/register", methods=["GET", "POST"])
@@ -55,37 +62,36 @@ def register() -> str:
             user=current_user,
         )
 
-    elif request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        password_again = request.form.get("password_again")
-        email = request.form.get("email")
-        if password != password_again:
-            return render_template(
-                "users/register.html",
-                form=form,
-                error="Пароли не совпадают",
-                complex_to_device=complex_to_device,
-                now=datetime.now(),
-                view_name="registration",
-            )
-        
-        if User.query.filter_by(username=username).first():
-            return render_template(
-                "users/register.html",
-                form=form,
-                message="Пользователь с таким именем уже существует",
-                complex_to_device=complex_to_device,
-                now=datetime.now(),
-                view_name="registration",
-            )
-        
-        new_user = User(
-            username=username,
-            hashed_password=generate_password_hash(password),
-            email=email,
+    username = request.form.get("username")
+    password = request.form.get("password")
+    password_again = request.form.get("password_again")
+    email = request.form.get("email")
+    if password != password_again:
+        return render_template(
+            "users/register.html",
+            form=form,
+            error="Пароли не совпадают",
+            complex_to_device=complex_to_device,
+            now=datetime.now(),
+            view_name="registration",
         )
-    
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for("home.index"))
+
+    if User.query.filter_by(username=username).first():
+        return render_template(
+            "users/register.html",
+            form=form,
+            message="Пользователь с таким именем уже существует",
+            complex_to_device=complex_to_device,
+            now=datetime.now(),
+            view_name="registration",
+        )
+
+    new_user = User(
+        username=username,
+        hashed_password=generate_password_hash(password),
+        email=email,
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+    return redirect(url_for("home.index"))

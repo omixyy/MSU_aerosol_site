@@ -112,8 +112,9 @@ def make_graph(device):
     )
 
     combined_data_48 = combined_data.loc[
-        (last_48_hours[0] <= pd.to_datetime(combined_data[time_col])) & (
-                pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])]
+        (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
+        & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
+    ]
     fig = px.line(
         combined_data_48,
         x=time_col,
