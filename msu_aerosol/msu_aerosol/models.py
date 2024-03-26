@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask_admin.contrib.sqla import ModelView
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from wtforms.fields import TextAreaField
 
@@ -78,7 +79,7 @@ class Device(db.Model):
         return self.name_on_disk
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = "users"
 
     id = db.Column(
@@ -88,7 +89,7 @@ class User(db.Model):
     )
     username = db.Column(
         db.String,
-        nullable=True,
+        nullable=False,
     )
     email = db.Column(
         db.String,
@@ -98,7 +99,7 @@ class User(db.Model):
     )
     hashed_password = db.Column(
         db.String,
-        nullable=True,
+        nullable=False,
     )
     created_date = db.Column(
         db.DateTime,

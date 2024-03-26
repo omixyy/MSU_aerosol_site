@@ -7,10 +7,18 @@ from flask import (
     request,
     url_for,
 )
-from flask_login import current_user
-from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import (
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
+from werkzeug.security import (
+    check_password_hash,
+    generate_password_hash,
+)
 
-from msu_aerosol.admin import get_complexes_dict
+from msu_aerosol.admin import get_complexes_dict, login_manager
 from msu_aerosol.models import db, User
 from users.forms import LoginForm, RegisterForm
 
@@ -29,22 +37,50 @@ register_bp: Blueprint = Blueprint("register", __name__, url_prefix="/")
 login_bp: Blueprint = Blueprint("login", __name__, url_prefix="/")
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
 @login_bp.route("/login", methods=["GET", "POST"])
 def login() -> str:
     complex_to_device = get_complexes_dict()
     form = LoginForm()
-    if request.method == "GET":
-        return render_template(
-            "users/login.html",
-            title="Войти",
-            form=form,
-            complex_to_device=complex_to_device,
-            now=datetime.now(),
-            view_name="login",
-            user=current_user,
-        )
+    if request.method == "POST":
+        if form.validate_on_submit():
+            user = User.query.filter_by(username=form.username.data).first()
+            if user:
+                if check_password_hash(
+                    user.hashed_password,
+                    form.password.data,
+                ):
+                    login_user(user)
+                    return redirect(url_for("home.index", user=user))
 
-    return redirect("home.index")
+                return render_template(
+                    "users/login.html",
+                    form=form,
+                    message="Неверный пароль",
+                    complex_to_device=complex_to_device,
+                    now=datetime.now(),
+                    view_name="login",
+                )
+
+    return render_template(
+        "users/login.html",
+        form=form,
+        complex_to_device=complex_to_device,
+        now=datetime.now(),
+        view_name="login",
+        user=current_user,
+    )
+
+
+@login_bp.route("/logout", methods=["GET", "POST"])
+@login_required
+def logout() -> str:
+    logout_user()
+    return redirect(url_for("home.index"))
 
 
 @register_bp.route("/register", methods=["GET", "POST"])

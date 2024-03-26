@@ -7,6 +7,7 @@ from flask import Flask, request
 from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
+from flask_login import LoginManager
 
 from msu_aerosol.models import (
     Complex,
@@ -111,6 +112,8 @@ admin: Admin = Admin(
     ),
 )
 
+login_manager: LoginManager = LoginManager()
+
 
 def get_complexes_dict() -> dict:
     return {
@@ -127,6 +130,7 @@ def get_dialect(path: str) -> csv.Dialect:
 
 
 def init_admin(app: Flask):
+    login_manager.init_app(app)
     admin.init_app(app)
     admin.add_view(ModelView(Complex, db.session))
     admin.add_view(TextFieldView(Device, db.session))
