@@ -9,7 +9,7 @@ from msu_aerosol.graph_funcs import (
     preprocessing_all_files,
 )
 from msu_aerosol.models import db
-from users.views import register_bp, login_bp
+from users.views import login_bp, register_bp
 
 __all__: list = []
 
