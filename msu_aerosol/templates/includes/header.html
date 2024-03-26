@@ -54,7 +54,7 @@
         </div>
       </ul>
     </div>
-    <a type="button" href="{% if view_name != 'registration' %} {{ url_for('registration.register') }} {% else %} # {% endif %}" class="btn btn-outline-dark" style="margin-right: 15px">Войти</a>
+    <a type="button" href="{% if view_name not in ['registration', 'login'] %} {{ url_for('login.login') }} {% else %} # {% endif %}" class="btn btn-outline-dark" style="margin-right: 15px">Войти</a>
   </nav>
 </header>
 {% endblock header %}

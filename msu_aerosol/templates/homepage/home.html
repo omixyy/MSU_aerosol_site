@@ -15,7 +15,7 @@
             <div id="dev{{ device.id }}" style="width: 700px; height: 600px; text-align: center;">
               <h4 style="margin-top: 15px; margin-bottom: 20px;">{{ device.name }}</h4>
               <hr>
-              {% include "includes/devices/graph_" ~ device.name_on_disk ~ ".html" %}
+              {% include "includes/devices/recent/graph_" ~ device.name_on_disk ~ ".html" %}
               <a class="btn btn-dark" style="width: 400px;" href="{{ url_for('device_details.device', device_id=device.id) }}">Подробнее</a>
             </div>
           {% endif %}
