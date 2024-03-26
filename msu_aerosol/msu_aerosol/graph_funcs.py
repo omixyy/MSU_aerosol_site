@@ -107,6 +107,43 @@ def make_graph(device):
     )
     offline.plot(
         fig,
-        filename=f"templates/includes/devices/graph_{device}.html",
+        filename=f"templates/includes/devices/full/graph_{device}.html",
+        auto_open=False,
+    )
+
+    combined_data_48 = combined_data.loc[
+        (last_48_hours[0] <= pd.to_datetime(combined_data[time_col])) & (
+                pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])]
+    fig = px.line(
+        combined_data_48,
+        x=time_col,
+        y=device_dict["cols"],
+    )
+    fig.update_layout(
+        title=str(device),
+        xaxis={"title": "Time"},
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        showlegend=True,
+    )
+    fig.update_traces(line={"width": 2})
+    fig.update_xaxes(
+        gridcolor="grey",
+        showline=True,
+        linewidth=1,
+        linecolor="black",
+        mirror=True,
+        tickformat="%d.%m.%Y",
+    )
+    fig.update_yaxes(
+        gridcolor="grey",
+        showline=True,
+        linewidth=1,
+        linecolor="black",
+        mirror=True,
+    )
+    offline.plot(
+        fig,
+        filename=f"templates/includes/devices/recent/graph_{device}.html",
         auto_open=False,
     )
