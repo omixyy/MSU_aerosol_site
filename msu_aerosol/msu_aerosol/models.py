@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
 from wtforms.fields import TextAreaField
@@ -76,6 +78,37 @@ class Device(db.Model):
         return self.name_on_disk
 
 
+class User(db.Model):
+    __tablename__ = "users"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    username = db.Column(
+        db.String,
+        nullable=True,
+    )
+    email = db.Column(
+        db.String,
+        index=True,
+        unique=True,
+        nullable=True,
+    )
+    hashed_password = db.Column(
+        db.String,
+        nullable=True,
+    )
+    created_date = db.Column(
+        db.DateTime,
+        default=datetime.now(),
+    )
+
+    def __repr__(self):
+        return f"User ({self.id, self.username})"
+
+
 class TextFieldView(ModelView):
     column_list = (
         "id",
@@ -104,11 +137,6 @@ class TextFieldView(ModelView):
             > 50
             else model.description
         )
-
-    def on_model_change(self, form, model, is_created) -> None:
-        print(type(form), model)
-        if is_created:
-            ...
 
     column_formatters = {
         "description": description_formatter,
