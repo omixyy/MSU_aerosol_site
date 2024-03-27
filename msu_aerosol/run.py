@@ -22,12 +22,12 @@ init_admin(app)
 db.init_app(app)
 
 with app.app_context():
-    preprocessing_all_files()
-    make_graph("AE33-S09-01249")
-    make_graph("LVS")
-    make_graph("PNS")
-    make_graph("TCA08")
-    make_graph("Web_MEM")
+    # preprocessing_all_files()
+    # make_graph("AE33-S09-01249")
+    # make_graph("LVS")
+    # make_graph("PNS")
+    # make_graph("TCA08")
+    # make_graph("Web_MEM")
     db.create_all()
 
 
