@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask import Blueprint, render_template
+from flask_login import current_user
 
 from msu_aerosol.admin import get_complexes_dict
 from msu_aerosol.models import Complex, Device
@@ -22,4 +23,5 @@ def device(device_id: int) -> str:
         device=device,
         complex=complex,
         complex_to_device=complex_to_device,
+        user=current_user,
     )

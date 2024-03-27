@@ -1,7 +1,7 @@
 from flask import Flask
 
-from device.views import device_bp
-from homepage.views import home_bp
+from views.device import device_bp
+from views.homepage import home_bp
 from msu_aerosol import config
 from msu_aerosol.admin import init_admin
 from msu_aerosol.graph_funcs import (
@@ -9,7 +9,7 @@ from msu_aerosol.graph_funcs import (
     preprocessing_all_files,
 )
 from msu_aerosol.models import db
-from users.views import login_bp, register_bp
+from views.users import login_bp, register_bp
 
 __all__: list = []
 
@@ -22,12 +22,12 @@ init_admin(app)
 db.init_app(app)
 
 with app.app_context():
-    preprocessing_all_files()
-    make_graph("AE33-S09-01249")
-    make_graph("LVS")
-    make_graph("PNS")
-    make_graph("TCA08")
-    make_graph("Web_MEM")
+    # preprocessing_all_files()
+    # make_graph("AE33-S09-01249")
+    # make_graph("LVS")
+    # make_graph("PNS")
+    # make_graph("TCA08")
+    # make_graph("Web_MEM")
     db.create_all()
 
 

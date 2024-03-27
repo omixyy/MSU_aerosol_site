@@ -20,7 +20,7 @@ from werkzeug.security import (
 
 from msu_aerosol.admin import get_complexes_dict, login_manager
 from msu_aerosol.models import db, User
-from users.forms import LoginForm, RegisterForm
+from forms.user_forms import LoginForm, RegisterForm
 
 __all__: list = []
 
