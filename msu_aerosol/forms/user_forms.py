@@ -45,13 +45,13 @@ class LoginForm(FlaskForm):
 class ProfileForm(FlaskForm):
     username = StringField(
         "Логин",
-        validators=[DataRequired()]
+        validators=[DataRequired()],
     )
     first_name = StringField("Имя")
     last_name = StringField("Фамилия")
     email = StringField(
         "Почта",
-        validators=[DataRequired()]
+        validators=[DataRequired()],
     )
     is_admin = StringField(
         "Является ли админом",

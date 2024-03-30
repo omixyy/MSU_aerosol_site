@@ -14,12 +14,8 @@ from msu_aerosol.models import (
     db,
     Device,
     TextFieldView,
-    UserFieldView,
     User,
-)
-from msu_aerosol.graph_funcs import (
-    preprocessing_one_file,
-    make_graph,
+    UserFieldView,
 )
 
 __all__ = []
@@ -82,19 +78,25 @@ class AdminHomeView(AdminIndexView):
                             header,
                         ),
                     )
-                
-                with Path("msu_aerosol/config_devices.json").open("r") as config:
+
+                with Path(
+                    "msu_aerosol/config_devices.json",
+                ).open("r") as config:
                     data = json.load(config)
                     if dev.name_on_disk not in data:
                         data[dev.name_on_disk] = {
                             "cols": [],
-                            "time_cols": []
+                            "time_cols": [],
                         }
                         data[dev.name_on_disk]["cols"] = device_to_cols[dev]
-                        data[dev.name_on_disk]["time_cols"] = device_to_time_cols[dev]
-                        with Path("msu_aerosol/config_devices.json").open("w") as write_config:
+                        data[dev.name_on_disk]["time_cols"] = (
+                            device_to_time_cols[dev]
+                        )
+                        with Path(
+                            "msu_aerosol/config_devices.json",
+                        ).open("w") as write_config:
                             json.dump(data, write_config, indent=2)
-                        
+
                         # TODO: копировать файл из external_data в data
 
         if request.method == "GET":

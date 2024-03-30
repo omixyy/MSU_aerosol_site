@@ -18,7 +18,7 @@ from werkzeug.security import (
     generate_password_hash,
 )
 
-from forms.user_forms import LoginForm, RegisterForm, ProfileForm
+from forms.user_forms import LoginForm, ProfileForm, RegisterForm
 from msu_aerosol.admin import get_complexes_dict, login_manager
 from msu_aerosol.models import db, User
 
@@ -93,17 +93,16 @@ def login() -> str:
                     view_name="login",
                     user=current_user,
                 )
-            
-            else:
-                return render_template(
-                    "users/login.html",
-                    form=form,
-                    message="Не существует такого пользователя",
-                    complex_to_device=complex_to_device,
-                    now=datetime.now(),
-                    view_name="login",
-                    user=current_user,
-                )
+
+            return render_template(
+                "users/login.html",
+                form=form,
+                message="Не существует такого пользователя",
+                complex_to_device=complex_to_device,
+                now=datetime.now(),
+                view_name="login",
+                user=current_user,
+            )
 
     return render_template(
         "users/login.html",

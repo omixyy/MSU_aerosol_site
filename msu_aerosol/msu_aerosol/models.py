@@ -138,7 +138,7 @@ class UserFieldView(ModelView):
         "admin",
         "can_upload_data",
         "avatar",
-    ) 
+    )
 
 
 class TextFieldView(ModelView):
