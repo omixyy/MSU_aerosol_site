@@ -1,47 +1,23 @@
-<form action="" method="post">
-  {{ form.hidden_tag() }}
-  {% if message %}
-    <div class="alert alert-danger" role="alert">
-      {{ message }}
+<form method='POST'>
+  {% if message_success %}
+    <div class="alert alert-success" role="alert">
+      {{ message_success }}
     </div>
   {% endif %}
-  {% if form.email %}
-    {{ form.email.label }}<br>
-    {{ form.email(class="form-control", type="email") }}<br>
-    {% for error in form.email.errors %}
-      <div class="alert alert-danger" role="alert">
-        {{ error }}
-      </div>
-    {% endfor %}
-  {% endif %}
-  <p>
-    {{ form.username.label }}<br>
-    {{ form.username(class="form-control") }}<br>
-    {% for error in form.username.errors %}
-      <p class="alert alert-danger" role="alert">
-        {{ error }}
-      </p>
-    {% endfor %}
-  </p>
-  <p>
-    {{ form.password.label }}<br>
-    {{ form.password(class="form-control", type="password") }}<br>
-    {% for error in form.password.errors %}
-      <p class="alert alert-danger" role="alert">
-        {{ error }}
-      </p>
-    {% endfor %}
-  </p>
-  {% if form.password_again %}
-    <p>
-      {{ form.password_again.label }}<br>
-      {{ form.password_again(class="form-control", type="password") }}<br>
-      {% for error in form.password_again.errors %}
-        <p class="alert alert-danger" role="alert">
-          {{ error }}
-        </p>
-      {% endfor %}
-    </p>
-  {% endif %}
-  <p>{{ form.submit(type="submit", class="btn btn-dark") }}</p>
+  <div>
+    {{ form.csrf_token }}
+  </div>
+  {% for field in form if field.name != 'csrf_token' %}
+    <div class="mb-3">
+      {% if field.name != 'submit' %}
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        {{ field(class="form-control") }}
+        {% if field.help_text %}
+          <div class="form-text">{{ field.help_text }}</div>
+        {% endif %}
+      {% else %}
+        {{ field(class="btn btn-dark mt-5", type="submit") }}
+      {% endif %}
+    </div>
+  {% endfor %}
 </form>

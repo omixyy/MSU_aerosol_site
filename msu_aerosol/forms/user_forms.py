@@ -1,6 +1,5 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField,
     EmailField,
     PasswordField,
     StringField,
@@ -40,5 +39,30 @@ class LoginForm(FlaskForm):
         "Пароль",
         validators=[DataRequired()],
     )
-    remember_me = BooleanField("Запомнить меня")
     submit = SubmitField("Войти")
+
+
+class ProfileForm(FlaskForm):
+    username = StringField(
+        "Логин",
+        validators=[DataRequired()]
+    )
+    first_name = StringField("Имя")
+    last_name = StringField("Фамилия")
+    email = StringField(
+        "Почта",
+        validators=[DataRequired()]
+    )
+    is_admin = StringField(
+        "Является ли админом",
+        render_kw={"readonly": True},
+    )
+    created_date = StringField(
+        "Когда зарегистрирован",
+        render_kw={"readonly": True},
+    )
+    can_upload_data = StringField(
+        "Может ли загруать данные",
+        render_kw={"readonly": True},
+    )
+    submit = SubmitField("Сохранить")

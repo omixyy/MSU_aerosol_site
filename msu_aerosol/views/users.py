@@ -18,28 +18,55 @@ from werkzeug.security import (
     generate_password_hash,
 )
 
-from forms.user_forms import LoginForm, RegisterForm
+from forms.user_forms import LoginForm, RegisterForm, ProfileForm
 from msu_aerosol.admin import get_complexes_dict, login_manager
 from msu_aerosol.models import db, User
 
 __all__: list = []
 
 
-def set_password(self, password: str) -> None:
-    self.hashed_password = generate_password_hash(password)
-
-
-def check_password(self, password: str) -> bool:
-    return check_password_hash(self.hashed_password, password)
-
-
 register_bp: Blueprint = Blueprint("register", __name__, url_prefix="/")
 login_bp: Blueprint = Blueprint("login", __name__, url_prefix="/")
+profile_bp: Blueprint = Blueprint("profile", __name__, url_prefix="/")
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@profile_bp.route("/profile", methods=["GET", "POST"])
+@login_required
+def user_profile() -> str:
+    complex_to_device = get_complexes_dict()
+    form = ProfileForm(obj=current_user)
+    print(current_user.created_date)
+    if request.method == "POST":
+        if form.validate_on_submit():
+            current_user.username = request.form.get("username")
+            current_user.first_name = request.form.get("first_name")
+            current_user.last_name = request.form.get("last_name")
+            current_user.email = request.form.get("email")
+            db.session.commit()
+
+        return render_template(
+            "users/profile.html",
+            now=datetime.now(),
+            complex_to_device=complex_to_device,
+            view_name="profile",
+            user=current_user,
+            form=form,
+            message_success="Данные успешно сохранены",
+        )
+
+    return render_template(
+        "users/profile.html",
+        now=datetime.now(),
+        complex_to_device=complex_to_device,
+        view_name="profile",
+        user=current_user,
+        form=form,
+    )
 
 
 @login_bp.route("/login", methods=["GET", "POST"])
@@ -51,7 +78,7 @@ def login() -> str:
             user = User.query.filter_by(username=form.username.data).first()
             if user:
                 if check_password_hash(
-                    user.hashed_password,
+                    user.password,
                     form.password.data,
                 ):
                     login_user(user)
@@ -64,6 +91,18 @@ def login() -> str:
                     complex_to_device=complex_to_device,
                     now=datetime.now(),
                     view_name="login",
+                    user=current_user,
+                )
+            
+            else:
+                return render_template(
+                    "users/login.html",
+                    form=form,
+                    message="Не существует такого пользователя",
+                    complex_to_device=complex_to_device,
+                    now=datetime.now(),
+                    view_name="login",
+                    user=current_user,
                 )
 
     return render_template(
@@ -124,7 +163,7 @@ def register() -> str:
 
     new_user = User(
         username=username,
-        hashed_password=generate_password_hash(password),
+        password=generate_password_hash(password),
         email=email,
     )
 

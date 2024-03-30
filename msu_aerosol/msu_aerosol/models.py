@@ -87,6 +87,14 @@ class User(db.Model, UserMixin):
         primary_key=True,
         autoincrement=True,
     )
+    first_name = db.Column(
+        db.String,
+        nullable=True,
+    )
+    last_name = db.Column(
+        db.String,
+        nullable=True,
+    )
     username = db.Column(
         db.String,
         nullable=False,
@@ -97,17 +105,40 @@ class User(db.Model, UserMixin):
         unique=True,
         nullable=True,
     )
-    hashed_password = db.Column(
+    password = db.Column(
         db.String,
         nullable=False,
     )
     created_date = db.Column(
-        db.DateTime,
-        default=datetime.now(),
+        db.String,
+        default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
+    admin = db.Column(
+        db.Boolean,
+        default=False,
+    )
+    can_upload_data = db.Column(
+        db.Boolean,
+        default=False,
+    )
+    avatar = db.Column(db.Text)
 
     def __repr__(self):
         return f"User ({self.id, self.username})"
+
+
+class UserFieldView(ModelView):
+    column_list = (
+        "id",
+        "first_name",
+        "last_name",
+        "username",
+        "email",
+        "created_date",
+        "admin",
+        "can_upload_data",
+        "avatar",
+    ) 
 
 
 class TextFieldView(ModelView):
@@ -125,7 +156,7 @@ class TextFieldView(ModelView):
     form_widget_args = {
         "description": {
             "rows": 10,
-            "style": "width: 500px",
+            "style": "width: 50%",
         },
     }
 

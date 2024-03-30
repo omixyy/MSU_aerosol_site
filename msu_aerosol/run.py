@@ -10,6 +10,7 @@ from msu_aerosol.models import db
 from views.device import device_bp
 from views.homepage import home_bp
 from views.users import login_bp, register_bp
+from views.users import profile_bp
 
 __all__: list = []
 
@@ -18,21 +19,22 @@ app.register_blueprint(home_bp, name="home")
 app.register_blueprint(device_bp, name="device_details")
 app.register_blueprint(register_bp, name="registration")
 app.register_blueprint(login_bp, name="login")
+app.register_blueprint(profile_bp, name="profile")
 init_admin(app)
 db.init_app(app)
 
 with app.app_context():
-    preprocessing_all_files()
-    make_graph("AE33-S09-01249")
-    make_graph("LVS")
-    make_graph("PNS")
-    make_graph("TCA08")
-    make_graph("Web_MEM")
+    # preprocessing_all_files()
+    # make_graph("AE33-S09-01249")
+    # make_graph("LVS")
+    # make_graph("PNS")
+    # make_graph("TCA08")
+    # make_graph("Web_MEM")
     db.create_all()
 
 
 def main() -> None:
-    app.run()
+    app.run(use_reloader=True)
 
 
 if __name__ == "__main__":

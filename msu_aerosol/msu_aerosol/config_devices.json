@@ -13,50 +13,72 @@
       "BCbb",
       "BCff"
     ],
-    "format": "%d.%m.%Y %H:%M"
+    "format": ""
   },
   "TCA08": {
-    "time_cols": "EndTimeUTC",
     "cols": [
+      "ID",
+      "SampleID",
+      "TCcounts",
+      "TCmass",
       "TCconc",
       "AE33_BC6",
       "AE33_ValidData",
       "AE33_b",
       "OC",
+      "EC",
       "CO2",
       "Volume",
-      "Chamber"
+      "Chamber",
+      "SetupID",
+      "a1",
+      "b1",
+      "c1",
+      "d1",
+      "e1",
+      "f1",
+      "a2",
+      "b2",
+      "c2",
+      "d2",
+      "e2",
+      "f2"
     ],
-    "format": "%Y-%m-%d %H:%M:%S"
+    "time_cols": [
+      "StartTimeUTC",
+      "EndTimeUTC",
+      "StartTimeLocal",
+      "EndTimeLocal"
+    ]
   },
   "LVS": {
-    "time_cols": "Date",
     "cols": [
-      "Actual(Nm3/h)",
-      "Actual(Nm3)",
-      "Filter Press.(hPa)"
-    ],
-    "format": "%d.%m.%Y %H:%M:%S"
-  },
-  "Web_MEM": {
-    "time_cols": "datetime",
-    "cols": [
-      "CO",
-      "NO",
-      "NO2"
-    ],
-    "format": "%d.%m.%Y %H:%M"
-  },
-  "PNS": {
-    "time_cols": "Date",
-    "cols": [
+      "Type",
+      "D/N",
       "Motorspeed(%)",
       "Actual(m3/h)",
       "Actual(Nm3/h)",
+      "Actual(m3)",
+      "Actual(Nm3)",
+      "Filter Press.(hPa)",
+      "Air Pressure(hPa)",
+      "Outdoor Temp.('C)",
+      "Filter Temp.('C)",
       "Chamber Temp.('C)",
       "Temperature orifice('C)",
-      "Rel.Humidity(%)"
+      "Rel.Humidity(%)",
+      "Magazine Position",
+      "Measuring Typ",
+      "Sample ID",
+      "Max. Planned Pos.",
+      "Event",
+      "Error"
     ],
-    "format": "%d.%m.%Y %H:%M:%S"
+    "time_cols": [
+      "Date",
+      "Time",
+      "Pump Run Time Total(h:m)",
+      "Time of Measurement(h:m)"
+    ]
   }
 }
