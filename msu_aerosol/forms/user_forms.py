@@ -53,7 +53,7 @@ class ProfileForm(FlaskForm):
         "Почта",
         validators=[DataRequired()],
     )
-    is_admin = StringField(
+    admin = StringField(
         "Является ли админом",
         render_kw={"readonly": True},
     )

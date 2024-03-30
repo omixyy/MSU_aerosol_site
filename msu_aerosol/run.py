@@ -22,6 +22,7 @@ app.register_blueprint(login_bp, name="login")
 app.register_blueprint(profile_bp, name="profile")
 init_admin(app)
 db.init_app(app)
+db.session.permanent = True
 
 with app.app_context():
     preprocessing_all_files()
