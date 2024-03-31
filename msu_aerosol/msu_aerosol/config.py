@@ -4,10 +4,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask
 
-__all__: list = ["Config", "ProdConfig", "DevConfig"]
+__all__: list = []
 
 load_dotenv()
 basedir: Path = Path(os.path.dirname(__file__)).resolve().parent
+yadisk_token: str = os.getenv("YADISK_TOKEN")
 
 
 class Config:

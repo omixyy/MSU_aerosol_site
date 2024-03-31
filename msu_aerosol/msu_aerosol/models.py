@@ -3,7 +3,7 @@ from datetime import datetime
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from wtforms.fields import TextAreaField
+from wtforms.fields import TextAreaField, BooleanField
 
 __all__ = [
     "Complex",
@@ -139,6 +139,7 @@ class UserFieldView(ModelView):
         "can_upload_data",
         "avatar",
     )
+
 
 
 class TextFieldView(ModelView):

@@ -3,10 +3,15 @@ import os
 from pathlib import Path
 import re
 import shutil
+from urllib.parse import urlencode
 
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
+from yadisk import YaDisk
+import requests
+
+from msu_aerosol.config import yadisk_token
 
 __all__ = []
 
@@ -19,6 +24,36 @@ config_devices_open = load_json("msu_aerosol/config_devices.json")
 list_devices = list(config_devices_open.keys())
 disk_path = "external_data"
 main_path = "data"
+disk = YaDisk(token=yadisk_token)
+last_modified_file = {}
+base_url = "https://cloud-api.yandex.net/v1/disk/public/resources/download?"
+
+
+def download_last_modified_file(device: str) -> None:
+    folder_path = '/external_data'
+    for i in disk.listdir(folder_path):
+        last_modified_file[i["name"]] = max(
+            [
+                file for file in i.listdir()
+                if file['name'].endswith('.csv')
+            ], key=lambda x: x['modified']
+        )
+    public_key = last_modified_file[device]["public_url"]
+    final_url = base_url + urlencode(dict(public_key=public_key))
+    response = requests.get(final_url)
+    download_url = response.json()["href"]
+
+    download_response = requests.get(download_url)
+    with open(f"data/{device}.csv", "wb") as f:
+        f.write(download_response.content)
+
+
+def download_device_data() -> None:
+    download_url = f'{disk_path}/?format=zip'
+    response = requests.get(download_url)
+    with open('yandex_disk_folder.zip', 'wb') as file:
+        file.write(response.content)
+    print('Папка успешно скачана в виде zip архива.')
 
 
 def preprocessing_all_files():

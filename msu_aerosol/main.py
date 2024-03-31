@@ -25,7 +25,7 @@ with app.app_context():
 
 
 def main() -> None:
-    app.run(use_reloader=True)
+    app.run()
 
 
 if __name__ == "__main__":
