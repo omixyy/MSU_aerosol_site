@@ -8,7 +8,6 @@ from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
-import yadisk
 
 from msu_aerosol.models import (
     Complex,
@@ -18,7 +17,6 @@ from msu_aerosol.models import (
     User,
     UserFieldView,
 )
-from config import yadisk_token
 
 __all__ = []
 
