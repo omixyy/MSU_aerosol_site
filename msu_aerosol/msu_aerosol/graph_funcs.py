@@ -4,13 +4,12 @@ from pathlib import Path
 import re
 import shutil
 from urllib.parse import urlencode
-
+from zipfile import ZipFile
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
 import requests
 from yadisk import YaDisk
-
 from msu_aerosol.config import yadisk_token
 
 __all__ = []
@@ -46,27 +45,23 @@ def download_last_modified_file(device: str) -> None:
         f.write(download_response.content)
 
 
-def download_device_data() -> None:
+def download_device_data() -> str:
     download_url = f"{disk_path}/?format=zip"
     response = requests.get(download_url)
     with Path("yandex_disk_folder.zip").open("wb") as file:
         file.write(response.content)
     print("Папка успешно скачана в виде zip архива.")
+    with ZipFile('yandex_disk_folder.zip', "r") as zf:
+        zf.extractall(f"{main_path}")
+        return zf.namelist()[-1][0:-1:]
 
 
-def preprocessing_all_files():
-    for name_folder in list_devices:
-        for name_file in os.listdir(f"{disk_path}/{name_folder}"):
-            if name_file.endswith(".csv"):
-                if not Path(f"{main_path}/{name_folder}").exists():
-                    Path(f"{main_path}/{name_folder}").mkdir(parents=True)
-                shutil.copy(
-                    f"{disk_path}/{name_folder}/{name_file}",
-                    f"{main_path}/{name_folder}/{name_file}",
-                )
-    for name_folder in os.listdir(f"{main_path}"):
-        for name_file in os.listdir(f"{main_path}/{name_folder}"):
-            preprocessing_one_file(f"{main_path}/{name_folder}/{name_file}")
+def pre_proc_device_from_data_to_proc_data(name_folder):
+    for name_file in os.listdir(f"{disk_path}/{name_folder}"):
+        if not name_file.endswith(".csv"):
+            os.remove(f"{main_path}/{name_folder}/{name_file}")
+    for name_file in os.listdir(f"{main_path}/{name_folder}"):
+        preprocessing_one_file(f"{main_path}/{name_folder}/{name_file}")
 
 
 def preprocessing_one_file(path):
@@ -147,7 +142,7 @@ def make_graph(device):
     combined_data_48 = combined_data.loc[
         (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
         & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
-    ]
+        ]
     fig = px.line(
         combined_data_48,
         x=time_col,
