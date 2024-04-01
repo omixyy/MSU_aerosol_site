@@ -8,7 +8,13 @@ from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
+from sqlalchemy.event import listens_for
 
+from msu_aerosol.graph_funcs import (
+    download_device_data,
+    make_graph,
+    preprocess_device_data,
+)
 from msu_aerosol.models import (
     Complex,
     db,
@@ -45,25 +51,21 @@ class AdminHomeView(AdminIndexView):
         )
 
     @expose("/", methods=["GET", "POST"])
-    def create_settings_form(self) -> str:
-        complex_to_devices: dict = get_complexes_dict()
+    def admin_index(self) -> str:
         device_to_cols: dict = {}
         device_to_time_cols: dict = {}
-        for _, devices in complex_to_devices.items():
-            for dev in devices:
+        downloaded = os.listdir("data")
+        if downloaded:
+            for folder in downloaded:
                 dialect = get_dialect(
-                    f"external_data/"
-                    f"{dev}/"
-                    f"{os.listdir(f'external_data/{dev}')[0]}",
+                    f"data/" f"{folder}/" f"{os.listdir(f'data/{folder}')[0]}",
                 )
 
                 with Path(
-                    f"external_data/"
-                    f"{dev}/"
-                    f"{os.listdir(f'external_data/{dev}')[0]}",
+                    f"data/" f"{folder}/" f"{os.listdir(f'data/{folder}')[0]}",
                 ).open("r") as csv_file:
                     header = list(csv.reader(csv_file, dialect=dialect))[0]
-                    device_to_cols[dev] = list(
+                    device_to_cols[folder] = list(
                         filter(
                             lambda x: "date" not in x.lower()
                             and "time" not in x.lower(),
@@ -71,7 +73,7 @@ class AdminHomeView(AdminIndexView):
                         ),
                     )
 
-                    device_to_time_cols[dev] = list(
+                    device_to_time_cols[folder] = list(
                         filter(
                             lambda x: "date" in x.lower()
                             or "time" in x.lower(),
@@ -83,21 +85,17 @@ class AdminHomeView(AdminIndexView):
                     "msu_aerosol/config_devices.json",
                 ).open("r") as config:
                     data = json.load(config)
-                    if dev.name_on_disk not in data:
-                        data[dev.name_on_disk] = {
+                    if folder not in data:
+                        data[folder] = {
                             "cols": [],
                             "time_cols": [],
                         }
-                        data[dev.name_on_disk]["cols"] = device_to_cols[dev]
-                        data[dev.name_on_disk]["time_cols"] = (
-                            device_to_time_cols[dev]
-                        )
-                        with Path(
-                            "msu_aerosol/config_devices.json",
-                        ).open("w") as write_config:
-                            json.dump(data, write_config, indent=2)
-
-                        # TODO: копировать файл из external_data в data
+                        data[folder]["cols"] = device_to_cols[folder]
+                        data[folder]["time_cols"] = device_to_time_cols[folder]
+                with Path(
+                    "msu_aerosol/config_devices.json",
+                ).open("w") as write_config:
+                    json.dump(data, write_config, indent=2)
 
         if request.method == "GET":
             with Path("msu_aerosol/config_devices.json").open("r") as config:
@@ -106,16 +104,26 @@ class AdminHomeView(AdminIndexView):
         elif request.method == "POST":
             with Path("msu_aerosol/config_devices.json").open("w") as config:
                 data = {
-                    dev.name_on_disk: {
-                        "time_cols": request.form.get(f"{dev.name}_rb"),
-                        "cols": request.form.getlist(f"{dev.name}_cb"),
+                    dev_path: {
+                        "time_cols": request.form.get(f"{dev_path}_rb"),
+                        "cols": request.form.getlist(f"{dev_path}_cb"),
                         "format": request.form.get(
-                            f"datetime_format_{dev.name}",
+                            f"datetime_format_{dev_path}",
                         ),
                     }
-                    for dev in Device.query.all()
+                    for dev_path in os.listdir("data")
                 }
                 json.dump(data, config, indent=2)
+            for device in [
+                i
+                for i in os.listdir("data")
+                if "graph_" + i
+                not in os.listdir(
+                    "templates/includes/devices/full",
+                )
+            ]:
+                preprocess_device_data(device)
+                make_graph(device)
 
         return self.render(
             "admin/admin_home.html",
@@ -149,6 +157,11 @@ def get_complexes_dict() -> dict:
 def get_dialect(path: str) -> csv.Dialect:
     with Path(path).open("r") as f:
         return csv.Sniffer().sniff(f.readline())
+
+
+@listens_for(Device, "after_insert")
+def after_insert(mapper, connection, target):
+    download_device_data(target.link)
 
 
 def init_admin(app: Flask):

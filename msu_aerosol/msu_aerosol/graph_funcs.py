@@ -5,12 +5,13 @@ import re
 from urllib.parse import urlencode
 from zipfile import ZipFile
 
-from config import yadisk_token
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
 import requests
 from yadisk import YaDisk
+
+from msu_aerosol.config import yadisk_token
 
 __all__ = []
 
@@ -19,8 +20,6 @@ def load_json(path: str):
     return json.load(open(path, "r"))
 
 
-config_devices_open = load_json("config_devices.json")
-list_devices = list(config_devices_open.keys())
 disk_path = "external_data"
 main_path = "data"
 disk = YaDisk(token=yadisk_token)
@@ -52,13 +51,12 @@ def download_device_data(url: str) -> str:
     download_response = requests.get(download_url)
     with Path("yandex_disk_folder.zip").open("wb") as file:
         file.write(download_response.content)
-    print("Папка успешно скачана в виде zip архива.")
     with ZipFile("yandex_disk_folder.zip", "r") as zf:
         zf.extractall(f"{main_path}")
         return zf.namelist()[-1][0:-1:]
 
 
-def pre_proc_device_from_data_to_proc_data(name_folder):
+def preprocess_device_data(name_folder):
     for name_file in os.listdir(f"{main_path}/{name_folder}"):
         if not name_file.endswith(".csv"):
             Path(f"{main_path}/{name_folder}/{name_file}").unlink()
@@ -67,6 +65,7 @@ def pre_proc_device_from_data_to_proc_data(name_folder):
 
 
 def preprocessing_one_file(path):
+    config_devices_open = load_json("msu_aerosol/config_devices.json")
     _, device, file_name = path.split("/")
     df = pd.read_csv(path, sep=None, engine="python", decimal=",")
     config_device_open = config_devices_open[device]

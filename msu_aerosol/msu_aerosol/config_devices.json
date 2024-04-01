@@ -1,5 +1,5 @@
 {
-  "AE33-S09-01249": {
+  "AE33-S04-00360": {
     "time_cols": "Datetime",
     "cols": [
       "BC1",
@@ -15,100 +15,46 @@
     ],
     "format": "%d.%m.%Y %H:%M"
   },
-  "TCA08": {
+  "DAS": {
+    "time_cols": "datetime",
     "cols": [
-      "ID",
-      "SampleID",
-      "TCcounts",
-      "TCmass",
-      "TCconc",
-      "AE33_BC6",
-      "AE33_ValidData",
-      "AE33_b",
-      "OC",
-      "EC",
-      "CO2",
-      "Volume",
-      "Chamber",
-      "SetupID",
-      "a1",
-      "b1",
-      "c1",
-      "d1",
-      "e1",
-      "f1",
-      "a2",
-      "b2",
-      "c2",
-      "d2",
-      "e2",
-      "f2"
+      "Count1",
+      "Count2",
+      "Count3",
+      "Count4",
+      "Count5",
+      "Count6",
+      "0~5",
+      "5~10",
+      "10~15",
+      "15~20",
+      "20~25",
+      "25~30",
+      "30~35",
+      "35~40",
+      "Total",
+      "Sigma",
+      "Dm",
+      "Rel.Humidity",
+      "Pressure",
+      "Ambient",
+      "0.2um",
+      "0.3um",
+      "0.5um",
+      "0.7um",
+      "1.0um",
+      "2.0um",
+      "2.5um",
+      "3.0um",
+      "5.0um",
+      "7.0um",
+      "10um",
+      ">10um",
+      "PM1",
+      "PM2.5",
+      "PM10",
+      "Surface Area"
     ],
-    "time_cols": [
-      "StartTimeUTC",
-      "EndTimeUTC",
-      "StartTimeLocal",
-      "EndTimeLocal"
-    ]
-  },
-  "LVS": {
-    "cols": [
-      "Type",
-      "D/N",
-      "Motorspeed(%)",
-      "Actual(m3/h)",
-      "Actual(Nm3/h)",
-      "Actual(m3)",
-      "Actual(Nm3)",
-      "Filter Press.(hPa)",
-      "Air Pressure(hPa)",
-      "Outdoor Temp.('C)",
-      "Filter Temp.('C)",
-      "Chamber Temp.('C)",
-      "Temperature orifice('C)",
-      "Rel.Humidity(%)",
-      "Magazine Position",
-      "Measuring Typ",
-      "Sample ID",
-      "Max. Planned Pos.",
-      "Event",
-      "Error"
-    ],
-    "time_cols": [
-      "Date",
-      "Time",
-      "Pump Run Time Total(h:m)",
-      "Time of Measurement(h:m)"
-    ]
-  },
-  "PNS": {
-    "cols": [
-      "Type",
-      "D/N",
-      "Motorspeed(%)",
-      "Actual(m3/h)",
-      "Actual(Nm3/h)",
-      "Actual(m3)",
-      "Actual(Nm3)",
-      "Filter Press.(hPa)",
-      "Air Pressure(hPa)",
-      "Outdoor Temp.('C)",
-      "Filter Temp.('C)",
-      "Chamber Temp.('C)",
-      "Temperature orifice('C)",
-      "Rel.Humidity(%)",
-      "Magazine Position",
-      "Measuring Typ",
-      "Sample ID",
-      "Max. Planned Pos.",
-      "Event",
-      "Error"
-    ],
-    "time_cols": [
-      "Date",
-      "Time",
-      "Pump Run Time Total(h:m)",
-      "Time of Measurement(h:m)"
-    ]
+    "format": "%d.%m.%Y %H:%M:%S"
   }
 }

@@ -62,9 +62,9 @@ class Device(db.Model):
         db.Boolean,
         nullable=False,
     )
-    name_on_disk = db.Column(
+    link = db.Column(
         db.String,
-        nullable=True,
+        nullable=False,
     )
     complex_id = db.Column(
         db.Integer,
@@ -76,7 +76,7 @@ class Device(db.Model):
         return self.name
 
     def __str__(self):
-        return self.name_on_disk
+        return self.name
 
 
 class User(db.Model, UserMixin):
@@ -121,7 +121,6 @@ class User(db.Model, UserMixin):
         db.Boolean,
         default=False,
     )
-    avatar = db.Column(db.Text)
 
     def __repr__(self):
         return f"User ({self.id, self.username})"
@@ -157,6 +156,10 @@ class TextFieldView(ModelView):
         "description": {
             "rows": 10,
             "style": "width: 50%",
+        },
+        "full_name": {
+            "readonly": True,
+            "disabled": True,
         },
     }
 

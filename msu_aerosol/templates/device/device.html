@@ -8,7 +8,7 @@
     <h3 style="margin-left: 50px; margin-top: 50px">{{ device.name }}, {{ device.serial_number }}</h3>
     <h5 style="margin-left: 50px; margin-top: 30px">Состоит в комплексе "{{ complex }}"</h2>
     <div style="width: 55%; height: 400px; float: right; margin-right: 100px">
-      {% include "includes/devices/full/graph_" ~ device.name_on_disk ~ ".html"  %}
+      {% include "includes/devices/full/graph_" ~ device_to_name[device.name] ~ ".html"  %}
     </div>
     <div class="col-sm-3" style="margin-bottom: 180px">
       <textarea class="form-control form-control-sm rounded focus" style="margin-left: 50px; margin-top: 20px; margin-bottom: 20px" rows="20" value="50px" type="text" readonly>{{ device.description }}</textarea>
