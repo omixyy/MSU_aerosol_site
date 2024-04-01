@@ -10,8 +10,7 @@ import plotly.express as px
 import plotly.offline as offline
 import requests
 from yadisk import YaDisk
-
-from msu_aerosol.config import yadisk_token
+from config import yadisk_token
 
 __all__ = []
 
@@ -20,7 +19,7 @@ def load_json(path: str):
     return json.load(open(path, "r"))
 
 
-config_devices_open = load_json("msu_aerosol/config_devices.json")
+config_devices_open = load_json("config_devices.json")
 list_devices = list(config_devices_open.keys())
 disk_path = "external_data"
 main_path = "data"
@@ -46,11 +45,15 @@ def download_last_modified_file(device: str) -> None:
         f.write(download_response.content)
 
 
-def download_device_data() -> str:
-    download_url = f"{disk_path}/?format=zip"
-    response = requests.get(download_url)
+download_last_modified_file("AE33-S04-00360")
+
+def download_device_data(url: str) -> str:
+    final_url = base_url + urlencode({"public_key": url})
+    response = requests.get(final_url)
+    download_url = response.json()['href']
+    download_response = requests.get(download_url)
     with Path("yandex_disk_folder.zip").open("wb") as file:
-        file.write(response.content)
+        file.write(download_response.content)
     print("Папка успешно скачана в виде zip архива.")
     with ZipFile("yandex_disk_folder.zip", "r") as zf:
         zf.extractall(f"{main_path}")
@@ -58,7 +61,7 @@ def download_device_data() -> str:
 
 
 def pre_proc_device_from_data_to_proc_data(name_folder):
-    for name_file in os.listdir(f"{disk_path}/{name_folder}"):
+    for name_file in os.listdir(f"{main_path}/{name_folder}"):
         if not name_file.endswith(".csv"):
             Path(f"{main_path}/{name_folder}/{name_file}").unlink()
     for name_file in os.listdir(f"{main_path}/{name_folder}"):
@@ -143,7 +146,7 @@ def make_graph(device):
     combined_data_48 = combined_data.loc[
         (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
         & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
-    ]
+        ]
     fig = px.line(
         combined_data_48,
         x=time_col,

@@ -13,7 +13,7 @@
       "BCbb",
       "BCff"
     ],
-    "format": ""
+    "format": "%d.%m.%Y %H:%M"
   },
   "TCA08": {
     "cols": [
@@ -52,6 +52,36 @@
     ]
   },
   "LVS": {
+    "cols": [
+      "Type",
+      "D/N",
+      "Motorspeed(%)",
+      "Actual(m3/h)",
+      "Actual(Nm3/h)",
+      "Actual(m3)",
+      "Actual(Nm3)",
+      "Filter Press.(hPa)",
+      "Air Pressure(hPa)",
+      "Outdoor Temp.('C)",
+      "Filter Temp.('C)",
+      "Chamber Temp.('C)",
+      "Temperature orifice('C)",
+      "Rel.Humidity(%)",
+      "Magazine Position",
+      "Measuring Typ",
+      "Sample ID",
+      "Max. Planned Pos.",
+      "Event",
+      "Error"
+    ],
+    "time_cols": [
+      "Date",
+      "Time",
+      "Pump Run Time Total(h:m)",
+      "Time of Measurement(h:m)"
+    ]
+  },
+  "PNS": {
     "cols": [
       "Type",
       "D/N",
