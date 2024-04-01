@@ -5,12 +5,12 @@ import re
 from urllib.parse import urlencode
 from zipfile import ZipFile
 
+from config import yadisk_token
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
 import requests
 from yadisk import YaDisk
-from config import yadisk_token
 
 __all__ = []
 
@@ -45,12 +45,10 @@ def download_last_modified_file(device: str) -> None:
         f.write(download_response.content)
 
 
-download_last_modified_file("AE33-S04-00360")
-
 def download_device_data(url: str) -> str:
     final_url = base_url + urlencode({"public_key": url})
     response = requests.get(final_url)
-    download_url = response.json()['href']
+    download_url = response.json()["href"]
     download_response = requests.get(download_url)
     with Path("yandex_disk_folder.zip").open("wb") as file:
         file.write(download_response.content)
@@ -146,7 +144,7 @@ def make_graph(device):
     combined_data_48 = combined_data.loc[
         (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
         & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
-        ]
+    ]
     fig = px.line(
         combined_data_48,
         x=time_col,
