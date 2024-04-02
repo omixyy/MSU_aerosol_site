@@ -24,6 +24,7 @@ class Complex(db.Model):
     )
     name = db.Column(
         db.String,
+        unique=True,
     )
     devices = db.relationship(
         "Device",
@@ -50,6 +51,7 @@ class Device(db.Model):
     name = db.Column(
         db.String,
         nullable=False,
+        unique=True,
     )
     serial_number = db.Column(
         db.String,
