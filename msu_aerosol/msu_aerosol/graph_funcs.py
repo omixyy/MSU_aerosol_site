@@ -103,14 +103,20 @@ def make_graph(device):
     for i in os.listdir(f"proc_data/{device}"):
         data = pd.read_csv(f"proc_data/{device}/{i}")
         combined_data = pd.concat([combined_data, data], ignore_index=True)
-    combined_data[time_col] = pd.to_datetime(combined_data[time_col], format="%Y-%m-%d %H:%M:%S")
+    combined_data[time_col] = pd.to_datetime(
+        combined_data[time_col],
+        format="%Y-%m-%d %H:%M:%S",
+    )
     m = max(combined_data[time_col])
     last_48_hours = [m.replace(day=(m.day - 2)), m]
     combined_data_full = combined_data.copy()
     combined_data_full.set_index(time_col, inplace=True)
-    combined_data_full = combined_data_full.replace(',', '.', regex=True).astype(float)
-    print(combined_data_full.head())
-    combined_data_full = combined_data_full.resample('60min').mean()
+    combined_data_full = combined_data_full.replace(
+        ",",
+        ".",
+        regex=True,
+    ).astype(float)
+    combined_data_full = combined_data_full.resample("60min").mean()
     combined_data_full.reset_index(inplace=True)
     fig = px.line(
         combined_data_full,
@@ -152,8 +158,12 @@ def make_graph(device):
         & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
     ]
     combined_data_48.set_index(time_col, inplace=True)
-    combined_data_48 = combined_data_48.replace(',', '.', regex=True).astype(float)
-    combined_data_48 = combined_data_48.resample('60min').mean()
+    combined_data_48 = combined_data_48.replace(
+        ",",
+        ".",
+        regex=True,
+    ).astype(float)
+    combined_data_48 = combined_data_48.resample("60min").mean()
     combined_data_48.reset_index(inplace=True)
     fig = px.line(
         combined_data_48,
