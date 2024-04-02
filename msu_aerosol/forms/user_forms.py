@@ -52,14 +52,23 @@ class ProfileForm(FlaskForm):
     )
     admin = StringField(
         "Является ли админом",
-        render_kw={"readonly": True},
+        render_kw={
+            "readonly": True,
+            "disabled": True,
+        },
     )
     created_date = StringField(
         "Когда зарегистрирован",
-        render_kw={"readonly": True},
+        render_kw={
+            "readonly": True,
+            "disabled": True,
+        },
     )
     can_upload_data = StringField(
         "Может ли загруать данные",
-        render_kw={"readonly": True},
+        render_kw={
+            "readonly": True,
+            "disabled": True,
+        },
     )
     submit = SubmitField("Сохранить")
