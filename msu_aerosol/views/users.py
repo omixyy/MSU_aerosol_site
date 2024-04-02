@@ -83,11 +83,11 @@ def login() -> Response | str:
                 ):
                     login_user(user)
                     return redirect(url_for("home.index", user=user))
-
+                
                 return render_template(
                     "users/login.html",
                     form=form,
-                    message="Неверный пароль",
+                    message_error="Неверный пароль",
                     complex_to_device=complex_to_device,
                     now=datetime.now(),
                     view_name="login",
@@ -97,7 +97,7 @@ def login() -> Response | str:
             return render_template(
                 "users/login.html",
                 form=form,
-                message="Не существует такого пользователя",
+                message_error="Не существует такого пользователя",
                 complex_to_device=complex_to_device,
                 now=datetime.now(),
                 view_name="login",
@@ -144,7 +144,7 @@ def register() -> str | Response:
         return render_template(
             "users/register.html",
             form=form,
-            error="Пароли не совпадают",
+            message_error="Пароли не совпадают",
             complex_to_device=complex_to_device,
             now=datetime.now(),
             view_name="registration",
@@ -154,7 +154,7 @@ def register() -> str | Response:
         return render_template(
             "users/register.html",
             form=form,
-            message="Пользователь с таким именем уже существует",
+            message_error="Пользователь с таким именем уже существует",
             complex_to_device=complex_to_device,
             now=datetime.now(),
             view_name="registration",
