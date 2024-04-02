@@ -87,6 +87,7 @@ ipython_config.py
 proc_data
 external_data
 includes/devices
+yandex_disk_folder.zip
 
 # pyenv
 #   For a library or package, you might want to ignore these files since the code is
