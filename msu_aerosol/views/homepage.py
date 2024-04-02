@@ -19,7 +19,6 @@ def index() -> str:
         dev.name: disk.get_public_meta(dev.link)["name"]
         for dev in Device.query.all()
     }
-    print(device_to_name)
     return render_template(
         "homepage/home.html",
         now=datetime.now(),

@@ -55,6 +55,7 @@ class AdminHomeView(AdminIndexView):
         device_to_cols: dict = {}
         device_to_time_cols: dict = {}
         downloaded = os.listdir("data")
+        downloaded.remove(".gitignore")
         if downloaded:
             for folder in downloaded:
                 dialect = get_dialect(
@@ -111,12 +112,12 @@ class AdminHomeView(AdminIndexView):
                             f"datetime_format_{dev_path}",
                         ),
                     }
-                    for dev_path in os.listdir("data")
+                    for dev_path in downloaded
                 }
                 json.dump(data, config, indent=2)
             for device in [
                 i
-                for i in os.listdir("data")
+                for i in downloaded
                 if "graph_" + i
                 not in os.listdir(
                     "templates/includes/devices/full",
