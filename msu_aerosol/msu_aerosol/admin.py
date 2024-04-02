@@ -1,7 +1,6 @@
 import csv
 import json
 import os
-from _csv import Dialect
 from pathlib import Path
 from typing import Type
 
@@ -126,7 +125,7 @@ class AdminHomeView(AdminIndexView):
             ]:
                 preprocess_device_data(device)
                 make_graph(device)
-            
+
             for dev in Device.query.all():
                 dev.show = True
             db.session.commit()
@@ -160,7 +159,7 @@ def get_complexes_dict() -> dict:
     }
 
 
-def get_dialect(path: str) -> Type[Dialect | Dialect]:
+def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
     with Path(path).open("r") as f:
         return csv.Sniffer().sniff(f.readline())
 
