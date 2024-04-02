@@ -83,7 +83,7 @@ def login() -> Response | str:
                 ):
                     login_user(user)
                     return redirect(url_for("home.index", user=user))
-                
+
                 return render_template(
                     "users/login.html",
                     form=form,
