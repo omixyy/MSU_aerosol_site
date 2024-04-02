@@ -97,16 +97,23 @@ def preprocessing_one_file(path):
 
 
 def make_graph(device):
+    device_dict = load_json("msu_aerosol/config_devices.json")[device]
+    time_col = device_dict["time_cols"]
     combined_data = pd.DataFrame()
     for i in os.listdir(f"proc_data/{device}"):
         data = pd.read_csv(f"proc_data/{device}/{i}")
         combined_data = pd.concat([combined_data, data], ignore_index=True)
-    device_dict = load_json("msu_aerosol/config_devices.json")[device]
-    time_col = device_dict["time_cols"]
-    m = pd.to_datetime(max(combined_data[time_col]))
+    combined_data[time_col] = pd.to_datetime(combined_data[time_col], format="%Y-%m-%d %H:%M:%S")
+    m = max(combined_data[time_col])
     last_48_hours = [m.replace(day=(m.day - 2)), m]
+    combined_data_full = combined_data.copy()
+    combined_data_full.set_index(time_col, inplace=True)
+    combined_data_full = combined_data_full.replace(',', '.', regex=True).astype(float)
+    print(combined_data_full.head())
+    combined_data_full = combined_data_full.resample('60min').mean()
+    combined_data_full.reset_index(inplace=True)
     fig = px.line(
-        combined_data,
+        combined_data_full,
         x=time_col,
         y=device_dict["cols"],
         range_x=last_48_hours,
@@ -144,6 +151,10 @@ def make_graph(device):
         (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
         & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
     ]
+    combined_data_48.set_index(time_col, inplace=True)
+    combined_data_48 = combined_data_48.replace(',', '.', regex=True).astype(float)
+    combined_data_48 = combined_data_48.resample('60min').mean()
+    combined_data_48.reset_index(inplace=True)
     fig = px.line(
         combined_data_48,
         x=time_col,
