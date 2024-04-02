@@ -62,7 +62,8 @@ class Device(db.Model):
     )
     show = db.Column(
         db.Boolean,
-        nullable=False,
+        nullable=True,
+        default=False,
     )
     link = db.Column(
         db.String,
@@ -143,13 +144,14 @@ class UserFieldView(ModelView):
     )
 
 
-class TextFieldView(ModelView):
+class DeviceView(ModelView):
     column_list = (
         "id",
         "name",
         "description",
         "serial_number",
     )
+    form_excluded_columns = ("show",)
 
     form_overrides = {
         "description": TextAreaField,
@@ -159,10 +161,6 @@ class TextFieldView(ModelView):
         "description": {
             "rows": 10,
             "style": "width: 50%",
-        },
-        "full_name": {
-            "readonly": True,
-            "disabled": True,
         },
     }
 

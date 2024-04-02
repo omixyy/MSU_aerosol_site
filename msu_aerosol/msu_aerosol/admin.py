@@ -21,7 +21,7 @@ from msu_aerosol.models import (
     Complex,
     db,
     Device,
-    TextFieldView,
+    DeviceView,
     User,
     UserFieldView,
 )
@@ -118,15 +118,18 @@ class AdminHomeView(AdminIndexView):
                 }
                 json.dump(data, config, indent=2)
             for device in [
-                i
-                for i in downloaded
-                if "graph_" + i
+                i for i in downloaded
+                if "graph_" + i + ".html"
                 not in os.listdir(
                     "templates/includes/devices/full",
                 )
             ]:
                 preprocess_device_data(device)
                 make_graph(device)
+            
+            for dev in Device.query.all():
+                dev.show = True
+            db.session.commit()
 
         return self.render(
             "admin/admin_home.html",
@@ -171,5 +174,5 @@ def init_admin(app: Flask):
     login_manager.init_app(app)
     admin.init_app(app)
     admin.add_view(ModelView(Complex, db.session))
-    admin.add_view(TextFieldView(Device, db.session))
+    admin.add_view(DeviceView(Device, db.session))
     admin.add_view(UserFieldView(User, db.session))
