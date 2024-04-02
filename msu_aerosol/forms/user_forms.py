@@ -11,6 +11,7 @@ __all__: list = []
 
 
 class RegisterForm(FlaskForm):
+    login = StringField("Логин", validators=[DataRequired()])
     email = EmailField(
         "Почта",
         validators=[DataRequired()],
@@ -23,15 +24,11 @@ class RegisterForm(FlaskForm):
         "Повторите пароль",
         validators=[DataRequired()],
     )
-    username = StringField(
-        "Имя пользователя",
-        validators=[DataRequired()],
-    )
     submit = SubmitField("Отправить")
 
 
 class LoginForm(FlaskForm):
-    username = StringField(
+    login = StringField(
         "Логин",
         validators=[DataRequired()],
     )
@@ -43,7 +40,7 @@ class LoginForm(FlaskForm):
 
 
 class ProfileForm(FlaskForm):
-    username = StringField(
+    login = StringField(
         "Логин",
         validators=[DataRequired()],
     )

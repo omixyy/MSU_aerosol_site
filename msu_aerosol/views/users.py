@@ -40,10 +40,9 @@ def load_user(user_id):
 def user_profile() -> str:
     complex_to_device = get_complexes_dict()
     form = ProfileForm(obj=current_user)
-    print(current_user.created_date)
     if request.method == "POST":
         if form.validate_on_submit():
-            current_user.username = request.form.get("username")
+            current_user.login = request.form.get("login")
             current_user.first_name = request.form.get("first_name")
             current_user.last_name = request.form.get("last_name")
             current_user.email = request.form.get("email")
@@ -75,7 +74,7 @@ def login() -> str:
     form = LoginForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            user = User.query.filter_by(username=form.username.data).first()
+            user = User.query.filter_by(login=form.login.data).first()
             if user:
                 if check_password_hash(
                     user.password,
@@ -136,6 +135,7 @@ def register() -> str:
             user=current_user,
         )
 
+    user_login = request.form.get("login")
     username = request.form.get("username")
     password = request.form.get("password")
     password_again = request.form.get("password_again")
@@ -150,7 +150,7 @@ def register() -> str:
             view_name="registration",
         )
 
-    if User.query.filter_by(username=username).first():
+    if User.query.filter_by(login=user_login).first():
         return render_template(
             "users/register.html",
             form=form,
@@ -161,7 +161,7 @@ def register() -> str:
         )
 
     new_user = User(
-        username=username,
+        login=user_login,
         password=generate_password_hash(password),
         email=email,
     )

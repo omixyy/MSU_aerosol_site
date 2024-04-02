@@ -95,9 +95,10 @@ class User(db.Model, UserMixin):
         db.String,
         nullable=True,
     )
-    username = db.Column(
+    login = db.Column(
         db.String,
         nullable=False,
+        unique=True,
     )
     email = db.Column(
         db.String,
@@ -123,7 +124,7 @@ class User(db.Model, UserMixin):
     )
 
     def __repr__(self):
-        return f"User ({self.id, self.username})"
+        return f"User ({self.id, self.login})"
 
 
 class UserFieldView(ModelView):
