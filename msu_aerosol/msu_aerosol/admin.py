@@ -1,7 +1,9 @@
 import csv
 import json
 import os
+from _csv import Dialect
 from pathlib import Path
+from typing import Type
 
 from flask import Flask, request
 from flask_admin import Admin
@@ -155,7 +157,7 @@ def get_complexes_dict() -> dict:
     }
 
 
-def get_dialect(path: str) -> csv.Dialect:
+def get_dialect(path: str) -> Type[Dialect | Dialect]:
     with Path(path).open("r") as f:
         return csv.Sniffer().sniff(f.readline())
 

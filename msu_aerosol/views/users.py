@@ -13,6 +13,7 @@ from flask_login import (
     login_user,
     logout_user,
 )
+from werkzeug import Response
 from werkzeug.security import (
     check_password_hash,
     generate_password_hash,
@@ -69,7 +70,7 @@ def user_profile() -> str:
 
 
 @login_bp.route("/login", methods=["GET", "POST"])
-def login() -> str:
+def login() -> Response | str:
     complex_to_device = get_complexes_dict()
     form = LoginForm()
     if request.method == "POST":
@@ -115,13 +116,13 @@ def login() -> str:
 
 @login_bp.route("/logout", methods=["GET", "POST"])
 @login_required
-def logout() -> str:
+def logout() -> Response:
     logout_user()
     return redirect(url_for("home.index"))
 
 
 @register_bp.route("/register", methods=["GET", "POST"])
-def register() -> str:
+def register() -> str | Response:
     complex_to_device = get_complexes_dict()
     form = RegisterForm()
     if request.method == "GET":
