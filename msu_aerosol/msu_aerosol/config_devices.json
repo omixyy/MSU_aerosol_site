@@ -67,9 +67,40 @@
       "Ambient",
       "PM1",
       "PM2.5",
-      "PM10",
-      "Surface Area"
+      "PM10"
     ],
     "format": "%d.%m.%Y %H:%M:%S"
+  },
+  "TCA08": {
+    "time_cols": "EndTimeLocal",
+    "cols": [
+      "ID",
+      "SampleID",
+      "TCcounts",
+      "TCmass",
+      "TCconc",
+      "AE33_BC6",
+      "AE33_ValidData",
+      "AE33_b",
+      "OC",
+      "EC",
+      "CO2",
+      "Volume",
+      "Chamber",
+      "SetupID",
+      "a1",
+      "b1",
+      "c1",
+      "d1",
+      "e1",
+      "f1",
+      "a2",
+      "b2",
+      "c2",
+      "d2",
+      "e2",
+      "f2"
+    ],
+    "format": "%Y-%m-%d %H:%M:%S"
   }
 }

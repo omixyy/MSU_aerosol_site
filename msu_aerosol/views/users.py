@@ -136,7 +136,6 @@ def register() -> str:
         )
 
     user_login = request.form.get("login")
-    username = request.form.get("username")
     password = request.form.get("password")
     password_again = request.form.get("password_again")
     email = request.form.get("email")

@@ -2,12 +2,12 @@
 {% block body %}
 <a href="{{ url_for('home.index') }}">На главную</a>
 {% for dev, _ in device_to_time_cols.items() %}
-  <a href="#dev{{ dev.id }}">{{ dev }}</a>
+  <a href="#{{ dev }}">{{ dev }}</a>
 {% endfor %}
 <form method="POST">
   {% for dev, tc in device_to_time_cols.items() %}
     <br>
-    <div id="dev{{ dev.id }}">
+    <div id="{{ dev }}">
       <h3>{{ dev }}</h3>
     </div>
     <h6>Выберите столбец со временем</h6>
