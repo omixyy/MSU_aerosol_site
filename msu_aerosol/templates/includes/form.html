@@ -3,6 +3,10 @@
     <div class="alert alert-success" role="alert">
       {{ message_success }}
     </div>
+  {% elif message_error %}
+    <div class="alert alert-danger" role="alert">
+      {{ message_error }}
+    </div>
   {% endif %}
   <div>
     {{ form.csrf_token }}
