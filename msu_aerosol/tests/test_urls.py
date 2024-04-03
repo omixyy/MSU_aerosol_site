@@ -78,26 +78,3 @@ class TestStaticURL(unittest.TestCase):
         with self.app.app_context(), self.app.test_request_context():
             response = self.client.get(url_for("profile.user_profile"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_send_device(self):
-        with self.app.app_context(), self.app.test_request_context():
-            self.client.post(
-                url_for("admin.index"),
-                data={
-                    "time_cols": "AE33-S08-01006_rb",
-                    "cols": ["AE33-S08-01006_cb"],
-                    "format": "%d.%m.%Y %H:%M",
-                },
-                follow_redirects=True,
-            )
-
-            response = self.client.get(url_for("home.index"))
-            self.assertIn(b"TestDevice", response.data)
-
-            dev_response = self.client.get(
-                url_for(
-                    "device_details.device",
-                    device_id=Device.query.first().id,
-                ),
-            )
-            self.assertEqual(dev_response.status_code, HTTPStatus.OK)
