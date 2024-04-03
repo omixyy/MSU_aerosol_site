@@ -117,7 +117,8 @@ class AdminHomeView(AdminIndexView):
                 }
                 json.dump(data, config, indent=2)
             for device in [
-                i for i in downloaded
+                i
+                for i in downloaded
                 if "graph_" + i + ".html"
                 not in os.listdir(
                     "templates/includes/devices/full",
