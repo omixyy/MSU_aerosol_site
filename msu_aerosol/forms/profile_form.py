@@ -5,6 +5,8 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired
 
+__all__: list = []
+
 
 class ProfileForm(FlaskForm):
     login = StringField(
