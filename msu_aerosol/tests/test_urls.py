@@ -4,26 +4,53 @@ import unittest
 from flask import url_for
 
 from main import app
+from msu_aerosol.models import (
+    Complex,
+    db,
+    Device,
+)
 
 __all__ = []
 
 
-class TestStaticURLS(unittest.TestCase):
+class TestStaticURL(unittest.TestCase):
     def setUp(self):
-        app.config["TESTING"] = True
-        self.app = app.test_client()
+        self.app = app
+        self.app.config["TESTING"] = True
+        self.client = self.app.test_client()
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        db.create_all()
+
+        complex = Complex(
+            name="TestComplex",
+        )
+        db.session.add(complex)
+        db.session.commit()
+        device = Device(
+            name="TestDevice",
+            link="https://disk.yandex.ru/d/3iruCwAKaGUD7g",
+            complex_id=Complex.query.first().id,
+        )
+        db.session.add(device)
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
 
     def test_url(self):
-        with app.app_context(), app.test_request_context():
-            response = self.app.get(url_for("home.index"))
+        with self.app.app_context(), self.app.test_request_context():
+            response = self.client.get(url_for("home.index"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_login(self):
-        with app.app_context(), app.test_request_context():
-            response = self.app.get(url_for("login.login"))
+        with self.app.app_context(), self.app.test_request_context():
+            response = self.client.get(url_for("login.login"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_registration(self):
-        with app.app_context(), app.test_request_context():
-            response = self.app.get(url_for("registration.register"))
+        with self.app.app_context(), self.app.test_request_context():
+            response = self.client.get(url_for("registration.register"))
         self.assertEqual(response.status_code, HTTPStatus.OK)

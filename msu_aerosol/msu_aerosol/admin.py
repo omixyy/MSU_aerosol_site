@@ -9,6 +9,7 @@ from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
+import plotly.express as px
 from sqlalchemy.event import listens_for
 
 from msu_aerosol.graph_funcs import (
@@ -53,7 +54,7 @@ class AdminHomeView(AdminIndexView):
     @expose("/", methods=["GET", "POST"])
     def admin_index(self) -> str:
         device_to_cols: dict = {}
-        device_to_time_cols: dict = {}
+        device_to_time_col: dict = {}
         downloaded = os.listdir("data")
         downloaded.remove(".gitignore")
         if downloaded:
@@ -74,7 +75,7 @@ class AdminHomeView(AdminIndexView):
                         ),
                     )
 
-                    device_to_time_cols[folder] = list(
+                    device_to_time_col[folder] = list(
                         filter(
                             lambda x: "date" in x.lower()
                             or "time" in x.lower(),
@@ -82,17 +83,15 @@ class AdminHomeView(AdminIndexView):
                         ),
                     )
 
-                with Path(
-                    "msu_aerosol/config_devices.json",
-                ).open("r") as config:
-                    data = json.load(config)
+                with Path("msu_aerosol/config_devices.json").open("r") as cfg:
+                    data = json.load(cfg)
                     if folder not in data:
                         data[folder] = {
                             "cols": [],
                             "time_cols": [],
                         }
                         data[folder]["cols"] = device_to_cols[folder]
-                        data[folder]["time_cols"] = device_to_time_cols[folder]
+                        data[folder]["time_cols"] = device_to_time_col[folder]
                 with Path(
                     "msu_aerosol/config_devices.json",
                 ).open("w") as write_config:
@@ -104,6 +103,7 @@ class AdminHomeView(AdminIndexView):
 
         elif request.method == "POST":
             with Path("msu_aerosol/config_devices.json").open("w") as config:
+                colors = px.colors.qualitative.Alphabet
                 data = {
                     dev_path: {
                         "time_cols": request.form.get(f"{dev_path}_rb"),
@@ -111,6 +111,10 @@ class AdminHomeView(AdminIndexView):
                         "format": request.form.get(
                             f"datetime_format_{dev_path}",
                         ),
+                        "color_dict": {
+                            device_to_cols[dev_path][i]: colors[i]
+                            for i in range(len(device_to_cols[dev_path]))
+                        },
                     }
                     for dev_path in downloaded
                 }
@@ -119,9 +123,9 @@ class AdminHomeView(AdminIndexView):
                 i
                 for i in downloaded
                 if "graph_" + i + ".html"
-                not in os.listdir(
+                   not in os.listdir(
                     "templates/includes/devices/full",
-                )
+                    )
             ]:
                 preprocess_device_data(device)
                 make_graph(device)
@@ -133,7 +137,7 @@ class AdminHomeView(AdminIndexView):
         return self.render(
             "admin/admin_home.html",
             device_to_cols=device_to_cols,
-            device_to_time_cols=device_to_time_cols,
+            device_to_time_cols=device_to_time_col,
             data=data,
         )
 

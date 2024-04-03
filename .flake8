@@ -3,3 +3,11 @@ application_import_names=msu_aerosol, forms, tests, views, main
 import-order-style=google
 inline-quotes=double
 exclude=.venv,venv,*/migrations/*,.git,__pycache__
+plugins =
+    flake8-commas
+    flake8-import-order
+    flake8-return
+    flake8-quotes
+    flake8-clean-block
+    flake8-expression-complexity
+    flake8-bugbear
