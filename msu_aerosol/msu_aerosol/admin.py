@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 from typing import Type
+import shutil
 
 from flask import Flask, request
 from flask_admin import Admin
@@ -13,6 +14,7 @@ import plotly.express as px
 from sqlalchemy.event import listens_for
 
 from msu_aerosol.graph_funcs import (
+    disk,
     download_device_data,
     make_graph,
     preprocess_device_data,
@@ -152,8 +154,18 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
 
 
 @listens_for(Device, "after_insert")
-def after_insert(mapper, connection, target):
+def after_insert(mapper, connection, target) -> None:
     download_device_data(target.link)
+
+
+@listens_for(Device, "after_delete")
+def after_delete(mapper, connection, target) -> None:
+    with Path("msu_aerosol/config_devices.json").open("r") as config:
+        data = json.load(config)
+        full_name = disk.get_public_meta(target.link)["name"]
+        del data[full_name]
+        if Path(f"data/{full_name}").exists():
+            shutil.rmtree(f"data/{full_name}")
 
 
 admin: Admin = Admin(
