@@ -118,7 +118,7 @@ class AdminHomeView(AdminIndexView):
 
             full: list = os.listdir("templates/includes/devices/full")
             for device in list(
-                filter(lambda x: f"graph_{x}.html" not in full, downloaded)
+                filter(lambda x: f"graph_{x}.html" not in full, downloaded),
             ):
                 preprocess_device_data(device)
                 make_graph(device)
