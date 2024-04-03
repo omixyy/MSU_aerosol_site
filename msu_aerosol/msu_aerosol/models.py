@@ -56,10 +56,6 @@ class Device(db.Model):
     serial_number = db.Column(
         db.String,
     )
-    description = db.Column(
-        db.Text,
-        nullable=False,
-    )
     show = db.Column(
         db.Boolean,
         nullable=True,
@@ -142,38 +138,3 @@ class UserFieldView(ModelView):
         "can_upload_data",
         "avatar",
     )
-
-
-class DeviceView(ModelView):
-    column_list = (
-        "id",
-        "name",
-        "description",
-        "serial_number",
-    )
-    form_excluded_columns = ("show",)
-
-    form_overrides = {
-        "description": TextAreaField,
-    }
-
-    form_widget_args = {
-        "description": {
-            "rows": 10,
-            "style": "width: 50%",
-        },
-    }
-
-    def description_formatter(self, context, model, name) -> str:
-        return (
-            model.description[:50] + "..."
-            if len(
-                model.description,
-            )
-            > 50
-            else model.description
-        )
-
-    column_formatters = {
-        "description": description_formatter,
-    }

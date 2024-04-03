@@ -20,7 +20,6 @@ from msu_aerosol.models import (
     Complex,
     db,
     Device,
-    DeviceView,
     User,
     UserFieldView,
 )
@@ -174,5 +173,5 @@ def init_admin(app: Flask):
     login_manager.init_app(app)
     admin.init_app(app)
     admin.add_view(ModelView(Complex, db.session))
-    admin.add_view(DeviceView(Device, db.session))
+    admin.add_view(ModelView(Device, db.session))
     admin.add_view(UserFieldView(User, db.session))
