@@ -171,11 +171,15 @@ def after_delete(mapper, connection, target) -> None:
 
     graph_full = f"templates/includes/devices/full/graph_{full_name}.html"
     graph_rec = f"templates/includes/devices/recent/graph_{full_name}.html"
+    proc_data = f"proc_data/{full_name}"
     if Path(graph_full).exists():
         Path(graph_full).unlink()
 
     if Path(graph_rec).exists():
         Path(graph_rec).unlink()
+    
+    if Path(proc_data).exists():
+        Path(proc_data).unlink()
 
 
 admin: Admin = Admin(
