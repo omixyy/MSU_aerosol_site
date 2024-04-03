@@ -12,9 +12,18 @@ yadisk_token: str = os.getenv("YADISK_TOKEN", default="FAKE_TOKEN")
 
 
 class Config:
-    SECRET_KEY: str | None = os.getenv("SECRET_KEY", default="FAKE_SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI: str | None = os.getenv("DATABASE_URI", default="sqlite:///database.db")
-    SESSION_COOKIE_NAME: str | None = os.getenv("SESSION_COOKIE_NAME", default="FAKE_SESSION_COOKIE_NAME")
+    SECRET_KEY: str = os.getenv(
+        "SECRET_KEY",
+        default="FAKE_SECRET_KEY",
+    )
+    SQLALCHEMY_DATABASE_URI: str = os.getenv(
+        "DATABASE_URI",
+        default="sqlite:///database.db",
+    )
+    SESSION_COOKIE_NAME: str = os.getenv(
+        "SESSION_COOKIE_NAME",
+        default="FAKE_SESSION_COOKIE_NAME",
+    )
     STATIC_FOLDER: Path = basedir / "static_dev"
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = True
 
