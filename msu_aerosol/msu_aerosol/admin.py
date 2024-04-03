@@ -21,9 +21,9 @@ from msu_aerosol.models import (
     Complex,
     db,
     Device,
+    DeviceView,
     User,
     UserFieldView,
-    DeviceView,
 )
 
 __all__ = []
