@@ -26,7 +26,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install -r requirements/dev.txt
+        pip install -r dev/test.txt
+        pip install -r requirements/test.txt
     - name: Lint with flake8
       run: |
         flake8 .
@@ -49,7 +50,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install -r requirements/dev.txt
+          pip install -r requirements/test.txt
       - name: Test
         run: |
           cd msu_aerosol
