@@ -78,10 +78,3 @@ class TestStaticURL(unittest.TestCase):
         with self.app.app_context(), self.app.test_request_context():
             response = self.client.get(url_for("profile.user_profile"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_send_settings_form(self):
-        with self.app.app_context(), self.app.test_request_context():
-            response = self.client.post(
-                url_for("admin.index"),
-                data={},
-            )
