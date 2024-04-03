@@ -177,7 +177,7 @@ def after_delete(mapper, connection, target) -> None:
 
     if Path(graph_rec).exists():
         Path(graph_rec).unlink()
-    
+
     if Path(proc_data).exists():
         Path(proc_data).unlink()
 

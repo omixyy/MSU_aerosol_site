@@ -93,7 +93,7 @@ class TestStaticURL(unittest.TestCase):
 
             response = self.client.get(url_for("home.index"))
             self.assertIn(b"TestDevice", response.data)
-            
+
             dev_response = self.client.get(
                 url_for(
                     "device_details.device",
