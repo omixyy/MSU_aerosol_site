@@ -4,11 +4,26 @@
   <div class="mx-auto" style="width: 50%; text-align: center;">
     <h1>Данные с прибора {{ device }}</h1>
   </div>
-  <h3 style="margin-left: 2%; margin-top: 2%">{{ device.name }}, {{ device.serial_number }}</h3>
-  <h5 style="margin-left: 2%; margin-top: 2%">Состоит в комплексе "{{ complex }}"</h2>
-  <div style="width: 55%; height: 40%; float: left; margin-left: 2%; margin-bottom: 8%">
-    {% include "includes/devices/full/graph_" ~ device_to_name[device.name] ~ ".html"  %}
-    <button type="button" class="btn btn-dark">Dark</button>
-    <button type="button" class="btn btn-dark">Dark</button>
+  <style>
+    .datetime_picker_start table tr td.active:active, 
+    .datetime_picker_start table tr td.active.highlighted:active, 
+    .datetime_picker_start table tr td.active.active, 
+    .datetime_picker_start table tr td.active.highlighted.active {
+    background-color: green;
+  }
+  </style>
+  <div class="mx-auto", style="text-align: center">
+    <h3 style="margin-top: 2%">{{ device.name }}{% if device.serial_number %}, {{ device.serial_number }} {% endif %}</h3>
+    <h5 style="margin-top: 2%;">Состоит в комплексе "{{ complex }}"</h5>
+    <div class="my-3">
+      <input id="datetime_picker_start" name="datetime_picker_start" class="form-control my-1 d-inline" type="datetime-local" style="width: 15%;" min={{ min_date }}>
+      &rarr;
+      <input id="datetime_picker_end" name="datetime_picker_end" class="form-control my-1 d-inline" type="datetime-local" style="width: 15%;" max={{ max_date }}>
+      <button type="submit" class="btn btn-dark" style="">Подтвердить</button>
+      <button type="button" class="btn btn-dark" style="">Скачать</button>
+    </div>
+    <div class="mx-auto" style="width: 55%; height: 40%; margin-bottom: 5%">
+      {% include "includes/devices/full/graph_" ~ device_to_name[device.name] ~ ".html"  %}
+    </div>
   </div>
 {% endblock %}

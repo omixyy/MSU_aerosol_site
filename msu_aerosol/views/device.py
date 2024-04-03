@@ -30,4 +30,6 @@ def device(device_id: int) -> str:
         complex_to_device=complex_to_device,
         user=current_user,
         device_to_name=device_to_name,
+        min_date=None,
+        max_date=None,
     )
