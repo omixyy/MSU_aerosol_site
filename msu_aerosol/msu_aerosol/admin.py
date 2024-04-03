@@ -2,8 +2,8 @@ import csv
 import json
 import os
 from pathlib import Path
-from typing import Type
 import shutil
+from typing import Type
 
 from flask import Flask, request
 from flask_admin import Admin
@@ -166,6 +166,16 @@ def after_delete(mapper, connection, target) -> None:
         del data[full_name]
         if Path(f"data/{full_name}").exists():
             shutil.rmtree(f"data/{full_name}")
+    with Path("msu_aerosol/config_devices.json").open("w") as config:
+        json.dump(data, config, indent=2)
+
+    graph_full = f"templates/includes/devices/full/graph_{full_name}.html"
+    graph_rec = f"templates/includes/devices/recent/graph_{full_name}.html"
+    if Path(graph_full).exists():
+        Path(graph_full).unlink()
+
+    if Path(graph_rec).exists():
+        Path(graph_rec).unlink()
 
 
 admin: Admin = Admin(
