@@ -123,9 +123,9 @@ class AdminHomeView(AdminIndexView):
                 i
                 for i in downloaded
                 if "graph_" + i + ".html"
-                   not in os.listdir(
+                not in os.listdir(
                     "templates/includes/devices/full",
-                    )
+                )
             ]:
                 preprocess_device_data(device)
                 make_graph(device)
