@@ -1,6 +1,7 @@
 # MSU_aerosol_site
 
 [![CI](https://github.com/omixyy/MSU_aerosol_site/actions/workflows/python-package.yml/badge.svg)](https://github.com/omixyy/MSU_aerosol_site/actions/workflows/python-package.yml)
+[![code style: black & flake8](https://img.shields.io/badge/code%20style-black%20%7C%20flake8-blue.svg)](https://github.com/psf/black)
 
 Сайт делался специально под нужды Географического Факультета МГУ имени М.В. Ломоносова. Он представляет собой систему, разработанную на Flask и bootstrap, реализующую систему работы с графиками, регистрацию и работу с базами данных для хранения приборов и комплексов.
 
