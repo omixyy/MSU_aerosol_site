@@ -1,1 +1,260 @@
-{}
+{
+  "AE33-S04-00360": {
+    "cols": [
+      "BC1",
+      "BC2",
+      "BC3",
+      "BC4",
+      "BC5",
+      "BC6",
+      "BC7",
+      "BB(%)",
+      "BCbb",
+      "BCff"
+    ],
+    "time_cols": [
+      "Datetime"
+    ]
+  },
+  "AE33-S08-01006": {
+    "cols": [
+      "BC1",
+      "BC2",
+      "BC3",
+      "BC4",
+      "BC5",
+      "BC6",
+      "BC7",
+      "BB(%)",
+      "BCbb",
+      "BCff"
+    ],
+    "time_cols": [
+      "Datetime"
+    ]
+  },
+  "AE33-S09-01249": {
+    "cols": [
+      "BC1",
+      "BC2",
+      "BC3",
+      "BC4",
+      "BC5",
+      "BC6",
+      "BC7",
+      "BB(%)",
+      "BCbb",
+      "BCff"
+    ],
+    "time_cols": [
+      "Datetime"
+    ]
+  },
+  "AE43-S01-00125": {
+    "cols": [
+      "BC1",
+      "BC2",
+      "BC3",
+      "BC4",
+      "BC5",
+      "BC6",
+      "BC7",
+      "BB(%)",
+      "BCbb",
+      "BCff"
+    ],
+    "time_cols": [
+      "Datetime"
+    ]
+  },
+  "DAS": {
+    "cols": [
+      "Count1",
+      "Count2",
+      "Count3",
+      "Count4",
+      "Count5",
+      "Count6",
+      "0~5",
+      "5~10",
+      "10~15",
+      "15~20",
+      "20~25",
+      "25~30",
+      "30~35",
+      "35~40",
+      "40~45",
+      "45~50",
+      "50~55",
+      "55~60",
+      "60~65",
+      "65~70",
+      "70~75",
+      "75~80",
+      "80~85",
+      "85~90",
+      "90~95",
+      "95~100",
+      "100~105",
+      "105~110",
+      "110~115",
+      "115~120",
+      "120~125",
+      "125~130",
+      "130~135",
+      "135~140",
+      "140~145",
+      "145~150",
+      "150~155",
+      "155~160",
+      "160~165",
+      "165~170",
+      "170~175",
+      "175~180",
+      "180~185",
+      "185~190",
+      "190~195",
+      "195~200",
+      "Total",
+      "Sigma",
+      "Dm",
+      "Rel.Humidity",
+      "Pressure",
+      "Ambient",
+      "0.2um",
+      "0.3um",
+      "0.5um",
+      "0.7um",
+      "1.0um",
+      "2.0um",
+      "2.5um",
+      "3.0um",
+      "5.0um",
+      "7.0um",
+      "10um",
+      ">10um",
+      "PM1",
+      "PM2.5",
+      "PM10",
+      "Surface Area"
+    ],
+    "time_cols": [
+      "timestamp",
+      "datetime",
+      "Date",
+      "Time"
+    ]
+  },
+  "LVS": {
+    "cols": [
+      "Type",
+      "D/N",
+      "Motorspeed(%)",
+      "Actual(m3/h)",
+      "Actual(Nm3/h)",
+      "Actual(m3)",
+      "Actual(Nm3)",
+      "Filter Press.(hPa)",
+      "Air Pressure(hPa)",
+      "Outdoor Temp.('C)",
+      "Filter Temp.('C)",
+      "Chamber Temp.('C)",
+      "Temperature orifice('C)",
+      "Rel.Humidity(%)",
+      "Magazine Position",
+      "Measuring Typ",
+      "Sample ID",
+      "Max. Planned Pos.",
+      "Event",
+      "Error"
+    ],
+    "time_cols": [
+      "Date",
+      "Time",
+      "Pump Run Time Total(h:m)",
+      "Time of Measurement(h:m)"
+    ]
+  },
+  "PNS": {
+    "cols": [
+      "Type",
+      "D/N",
+      "Motorspeed(%)",
+      "Actual(m3/h)",
+      "Actual(Nm3/h)",
+      "Actual(m3)",
+      "Actual(Nm3)",
+      "Filter Press.(hPa)",
+      "Air Pressure(hPa)",
+      "Outdoor Temp.('C)",
+      "Filter Temp.('C)",
+      "Chamber Temp.('C)",
+      "Temperature orifice('C)",
+      "Rel.Humidity(%)",
+      "Magazine Position",
+      "Measuring Typ",
+      "Sample ID",
+      "Max. Planned Pos.",
+      "Event",
+      "Error"
+    ],
+    "time_cols": [
+      "Date",
+      "Time",
+      "Pump Run Time Total(h:m)",
+      "Time of Measurement(h:m)"
+    ]
+  },
+  "TCA08": {
+    "cols": [
+      "ID",
+      "SampleID",
+      "TCcounts",
+      "TCmass",
+      "TCconc",
+      "AE33_BC6",
+      "AE33_ValidData",
+      "AE33_b",
+      "OC",
+      "EC",
+      "CO2",
+      "Volume",
+      "Chamber",
+      "SetupID",
+      "a1",
+      "b1",
+      "c1",
+      "d1",
+      "e1",
+      "f1",
+      "a2",
+      "b2",
+      "c2",
+      "d2",
+      "e2",
+      "f2"
+    ],
+    "time_cols": [
+      "StartTimeUTC",
+      "EndTimeUTC",
+      "StartTimeLocal",
+      "EndTimeLocal"
+    ]
+  },
+  "Web_MEM": {
+    "cols": [
+      "CH4",
+      "CO",
+      "NO",
+      "NO2",
+      "OZ",
+      "PM10",
+      "PM2.5",
+      "SO2"
+    ],
+    "time_cols": [
+      "timestamp",
+      "datetime"
+    ]
+  }
+}

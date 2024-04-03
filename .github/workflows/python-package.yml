@@ -47,6 +47,9 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -r requirements/dev.txt
       - name: Test
         run: |
           cd msu_aerosol
