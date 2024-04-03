@@ -4,15 +4,11 @@
   <div class="mx-auto" style="width: 50%; text-align: center;">
     <h1>Данные с прибора {{ device }}</h1>
   </div>
-  <div style="text-align: left;">
-    <h3 style="margin-left: 50px; margin-top: 50px">{{ device.name }}, {{ device.serial_number }}</h3>
-    <h5 style="margin-left: 50px; margin-top: 30px">Состоит в комплексе "{{ complex }}"</h2>
-    <div style="width: 55%; height: 400px; float: right; margin-right: 100px">
-      {% include "includes/devices/full/graph_" ~ device_to_name[device.name] ~ ".html"  %}
-    </div>
-    <div class="col-sm-3" style="margin-bottom: 180px">
-      <textarea class="form-control form-control-sm rounded focus" style="margin-left: 50px; margin-top: 20px; margin-bottom: 20px" rows="20" value="50px" type="text" readonly>{{ device.description }}</textarea>
-    </div>
+  <h3 style="margin-left: 2%; margin-top: 2%">{{ device.name }}, {{ device.serial_number }}</h3>
+  <h5 style="margin-left: 2%; margin-top: 2%">Состоит в комплексе "{{ complex }}"</h2>
+  <div style="width: 55%; height: 40%; float: left; margin-left: 2%; margin-bottom: 8%">
+    {% include "includes/devices/full/graph_" ~ device_to_name[device.name] ~ ".html"  %}
+    <button type="button" class="btn btn-dark">Dark</button>
+    <button type="button" class="btn btn-dark">Dark</button>
   </div>
 {% endblock %}
-
