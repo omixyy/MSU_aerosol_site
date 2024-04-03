@@ -8,7 +8,7 @@ __all__: list = []
 
 load_dotenv()
 basedir: Path = Path(os.path.dirname(__file__)).resolve().parent
-yadisk_token: str = os.getenv("YADISK_TOKEN")
+yadisk_token: str = os.getenv("YADISK_TOKEN", default="FAKE_TOKEN")
 
 
 class Config:
