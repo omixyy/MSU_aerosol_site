@@ -59,13 +59,9 @@ class AdminHomeView(AdminIndexView):
         downloaded.remove(".gitignore")
         if downloaded:
             for folder in downloaded:
-                dialect = get_dialect(
-                    f"data/" f"{folder}/" f"{os.listdir(f'data/{folder}')[0]}",
-                )
-
-                with Path(
-                    f"data/" f"{folder}/" f"{os.listdir(f'data/{folder}')[0]}",
-                ).open("r") as csv_file:
+                file: str = os.listdir(f"data/{folder}")[0]
+                dialect = get_dialect(f"data/{folder}/{file}")
+                with Path(f"data/{folder}/{file}").open("r") as csv_file:
                     header = list(csv.reader(csv_file, dialect=dialect))[0]
                     device_to_cols[folder] = list(
                         filter(
@@ -92,10 +88,9 @@ class AdminHomeView(AdminIndexView):
                         }
                         data[folder]["cols"] = device_to_cols[folder]
                         data[folder]["time_cols"] = device_to_time_col[folder]
-                with Path(
-                    "msu_aerosol/config_devices.json",
-                ).open("w") as write_config:
-                    json.dump(data, write_config, indent=2)
+
+                with Path("msu_aerosol/config_devices.json").open("w") as cfg:
+                    json.dump(data, cfg, indent=2)
 
         if request.method == "GET":
             with Path("msu_aerosol/config_devices.json").open("r") as config:
@@ -118,20 +113,19 @@ class AdminHomeView(AdminIndexView):
                     }
                     for dev_path in downloaded
                 }
+
                 json.dump(data, config, indent=2)
-            for device in [
-                i
-                for i in downloaded
-                if "graph_" + i + ".html"
-                not in os.listdir(
-                    "templates/includes/devices/full",
-                )
-            ]:
+
+            full: list = os.listdir("templates/includes/devices/full")
+            for device in list(
+                filter(lambda x: f"graph_{x}.html" not in full, downloaded)
+            ):
                 preprocess_device_data(device)
                 make_graph(device)
 
             for dev in Device.query.all():
                 dev.show = True
+
             db.session.commit()
 
         return self.render(
@@ -140,18 +134,6 @@ class AdminHomeView(AdminIndexView):
             device_to_time_cols=device_to_time_col,
             data=data,
         )
-
-
-admin: Admin = Admin(
-    template_mode="bootstrap4",
-    index_view=AdminHomeView(
-        name="Home",
-        template="admin/index.html",
-        url="/admin",
-    ),
-)
-
-login_manager: LoginManager = LoginManager()
 
 
 def get_complexes_dict() -> dict:
@@ -171,6 +153,18 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
 @listens_for(Device, "after_insert")
 def after_insert(mapper, connection, target):
     download_device_data(target.link)
+
+
+admin: Admin = Admin(
+    template_mode="bootstrap4",
+    index_view=AdminHomeView(
+        name="Home",
+        template="admin/index.html",
+        url="/admin",
+    ),
+)
+
+login_manager: LoginManager = LoginManager()
 
 
 def init_admin(app: Flask):
