@@ -27,21 +27,25 @@ last_modified_file = {}
 base_url = "https://cloud-api.yandex.net/v1/disk/public/resources/download?"
 
 
-def download_last_modified_file(device: str) -> None:
+def download_last_modified_file() -> None:
     folder_path = "/external_data"
-    for i in disk.listdir(folder_path):
-        last_modified_file[i["name"]] = max(
-            [file for file in i.listdir() if file["name"].endswith(".csv")],
-            key=lambda x: x["modified"],
-        )
-    public_key = last_modified_file[device]["public_url"]
-    final_url = base_url + urlencode({"public_key": public_key})
-    response = requests.get(final_url)
-    download_url = response.json()["href"]
 
-    download_response = requests.get(download_url)
-    with Path(f"data/{device}.csv").open("wb") as f:
-        f.write(download_response.content)
+    for i in disk.listdir(folder_path):
+        if i["name"] in load_json("msu_aerosol/config_devices.json").keys():
+            last_modified_file = max(
+                [
+                    file
+                    for file in i.listdir()
+                    if file["name"].endswith(".csv")
+                ],
+                key=lambda x: x["modified"],
+            )
+            download_response = requests.get(last_modified_file["file"])
+            Path(f"data/{i['name']}", exist_ok=True).mkdir(parents=True)
+            with Path(
+                f"data/{i['name']}/{last_modified_file['name']}",
+            ).open("wb") as f:
+                f.write(download_response.content)
 
 
 def download_device_data(url: str) -> str:
@@ -56,7 +60,7 @@ def download_device_data(url: str) -> str:
         return zf.namelist()[-1][0:-1:]
 
 
-def preprocess_device_data(name_folder):
+def preprocess_device_data(name_folder: str) -> None:
     for name_file in os.listdir(f"{main_path}/{name_folder}"):
         if not name_file.endswith(".csv"):
             Path(f"{main_path}/{name_folder}/{name_file}").unlink()
