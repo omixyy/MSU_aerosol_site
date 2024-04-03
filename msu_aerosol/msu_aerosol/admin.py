@@ -149,7 +149,7 @@ def get_complexes_dict() -> dict:
 
 
 def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
-    with Path(path).open("r", encoding="utf-8") as f:
+    with Path(path).open("r", encoding="cp-1251") as f:
         return csv.Sniffer().sniff(f.readline())
 
 
