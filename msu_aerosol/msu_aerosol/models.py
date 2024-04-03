@@ -137,3 +137,13 @@ class UserFieldView(ModelView):
         "can_upload_data",
         "avatar",
     )
+
+
+class DeviceView(ModelView):
+    column_list = (
+        "id",
+        "name",
+        "description",
+        "serial_number",
+    )
+    form_excluded_columns = ("show",)
