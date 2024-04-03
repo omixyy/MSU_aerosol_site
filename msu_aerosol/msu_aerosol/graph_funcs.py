@@ -53,7 +53,7 @@ def download_device_data(url: str) -> str:
     response = requests.get(final_url)
     download_url = response.json()["href"]
     download_response = requests.get(download_url)
-    with Path("yandex_disk_folder.zip").open("wb") as file:
+    with Path("yandex_disk_folder.zip").open("wb", encoding="utf8") as file:
         file.write(download_response.content)
     with ZipFile("yandex_disk_folder.zip", "r") as zf:
         zf.extractall(f"{main_path}")
