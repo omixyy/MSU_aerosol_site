@@ -54,12 +54,12 @@
         </div>
       </ul>
     </div>
-    {% if user.admin %}
+    {% if user and user.admin %}
       <span class="badge bg-warning text-dark">Admin</span>
     {% endif %}
-    {% if not user.is_authenticated %}
+    {% if user and not user.is_authenticated %}
       <a type="button" href="{% if view_name not in ['registration', 'login'] %} {{ url_for('login.login') }} {% else %} # {% endif %}" class="btn btn-outline-dark ml-5" style="margin-right: 15px">Войти</a>
-    {% else %}
+    {% elif user %}
       <a class="nav-link mx-3" href="{{ url_for('profile.user_profile') }}" style="float: right;">{{ user.login }}</a>
     {% endif %}  
   </nav>
