@@ -1,3 +1,4 @@
+from datetime import timedelta
 import json
 import os
 from pathlib import Path
@@ -25,6 +26,10 @@ main_path = "data"
 disk = YaDisk(token=yadisk_token)
 last_modified_file = {}
 base_url = "https://cloud-api.yandex.net/v1/disk/public/resources/download?"
+
+
+def make_format_date(date: str) -> str:
+    return "".join(["%" + i if i.isalpha() else i for i in list(date)])
 
 
 def download_last_modified_file() -> None:
@@ -100,30 +105,66 @@ def preprocessing_one_file(path):
     return f"proc_data/{device}/{name[0]}_{name[1]}.csv"
 
 
-def make_graph(device):
+def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
+    time_col = load_json(
+        "msu_aerosol/config_devices.json",
+    )[
+        device
+    ]["time_cols"]
+    list_files = os.listdir(f"proc_data/{device}")
+    return pd.to_datetime(
+        pd.read_csv(f"proc_data/{device}/{min(list_files)}")[time_col].iloc[0],
+    ), pd.to_datetime(
+        pd.read_csv(f"proc_data/{device}/{max(list_files)}")[time_col].iloc[-1]
+    )
+
+
+def make_graph(device, spec_act, begin_record_date=None, end_record_date=None):
+    resample = "60 min"
+    if spec_act == "manual":
+        begin_record_date = pd.to_datetime(
+            begin_record_date,
+            format="%Y-%m-%dT%H:%M:%S",
+        )
+        end_record_date = pd.to_datetime(
+            end_record_date,
+            format="%Y-%m-%dT%H:%M:%S",
+        )
     device_dict = load_json("msu_aerosol/config_devices.json")[device]
     time_col = device_dict["time_cols"]
-    combined_data = pd.DataFrame()
-    for i in os.listdir(f"proc_data/{device}"):
-        data = pd.read_csv(f"proc_data/{device}/{i}")
-        combined_data = pd.concat([combined_data, data], ignore_index=True)
-    combined_data[time_col] = pd.to_datetime(
-        combined_data[time_col],
-        format="%Y-%m-%d %H:%M:%S",
-    )
+    if not begin_record_date or not end_record_date:
+        begin_record_date, end_record_date = choose_range(device)
+    if spec_act == "recent":
+        begin_record_date = end_record_date - timedelta(days=3)
+    current_date, combined_data = begin_record_date, pd.DataFrame()
+    while current_date <= end_record_date + timedelta(days=100):
+        try:
+            data = pd.read_csv(
+                f"proc_data/{device}/{current_date.strftime('%Y_%m')}.csv",
+            )
+            combined_data = pd.concat([combined_data, data], ignore_index=True)
+            current_date += timedelta(days=29)
+        except FileNotFoundError:
+            current_date += timedelta(days=29)
+    combined_data[time_col] = pd.to_datetime(combined_data[time_col])
     m = max(combined_data[time_col])
     last_48_hours = [m.replace(day=(m.day - 2)), m]
-    combined_data_full = combined_data.copy()
-    combined_data_full.set_index(time_col, inplace=True)
-    combined_data_full = combined_data_full.replace(
+    if spec_act == "recent":
+        combined_data = combined_data.loc[
+            (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
+            & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
+        ]
+        last_48_hours = None
+    combined_data.set_index(time_col, inplace=True)
+    combined_data = combined_data.replace(
         ",",
         ".",
         regex=True,
     ).astype(float)
-    combined_data_full = combined_data_full.resample("60min").mean()
-    combined_data_full.reset_index(inplace=True)
+    combined_data = combined_data.resample(resample).mean()
+    combined_data.reset_index(inplace=True)
     fig = px.line(
-        combined_data_full,
+        combined_data,
         x=time_col,
         y=device_dict["cols"],
         range_x=last_48_hours,
@@ -153,52 +194,12 @@ def make_graph(device):
     )
     offline.plot(
         fig,
-        filename=f"templates/includes/devices/full/graph_{device}.html",
-        auto_open=False,
-    )
-
-    combined_data_48 = combined_data.loc[
-        (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
-        & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
-    ]
-    combined_data_48.set_index(time_col, inplace=True)
-    combined_data_48 = combined_data_48.replace(
-        ",",
-        ".",
-        regex=True,
-    ).astype(float)
-    combined_data_48 = combined_data_48.resample("60min").mean()
-    combined_data_48.reset_index(inplace=True)
-    fig = px.line(
-        combined_data_48,
-        x=time_col,
-        y=device_dict["cols"],
-    )
-    fig.update_layout(
-        title=str(device),
-        xaxis={"title": "Time"},
-        plot_bgcolor="white",
-        paper_bgcolor="white",
-        showlegend=True,
-    )
-    fig.update_traces(line={"width": 2})
-    fig.update_xaxes(
-        gridcolor="grey",
-        showline=True,
-        linewidth=1,
-        linecolor="black",
-        mirror=True,
-        tickformat="%d.%m.%Y",
-    )
-    fig.update_yaxes(
-        gridcolor="grey",
-        showline=True,
-        linewidth=1,
-        linecolor="black",
-        mirror=True,
-    )
-    offline.plot(
-        fig,
-        filename=f"templates/includes/devices/recent/graph_{device}.html",
+        filename=(
+            f"templates/"
+            f"includes/"
+            f"devices/"
+            f"{spec_act}"
+            f"/graph_{device}.html"
+        ),
         auto_open=False,
     )
