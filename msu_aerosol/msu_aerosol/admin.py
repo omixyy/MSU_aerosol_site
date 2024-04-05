@@ -142,7 +142,7 @@ class AdminHomeView(AdminIndexView):
         )
 
 
-def get_complexes_dict() -> dict:
+def get_complexes_dict() -> dict[Complex, list[Device]]:
     return {
         com: Device.query.filter(
             Device.complex_id == com.id,
@@ -197,7 +197,7 @@ admin: Admin = Admin(
 login_manager: LoginManager = LoginManager()
 
 
-def init_admin(app: Flask):
+def init_admin(app: Flask) -> None:
     login_manager.init_app(app)
     admin.init_app(app)
     admin.add_view(ModelView(Complex, db.session))

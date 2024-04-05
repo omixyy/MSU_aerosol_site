@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 from urllib.parse import urlencode
 from zipfile import ZipFile
+import typing as t
 
 import pandas as pd
 import plotly.express as px
@@ -17,7 +18,7 @@ from msu_aerosol.config import yadisk_token
 __all__ = []
 
 
-def load_json(path: str):
+def load_json(path: str) -> dict[str, dict[str, t.Any]]:
     return json.load(open(path, "r"))
 
 
@@ -73,7 +74,7 @@ def preprocess_device_data(name_folder: str) -> None:
         preprocessing_one_file(f"{main_path}/{name_folder}/{name_file}")
 
 
-def preprocessing_one_file(path):
+def preprocessing_one_file(path: str) -> None:
     config_devices_open = load_json("msu_aerosol/config_devices.json")
     _, device, file_name = path.split("/")
     df = pd.read_csv(path, sep=None, engine="python", decimal=",")
@@ -102,7 +103,6 @@ def preprocessing_one_file(path):
     df = df.sort_values(by=time_col)
     name = re.split("[-_]", file_name)
     df.to_csv(f"proc_data/{device}/{name[0]}_{name[1]}.csv", index=False)
-    return f"proc_data/{device}/{name[0]}_{name[1]}.csv"
 
 
 def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
@@ -130,7 +130,12 @@ def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
     )
 
 
-def make_graph(device, spec_act, begin_record_date=None, end_record_date=None):
+def make_graph(
+        device: str,
+        spec_act,
+        begin_record_date=None,
+        end_record_date=None,
+) -> None:
     resample = "60 min"
     if spec_act == "manual":
         begin_record_date = pd.to_datetime(
