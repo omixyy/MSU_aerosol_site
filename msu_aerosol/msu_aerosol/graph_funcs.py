@@ -112,11 +112,13 @@ def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
         device
     ]["time_cols"]
     list_files = os.listdir(f"proc_data/{device}")
-    return pd.to_datetime(
+    return (
+    pd.to_datetime(
         pd.read_csv(f"proc_data/{device}/{min(list_files)}")[time_col].iloc[0],
-    ), pd.to_datetime(
+    ),
+    pd.to_datetime(
         pd.read_csv(f"proc_data/{device}/{max(list_files)}")[time_col].iloc[-1],
-    )
+    ))
 
 
 def make_graph(device, spec_act, begin_record_date=None, end_record_date=None):
