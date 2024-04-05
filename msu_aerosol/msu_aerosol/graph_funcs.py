@@ -3,9 +3,9 @@ import json
 import os
 from pathlib import Path
 import re
+from typing import Any
 from urllib.parse import urlencode
 from zipfile import ZipFile
-import typing as t
 
 import pandas as pd
 import plotly.express as px
@@ -18,7 +18,7 @@ from msu_aerosol.config import yadisk_token
 __all__ = []
 
 
-def load_json(path: str) -> dict[str, dict[str, t.Any]]:
+def load_json(path: str) -> dict[str, dict[str, Any]]:
     return json.load(open(path, "r"))
 
 
@@ -131,10 +131,10 @@ def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
 
 
 def make_graph(
-        device: str,
-        spec_act,
-        begin_record_date=None,
-        end_record_date=None,
+    device: str,
+    spec_act,
+    begin_record_date=None,
+    end_record_date=None,
 ) -> None:
     resample = "60 min"
     if spec_act == "manual":
