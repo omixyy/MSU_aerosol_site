@@ -111,7 +111,9 @@ class AdminHomeView(AdminIndexView):
                         ),
                         "color_dict": {
                             device_to_cols[dev_path][i]: colors[i]
-                            for i in range(len(request.form.getlist(f"{dev_path}_cb")))
+                            for i in range(
+                                len(request.form.getlist(f"{dev_path}_cb")),
+                            )
                         },
                     }
                     for dev_path in downloaded

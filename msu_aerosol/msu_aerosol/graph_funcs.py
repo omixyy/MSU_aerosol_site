@@ -115,7 +115,7 @@ def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
     return pd.to_datetime(
         pd.read_csv(f"proc_data/{device}/{min(list_files)}")[time_col].iloc[0],
     ), pd.to_datetime(
-        pd.read_csv(f"proc_data/{device}/{max(list_files)}")[time_col].iloc[-1]
+        pd.read_csv(f"proc_data/{device}/{max(list_files)}")[time_col].iloc[-1],
     )
 
 
