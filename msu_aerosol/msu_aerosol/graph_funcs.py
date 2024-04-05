@@ -202,4 +202,5 @@ def make_graph(device, spec_act, begin_record_date=None, end_record_date=None):
             f"/graph_{device}.html"
         ),
         auto_open=False,
+        include_plotlyjs=False,
     )

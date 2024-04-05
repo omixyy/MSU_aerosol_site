@@ -111,7 +111,7 @@ class AdminHomeView(AdminIndexView):
                         ),
                         "color_dict": {
                             device_to_cols[dev_path][i]: colors[i]
-                            for i in range(len(device_to_cols[dev_path]))
+                            for i in range(len(request.form.getlist(f"{dev_path}_cb")))
                         },
                     }
                     for dev_path in downloaded
@@ -124,7 +124,8 @@ class AdminHomeView(AdminIndexView):
                 filter(lambda x: f"graph_{x}.html" not in full, downloaded),
             ):
                 preprocess_device_data(device)
-                make_graph(device)
+                make_graph(device, "full")
+                make_graph(device, "recent")
 
             for dev in Device.query.all():
                 dev.show = True
@@ -179,7 +180,7 @@ def after_delete(mapper, connection, target) -> None:
         Path(graph_rec).unlink()
 
     if Path(proc_data).exists():
-        Path(proc_data).unlink()
+        shutil.rmtree(proc_data)
 
 
 admin: Admin = Admin(

@@ -16,16 +16,16 @@
     <h3 style="margin-top: 2%">{{ device.name }}{% if device.serial_number %}, {{ device.serial_number }} {% endif %}</h3>
     <h5 style="margin-top: 2%;">Состоит в комплексе "{{ complex }}"</h5>
     <div class="my-3">
-      <form method="POST">
+      </div class="row">
         <input id="datetime_picker_start" name="datetime_picker_start" class="form-control my-1 d-inline" type="datetime-local" style="width: 15%;" min={{ min_date }} max={{ max_date }}>
         &rarr;
         <input id="datetime_picker_end" name="datetime_picker_end" class="form-control my-1 d-inline" type="datetime-local" style="width: 15%;" min={{ min_date }} max={{ max_date }}>
-        <button type="submit" class="btn btn-dark" type="submit">Подтвердить</button>
-        <button type="button" class="btn btn-dark">Скачать</button>
-      </form>
+        <button onclick="updateGraph()" class="btn btn-dark" style="margin-left: 1%">Подтвердить</button>
+      </div>
     </div>
-    <div class="mx-auto" style="width: 55%; height: 40%; margin-bottom: 5%" name="plotly-graph">
+    <div class="mx-auto mt-5" style="width: 55%; height: 40%; margin-bottom: 3%" id="graphDiv">
       {% include "includes/devices/full/graph_" ~ device_to_name[device.name] ~ ".html"  %}
+      <script type="text/javascript" src="{{ url_for('static', filename='js/xrange_changer.js') }}"></script>
     </div>
   </div>
 {% endblock %}
