@@ -183,7 +183,7 @@ def make_graph(
         combined_data,
         x=time_col,
         y=device_dict["cols"],
-        range_x=last_48_hours,
+        # range_x=last_48_hours,
     )
     fig.update_layout(
         title=str(device),

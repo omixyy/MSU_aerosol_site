@@ -122,9 +122,7 @@ class AdminHomeView(AdminIndexView):
                 json.dump(data, config, indent=2)
 
             full: list = os.listdir("templates/includes/devices/full")
-            for device in list(
-                filter(lambda x: f"graph_{x}.html" not in full, downloaded),
-            ):
+            for device in downloaded:
                 preprocess_device_data(device)
                 make_graph(device, "full")
                 make_graph(device, "recent")
