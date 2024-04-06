@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ device }}{% endblock %}
 {% block content %}
+  <script type="text/javascript" src="{{ url_for('static', filename='js/handlers.js') }}"></script>
   <div class="mx-auto" style="width: 50%; text-align: center;">
     <h1>Данные с прибора {{ device }}</h1>
   </div>
@@ -37,11 +38,12 @@
     <div class="row">
       <div class="col text-center">
         <button onclick="updateGraph()" class="btn btn-dark" style="float: center">Подтвердить</button>
+        <a onclick="getRange()" href="{{ url_for("device_details.download_file", device_id=device.id) }}" class="btn btn-dark" style="float: center; margin-left: 1%">Скачать по диапазону</a>
+        <button class="btn btn-dark" style="float: center; margin-left: 1%">Загрузить</button>
       </div>
     </div>
   </div>
   <div class="mx-auto" style="width: 55%; height: 40%; margin-bottom: 1%; margin-top: 1%" id="graphDiv">
     {% include "includes/devices/full/graph_" ~ device_to_name[device.name] ~ ".html"  %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/xrange_changer.js') }}"></script>
   </div>
 {% endblock %}

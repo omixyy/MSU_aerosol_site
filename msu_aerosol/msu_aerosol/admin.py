@@ -18,6 +18,7 @@ from msu_aerosol.graph_funcs import (
     download_device_data,
     make_graph,
     preprocess_device_data,
+    get_spaced_colors,
 )
 from msu_aerosol.models import (
     Complex,
@@ -100,29 +101,33 @@ class AdminHomeView(AdminIndexView):
                 data = json.load(config)
 
         elif request.method == "POST":
+            with Path("msu_aerosol/config_devices.json").open("r") as config:
+                config_dev = json.load(config)
+                changed = [
+                    k
+                    for k, _ in config_dev.items()
+                    if request.form.getlist(f"{k}_cb") != config_dev[k]["cols"]
+                    or not Path(f"templates/includes/devices/full/{k}.html").exists()
+                ]
             with Path("msu_aerosol/config_devices.json").open("w") as config:
-                colors = px.colors.qualitative.Alphabet
-                data = {
-                    dev_path: {
-                        "time_cols": request.form.get(f"{dev_path}_rb"),
-                        "cols": request.form.getlist(f"{dev_path}_cb"),
+                for dev_name in changed:
+                    checkboxes = request.form.getlist(f"{dev_name}_cb")
+                    colors = get_spaced_colors(len(checkboxes))
+                    data[dev_name] = {
+                        "time_cols": request.form.get(f"{dev_name}_rb"),
+                        "cols": checkboxes,
                         "format": request.form.get(
-                            f"datetime_format_{dev_path}",
+                            f"datetime_format_{dev_name}",
                         ),
                         "color_dict": {
-                            device_to_cols[dev_path][i]: colors[i]
-                            for i in range(
-                                len(request.form.getlist(f"{dev_path}_cb")),
-                            )
+                            device_to_cols[dev_name][i]: colors[i]
+                            for i in range(len(checkboxes))
                         },
                     }
-                    for dev_path in downloaded
-                }
 
                 json.dump(data, config, indent=2)
 
-            full: list = os.listdir("templates/includes/devices/full")
-            for device in downloaded:
+            for device in changed:
                 preprocess_device_data(device)
                 make_graph(device, "full")
                 make_graph(device, "recent")

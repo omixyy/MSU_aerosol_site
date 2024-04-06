@@ -130,6 +130,23 @@ def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
     )
 
 
+def hexx(num: int) -> str:
+    return hex(num)[2:].zfill(2)
+
+
+def get_spaced_colors(n: int) -> list:
+    return [
+        "#"
+        + "".join(
+            (hexx(int(i[:2], 16)), hexx(int(i[2:4], 16)), hexx(int(i[4:], 16)))
+        ).upper()
+        for i in [
+            hex(I)[2:].zfill(6)
+            for I in range(int(16581375 / n), 16581375, int(16581375 / n))
+        ]
+    ]
+
+
 def make_graph(
     device: str,
     spec_act,

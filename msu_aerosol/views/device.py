@@ -1,6 +1,7 @@
+import os
 from datetime import datetime
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, send_file, Response, request
 from flask_login import current_user
 
 from msu_aerosol.admin import get_complexes_dict
@@ -34,3 +35,15 @@ def device(device_id: int) -> str:
         min_date=str(min_date).replace(" ", "T"),
         max_date=str(max_date).replace(" ", "T"),
     )
+
+
+@device_bp.route("/devices/<int:device_id>/download", methods=["GET"])
+def download_file(device_id: int) -> Response:
+    data_range = request.form
+    print(data_range)
+    dev = Device.query.get(device_id)
+    full_name = disk.get_public_meta(dev.link)["name"]
+    path = "data/" + full_name
+    f = os.listdir(path)[0]
+    file_path = f"{path}/{f}"
+    return send_file(file_path, as_attachment=True)
