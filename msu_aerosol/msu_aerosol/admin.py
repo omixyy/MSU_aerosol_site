@@ -10,15 +10,14 @@ from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
-import plotly.express as px
 from sqlalchemy.event import listens_for
 
 from msu_aerosol.graph_funcs import (
     disk,
     download_device_data,
+    get_spaced_colors,
     make_graph,
     preprocess_device_data,
-    get_spaced_colors,
 )
 from msu_aerosol.models import (
     Complex,
@@ -107,7 +106,9 @@ class AdminHomeView(AdminIndexView):
                     k
                     for k, _ in config_dev.items()
                     if request.form.getlist(f"{k}_cb") != config_dev[k]["cols"]
-                    or not Path(f"templates/includes/devices/full/{k}.html").exists()
+                    or not Path(
+                        f"templates/includes/devices/full/{k}.html",
+                    ).exists()
                 ]
             with Path("msu_aerosol/config_devices.json").open("w") as config:
                 for dev_name in changed:

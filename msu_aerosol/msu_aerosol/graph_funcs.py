@@ -138,11 +138,19 @@ def get_spaced_colors(n: int) -> list:
     return [
         "#"
         + "".join(
-            (hexx(int(i[:2], 16)), hexx(int(i[2:4], 16)), hexx(int(i[4:], 16)))
+            (
+                hexx(int(i[:2], 16)),
+                hexx(int(i[2:4], 16)),
+                hexx(int(i[4:], 16)),
+            ),
         ).upper()
         for i in [
-            hex(I)[2:].zfill(6)
-            for I in range(int(16581375 / n), 16581375, int(16581375 / n))
+            hex(j)[2:].zfill(6)
+            for j in range(
+                int(16581375 / n),
+                16581375,
+                int(16581375 / n),
+            )
         ]
     ]
 
