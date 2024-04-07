@@ -6,6 +6,7 @@ import re
 from typing import Any
 from urllib.parse import urlencode
 from zipfile import ZipFile
+from io import BytesIO
 
 import pandas as pd
 import plotly.express as px
@@ -160,16 +161,16 @@ def make_graph(
     spec_act,
     begin_record_date=None,
     end_record_date=None,
-) -> None:
+) -> None | BytesIO:
     resample = "60 min"
-    if spec_act == "manual":
+    if spec_act == "download":
         begin_record_date = pd.to_datetime(
             begin_record_date,
-            format="%Y-%m-%dT%H:%M:%S",
+            format="%Y-%m-%dT%H:%M",
         )
         end_record_date = pd.to_datetime(
             end_record_date,
-            format="%Y-%m-%dT%H:%M:%S",
+            format="%Y-%m-%dT%H:%M",
         )
     device_dict = load_json("msu_aerosol/config_devices.json")[device]
     time_col = device_dict["time_cols"]
@@ -202,6 +203,16 @@ def make_graph(
         ".",
         regex=True,
     ).astype(float)
+    if spec_act == "download":
+        buffer = BytesIO()
+        combined_data.reset_index(inplace=True)
+        combined_data = combined_data.loc[
+            (begin_record_date <= pd.to_datetime(combined_data[time_col]))
+            & (pd.to_datetime(combined_data[time_col]) <= end_record_date)
+        ]
+        combined_data.to_csv(buffer, index=False)
+        buffer.seek(0)
+        return buffer
     combined_data = combined_data.resample(resample).mean()
     combined_data.reset_index(inplace=True)
     fig = px.line(
