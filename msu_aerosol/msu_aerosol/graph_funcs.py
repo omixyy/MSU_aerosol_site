@@ -34,6 +34,10 @@ def make_format_date(date: str) -> str:
     return "".join(["%" + i if i.isalpha() else i for i in list(date)])
 
 
+def make_visible_date_format(date: str) -> str:
+    return date.replace("%", "")
+
+
 def download_last_modified_file() -> None:
     folder_path = "/external_data"
 
@@ -80,7 +84,7 @@ def preprocessing_one_file(path: str) -> None:
     _, device, file_name = path.split("/")
     df = pd.read_csv(path, sep=None, engine="python", decimal=",")
     config_device_open = config_devices_open[device]
-    time_col = config_device_open["time_cols"]
+    time_col = config_device_open["time_col"]
     df = df[[time_col] + config_device_open["cols"]]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
     if not Path(f"proc_data/{device}").exists():
@@ -111,7 +115,7 @@ def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
         "msu_aerosol/config_devices.json",
     )[
         device
-    ]["time_cols"]
+    ]["time_col"]
     list_files = os.listdir(f"proc_data/{device}")
     return (
         pd.to_datetime(
@@ -173,7 +177,7 @@ def make_graph(
             format="%Y-%m-%dT%H:%M",
         )
     device_dict = load_json("msu_aerosol/config_devices.json")[device]
-    time_col = device_dict["time_cols"]
+    time_col = device_dict["time_col"]
     if not begin_record_date or not end_record_date:
         begin_record_date, end_record_date = choose_range(device)
     if spec_act == "recent":

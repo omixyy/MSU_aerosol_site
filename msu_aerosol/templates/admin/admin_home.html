@@ -14,7 +14,7 @@
     <div name={{ dev }}>
       {% for col in tc %}
         <div class="form-check">
-          <input class="form-check-input" type="radio" name={{ dev ~ "_rb" }} id="{{ "flexRadioDefault1" ~ dev ~ loop.index }}" value="{{ col }}" {% if loop.first and not data[dev]["time_cols"] %} checked {% elif data and data[dev]["time_cols"] == col %} checked {% endif %}>
+          <input class="form-check-input" type="radio" name={{ dev ~ "_rb" }} id="{{ "flexRadioDefault1" ~ dev ~ loop.index }}" value="{{ col }}" {% if loop.first and not data[dev]["time_col"] %} checked {% elif data and data[dev]["time_col"] == col %} checked {% endif %}>
           <label class="form-check-label" for={{ "flexRadioDefault1" ~ dev ~ loop.index }}>
             {{ col }} 
           </label>
@@ -25,7 +25,7 @@
     <h6>Опишите формат времени в файлах с данными</h6>
     <input type="datetime_format" class="form-control" name={{ "datetime_format_" ~ dev }} id={{ "datetime_format" ~ dev.id }} placeholder="Datetime format" style="width: 30%" value={% if not data[dev]["format"] %} "" {% else %} "{{ data[dev]["format"] }}" {% endif %}>
     <label class="form-control-label mb-4" for={{ "datetime_format" ~ dev.id }} style="font-size:13px;">
-      Например %d-%m-%Y %H:%M:%S
+      Например d-m-Y H:M:S
     </label>
     <br>
     <h6>Выберите столбцы, которые будут отображаться на графике</h6>

@@ -18,6 +18,8 @@ from msu_aerosol.graph_funcs import (
     get_spaced_colors,
     make_graph,
     preprocess_device_data,
+    make_format_date,
+    make_visible_date_format,
 )
 from msu_aerosol.models import (
     Complex,
@@ -88,6 +90,9 @@ class AdminHomeView(AdminIndexView):
                         data[folder] = {
                             "cols": [],
                             "time_cols": [],
+                            "time_col": None,
+                            "format": None,
+                            "color_dict": None,
                         }
                         data[folder]["cols"] = device_to_cols[folder]
                         data[folder]["time_cols"] = device_to_time_col[folder]
@@ -113,13 +118,16 @@ class AdminHomeView(AdminIndexView):
             with Path("msu_aerosol/config_devices.json").open("w") as config:
                 for dev_name in changed:
                     checkboxes = request.form.getlist(f"{dev_name}_cb")
-                    colors = get_spaced_colors(len(checkboxes))
+                    colors = get_spaced_colors(len(device_to_cols[dev_name]))
                     data[dev_name] = {
-                        "time_cols": request.form.get(f"{dev_name}_rb"),
+                        "time_col": request.form.get(f"{dev_name}_rb"),
+                        "time_cols": device_to_time_col[dev_name],
                         "cols": checkboxes,
-                        "format": request.form.get(
-                            f"datetime_format_{dev_name}",
-                        ),
+                        "format": make_format_date(
+                            request.form.get(
+                                f"datetime_format_{dev_name}",
+                            )
+                        ) if data[dev_name]["format"] else None,
                         "color_dict": {
                             device_to_cols[dev_name][i]: colors[i]
                             for i in range(len(checkboxes))
@@ -142,7 +150,17 @@ class AdminHomeView(AdminIndexView):
             "admin/admin_home.html",
             device_to_cols=device_to_cols,
             device_to_time_cols=device_to_time_col,
-            data=data,
+            data={
+                i: {
+                    "time_cols": j["time_cols"],
+                    "time_col": j["time_col"],
+                    "cols": j["cols"],
+                    "format": make_visible_date_format(j["format"])
+                    if j["format"]
+                    else "",
+                }
+                for i, j in data.items()
+            }
         )
 
 
