@@ -16,10 +16,10 @@ from msu_aerosol.graph_funcs import (
     disk,
     download_device_data,
     get_spaced_colors,
-    make_graph,
-    preprocess_device_data,
     make_format_date,
+    make_graph,
     make_visible_date_format,
+    preprocess_device_data,
 )
 from msu_aerosol.models import (
     Complex,
@@ -123,11 +123,15 @@ class AdminHomeView(AdminIndexView):
                         "time_col": request.form.get(f"{dev_name}_rb"),
                         "time_cols": device_to_time_col[dev_name],
                         "cols": checkboxes,
-                        "format": make_format_date(
-                            request.form.get(
-                                f"datetime_format_{dev_name}",
+                        "format": (
+                            make_format_date(
+                                request.form.get(
+                                    f"datetime_format_{dev_name}",
+                                ),
                             )
-                        ) if data[dev_name]["format"] else None,
+                            if data[dev_name]["format"]
+                            else None
+                        ),
                         "color_dict": {
                             device_to_cols[dev_name][i]: colors[i]
                             for i in range(len(checkboxes))
@@ -155,12 +159,14 @@ class AdminHomeView(AdminIndexView):
                     "time_cols": j["time_cols"],
                     "time_col": j["time_col"],
                     "cols": j["cols"],
-                    "format": make_visible_date_format(j["format"])
-                    if j["format"]
-                    else "",
+                    "format": (
+                        make_visible_date_format(j["format"])
+                        if j["format"]
+                        else ""
+                    ),
                 }
                 for i, j in data.items()
-            }
+            },
         )
 
 
