@@ -1,4 +1,5 @@
 from datetime import timedelta
+from io import BytesIO
 import json
 import os
 from pathlib import Path
@@ -6,7 +7,6 @@ import re
 from typing import Any
 from urllib.parse import urlencode
 from zipfile import ZipFile
-from io import BytesIO
 
 import pandas as pd
 import plotly.express as px
@@ -255,3 +255,5 @@ def make_graph(
         auto_open=False,
         include_plotlyjs=False,
     )
+
+    return None
