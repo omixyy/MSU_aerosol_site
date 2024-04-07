@@ -112,12 +112,15 @@ class AdminHomeView(AdminIndexView):
                     for k, _ in config_dev.items()
                     if request.form.getlist(f"{k}_cb") != config_dev[k]["cols"]
                     or not Path(
-                        f"templates/includes/devices/full/{k}.html",
+                        f"templates/includes/devices/full/graph_{k}.html",
                     ).exists()
                 ]
             with Path("msu_aerosol/config_devices.json").open("w") as config:
                 for dev_name in changed:
                     checkboxes = request.form.getlist(f"{dev_name}_cb")
+                    time_format = request.form.get(
+                        f"datetime_format_{dev_name}",
+                    )
                     colors = get_spaced_colors(len(device_to_cols[dev_name]))
                     data[dev_name] = {
                         "time_col": request.form.get(f"{dev_name}_rb"),
@@ -130,7 +133,7 @@ class AdminHomeView(AdminIndexView):
                                 ),
                             )
                             if data[dev_name]["format"]
-                            else None
+                            else time_format
                         ),
                         "color_dict": {
                             device_to_cols[dev_name][i]: colors[i]
