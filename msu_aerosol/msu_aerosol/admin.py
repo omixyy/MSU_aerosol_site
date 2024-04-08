@@ -1,3 +1,4 @@
+import atexit
 import csv
 import json
 import os
@@ -5,6 +6,7 @@ from pathlib import Path
 import shutil
 from typing import Type
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, request
 from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
@@ -15,6 +17,7 @@ from sqlalchemy.event import listens_for
 from msu_aerosol.graph_funcs import (
     disk,
     download_device_data,
+    download_last_modified_file,
     get_spaced_colors,
     make_format_date,
     make_graph,
@@ -226,6 +229,29 @@ admin: Admin = Admin(
 )
 
 login_manager: LoginManager = LoginManager()
+
+scheduler: BackgroundScheduler = BackgroundScheduler()
+
+
+@listens_for(Device, "after_insert")
+@listens_for(Device, "after_delete")
+def init_schedule(mapper, connection, target) -> None:
+    global scheduler
+    devices: list[str] = [i.link for i in Device.query.all()]
+    if scheduler.running or not (mapper and connection and target):
+        scheduler.remove_all_jobs()
+
+        scheduler.add_job(
+            func=download_last_modified_file,
+            trigger="interval",
+            seconds=5,
+            id="downloader",
+            args=[devices],
+        )
+        atexit.register(lambda: scheduler.shutdown())
+
+    if not scheduler.running:
+        scheduler.start()
 
 
 def init_admin(app: Flask) -> None:

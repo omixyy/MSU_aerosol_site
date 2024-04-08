@@ -12,3 +12,4 @@ Flask-Login==0.6.3
 Flask-WTF==1.2.1
 yadisk==2.1.0
 requests==2.31.0
+APScheduler==3.10.4

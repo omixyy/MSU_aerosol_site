@@ -38,25 +38,9 @@ def make_visible_date_format(date: str) -> str:
     return date.replace("%", "")
 
 
-def download_last_modified_file() -> None:
-    folder_path = "/external_data"
-
-    for i in disk.listdir(folder_path):
-        if i["name"] in load_json("msu_aerosol/config_devices.json").keys():
-            last_modified_file = max(
-                [
-                    file
-                    for file in i.listdir()
-                    if file["name"].endswith(".csv")
-                ],
-                key=lambda x: x["modified"],
-            )
-            download_response = requests.get(last_modified_file["file"])
-            Path(f"data/{i['name']}", exist_ok=True).mkdir(parents=True)
-            with Path(
-                f"data/{i['name']}/{last_modified_file['name']}",
-            ).open("wb") as f:
-                f.write(download_response.content)
+def download_last_modified_file(links) -> None:
+    for i in links:
+        print(i)
 
 
 def download_device_data(url: str) -> str:
