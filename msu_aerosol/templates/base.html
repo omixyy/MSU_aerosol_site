@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/form_style.css') }}">
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/fav/favicon.ico') }}">
   <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/fav/apple-touch-icon.png') }}">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/fav/favicon-32x32.png') }}">
@@ -14,12 +15,6 @@
   <script defer src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/plotly-2.30.0.min.js') }}"></script> 
   <title>{% block title %}{% endblock title %}</title>
-  <style type="text/css">
-    .form-control:focus {
-      border-color: #000000;
-      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 0, 0, 0.6);
-    }
-  </style>
 </head>
 {% include "includes/header.html" %}
 <body>
