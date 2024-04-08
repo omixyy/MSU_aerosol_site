@@ -50,7 +50,7 @@ def download_last_modified_file(links: str) -> None:
         list_data_path.append([file_path, full_name])
         with Path(file_path).open("wb") as f:
             f.write(download_response.content)
-    for i in list_data_path:
+    for i in list(filter(lambda x: x[0].endswith(".csv"), list_data_path)):
         preprocessing_one_file(i[0])
         make_graph(i[1], spec_act="full")
         make_graph(i[1], spec_act="recent")
