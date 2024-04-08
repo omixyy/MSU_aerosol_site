@@ -13,7 +13,6 @@ import plotly.express as px
 import plotly.offline as offline
 import requests
 from yadisk import YaDisk
-
 from msu_aerosol.config import yadisk_token
 
 __all__ = []
@@ -26,7 +25,6 @@ def load_json(path: str) -> dict[str, dict[str, Any]]:
 disk_path = "external_data"
 main_path = "data"
 disk = YaDisk(token=yadisk_token)
-last_modified_file = {}
 base_url = "https://cloud-api.yandex.net/v1/disk/public/resources/download?"
 
 
@@ -38,10 +36,20 @@ def make_visible_date_format(date: str) -> str:
     return date.replace("%", "")
 
 
-def download_last_modified_file(links) -> None:
-    # TODO
-    for i in links:
-        print(i)
+def download_last_modified_file(links: str) -> None:
+    list_data_path = []
+    for link in links:
+        full_name = disk.get_public_meta(link)["name"]
+        last_modified_file = sorted(disk.get_public_meta(link)["embedded"]["items"], key=lambda x: x["modified"])[-1]
+        download_response = requests.get(last_modified_file["file"])
+        file_path = f"data/{full_name}/{last_modified_file['name']}"
+        list_data_path.append([file_path, full_name])
+        with Path(file_path).open("wb") as f:
+            f.write(download_response.content)
+    for i in list_data_path:
+        preprocessing_one_file(i[0])
+        make_graph(i[1], spec_act="full")
+        make_graph(i[1], spec_act="recent")
 
 
 def download_device_data(url: str) -> str:
@@ -146,10 +154,10 @@ def get_spaced_colors(n: int) -> list:
 
 
 def make_graph(
-    device: str,
-    spec_act,
-    begin_record_date=None,
-    end_record_date=None,
+        device: str,
+        spec_act,
+        begin_record_date=None,
+        end_record_date=None,
 ) -> None | BytesIO:
     resample = "60 min"
     if spec_act == "download":
@@ -184,7 +192,7 @@ def make_graph(
         combined_data = combined_data.loc[
             (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
             & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
-        ]
+            ]
         last_48_hours = None
     combined_data.set_index(time_col, inplace=True)
     combined_data = combined_data.replace(
@@ -198,7 +206,7 @@ def make_graph(
         combined_data = combined_data.loc[
             (begin_record_date <= pd.to_datetime(combined_data[time_col]))
             & (pd.to_datetime(combined_data[time_col]) <= end_record_date)
-        ]
+            ]
         combined_data.to_csv(buffer, index=False)
         buffer.seek(0)
         return buffer
