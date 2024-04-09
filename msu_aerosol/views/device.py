@@ -29,7 +29,7 @@ def device(device_id: int) -> str | Response:
         ), request.form.get("datetime_picker_end")
         return redirect(
             url_for(
-                "device_details.download_file",
+                "device_details.download_data_range",
                 device_id=device_id,
                 data_range=data_range,
             ),
@@ -60,7 +60,7 @@ def device(device_id: int) -> str | Response:
     "/devices/<int:device_id>/download-<data_range>",
     methods=["GET", "POST"],
 )
-def download_file(device_id: int, data_range: str) -> Response:
+def download_data_range(device_id: int, data_range: str) -> Response:
     dev = Device.query.get(device_id)
     full_name = disk.get_public_meta(dev.link)["name"]
     data_range = eval(data_range)
@@ -76,3 +76,11 @@ def download_file(device_id: int, data_range: str) -> Response:
         attachment_filename=f"{full_name}_{data_range[0]}-{data_range[1]}.csv",
         mimetype="text/csv",
     )
+
+
+@device_bp.route(
+    "/devices/<int:device_id>/upload",
+    methods=["POST"],
+)
+def get_uploaded_file(device_id: int):
+    print(device_id)

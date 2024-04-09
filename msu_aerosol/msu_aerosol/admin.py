@@ -114,6 +114,10 @@ class AdminHomeView(AdminIndexView):
                     k
                     for k, _ in config_dev.items()
                     if request.form.getlist(f"{k}_cb") != config_dev[k]["cols"]
+                    or request.form.get(f"{k}_rb")
+                    != config_dev[k]["time_col"]
+                    or make_format_date(request.form.get(f"datetime_format_{k}"))
+                    != config_dev[k]["format"]
                     or not Path(
                         f"templates/includes/devices/full/graph_{k}.html",
                     ).exists()
@@ -135,8 +139,6 @@ class AdminHomeView(AdminIndexView):
                                     f"datetime_format_{dev_name}",
                                 ),
                             )
-                            if data[dev_name]["format"]
-                            else time_format
                         ),
                         "color_dict": {
                             device_to_cols[dev_name][i]: colors[i]
@@ -231,6 +233,7 @@ admin: Admin = Admin(
 login_manager: LoginManager = LoginManager()
 
 scheduler: BackgroundScheduler = BackgroundScheduler()
+atexit.register(lambda: scheduler.shutdown())
 
 
 @listens_for(Device, "after_insert")
@@ -244,11 +247,10 @@ def init_schedule(mapper, connection, target) -> None:
         scheduler.add_job(
             func=download_last_modified_file,
             trigger="interval",
-            seconds=5,
+            seconds=60,
             id="downloader",
             args=[devices],
         )
-        atexit.register(lambda: scheduler.shutdown())
 
     if not scheduler.running:
         scheduler.start()

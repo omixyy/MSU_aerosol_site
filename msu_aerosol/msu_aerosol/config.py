@@ -26,6 +26,8 @@ class Config:
     )
     STATIC_FOLDER: Path = basedir / "static"
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = True
+    UPLOAD_FOLDER = "received_data"
+    ALLOWED_EXTENSIONS = {"csv", "xlsx"}
 
 
 class ProdConfig(Config):

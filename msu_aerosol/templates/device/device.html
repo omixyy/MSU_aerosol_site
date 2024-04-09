@@ -17,29 +17,33 @@
     <h3 style="margin-top: 2%">{{ device.name }}{% if device.serial_number %}, {{ device.serial_number }} {% endif %}</h3>
     <h5 style="margin-top: 2%;">Состоит в комплексе "{{ complex }}"</h5>
     <form method="POST">
-      <div class="row" style="width: 40%; margin-top: 1%">
+      <div class="row" style="width: 30%; margin-top: 1%">
         <div class="col" style="width: 20%;">
-          <label for="coupon" class="control-label">Начало</label>
+          <label for="datetime_picker_start" class="control-label">Начало</label>
           <input id="datetime_picker_start" name="datetime_picker_start" class="form-control" type="datetime-local" min={{ min_date }} max={{ max_date }} value={{ min_date }}>
         </div>
         <div style="width: 10%; text-align: center; line-height: 90px;">
           &rarr;
         </div>
         <div class="col" style="width: 20%;">
-          <label for="coupon" class="control-label">Конец</label>
+          <label for="datetime_picker_end" class="control-label">Конец</label>
           <input id="datetime_picker_end" name="datetime_picker_end" class="form-control" type="datetime-local" min={{ min_date }} max={{ max_date }} value={{ max_date }}>
         </div>
         <div class="col" style="width: 20%;">
           {% if user and user.is_authenticated %}
-            <button type="submit" id="download" class="btn btn-dark my-4">Скачать</button>
+            <button type="submit" id="download" class="btn btn-outline-dark my-4">Скачать</button>
           {% endif %}
         </div>
       </div>
     </form>
-    <button onclick="updateGraph()" class="btn btn-dark" style="float: center;">Подтвердить</button>
-    {% if user and user.can_upload_data %}
-      <button class="btn btn-dark" style="float: center; margin-left: 1%">Загрузить</button>
-    {% endif %}
+    <div>
+      <button onclick="updateGraph()" class="btn btn-dark" style="float: center;">Подтвердить</button>
+      {% if user and user.can_upload_data %}
+        <div class="form-file">
+          <input type="file" class="form-file-input" id="customFile">
+        </div>
+      {% endif %}
+    </div>
   </div>
   <div style="width: 55%; height: 40%; margin-bottom: 0.5%; margin-top: 1%" id="graphDiv">
     {% include "includes/devices/full/graph_" ~ device_to_name[device.name] ~ ".html"  %}

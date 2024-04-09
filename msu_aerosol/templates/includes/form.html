@@ -20,7 +20,12 @@
           <div class="form-text">{{ field.help_text }}</div>
         {% endif %}
       {% else %}
-        {{ field(class="btn btn-dark mt-5", type="submit") }}
+        <div class="mx-auto">
+          {{ field(class="btn btn-dark mt-5", type="submit") }}
+          {% if view_name == 'profile' %}
+            <a type="button" href="{{ url_for('login.logout') }}" class="btn btn-dark mt-5" style="margin-right: 15px">Выйти</a>
+          {% endif %}
+        </div>
       {% endif %}
     </div>
   {% endfor %}

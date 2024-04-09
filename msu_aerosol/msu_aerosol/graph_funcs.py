@@ -167,11 +167,15 @@ def make_graph(
     if spec_act == "download":
         begin_record_date = pd.to_datetime(
             begin_record_date,
-            format="%Y-%m-%dT%H:%M",
+            format="%Y-%m-%dT%H:%M"
+            if pd.to_datetime(begin_record_date).second == 0
+            else "%Y-%m-%dT%H:%M:%S",
         )
         end_record_date = pd.to_datetime(
             end_record_date,
-            format="%Y-%m-%dT%H:%M",
+            format="%Y-%m-%dT%H:%M"
+            if pd.to_datetime(end_record_date).second == 0
+            else "%Y-%m-%dT%H:%M:%S",
         )
     device_dict = load_json("msu_aerosol/config_devices.json")[device]
     time_col = device_dict["time_col"]

@@ -20,6 +20,11 @@
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'devices' %} active {% endif %}" href="#">Контакты</a>
         </li>
+        {% if user.admin %}
+          <li class="nav-item">
+            <a class="nav-link {% if view_name == 'devices' %} active {% endif %}" href="{{ url_for('admin.admin_index') }}">Админка</a>
+          </li>
+        {% endif %}
         <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
           <ul class="navbar-nav">
             <li class="nav-item dropdown">
