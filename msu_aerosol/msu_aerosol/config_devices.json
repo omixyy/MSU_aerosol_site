@@ -1,1 +1,33 @@
-{}
+{
+  "AE33-S04-00360": {
+    "time_col": "Datetime",
+    "time_cols": [
+      "Datetime"
+    ],
+    "cols": [
+      "BC1",
+      "BC2",
+      "BC3",
+      "BC4",
+      "BC5",
+      "BC6",
+      "BC7",
+      "BB(%)",
+      "BCbb",
+      "BCff"
+    ],
+    "format": "%d.%m.%Y %H:%M",
+    "color_dict": {
+      "BC1": "#194D19",
+      "BC2": "#329A32",
+      "BC3": "#4BE74B",
+      "BC4": "#653464",
+      "BC5": "#7E817D",
+      "BC6": "#97CE96",
+      "BC7": "#B11BAF",
+      "BB(%)": "#CA68C8",
+      "BCbb": "#E3B5E1",
+      "BCff": "#FD02FA"
+    }
+  }
+}

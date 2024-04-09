@@ -5,16 +5,16 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 
 __all__ = [
-    'Complex',
-    'Device',
-    'db',
+    "Complex",
+    "Device",
+    "db",
 ]
 
 db: SQLAlchemy = SQLAlchemy()
 
 
 class Complex(db.Model):
-    __tablename__ = 'complexes'
+    __tablename__ = "complexes"
 
     id = db.Column(
         db.Integer,
@@ -26,10 +26,10 @@ class Complex(db.Model):
         unique=True,
     )
     devices = db.relationship(
-        'Device',
-        backref='Complex',
+        "Device",
+        backref="Complex",
         lazy=True,
-        cascade='all, delete-orphan',
+        cascade="all, delete-orphan",
     )
 
     def __repr__(self):
@@ -40,7 +40,7 @@ class Complex(db.Model):
 
 
 class Device(db.Model):
-    __tablename__ = 'devices'
+    __tablename__ = "devices"
 
     id = db.Column(
         db.Integer,
@@ -66,7 +66,7 @@ class Device(db.Model):
     )
     complex_id = db.Column(
         db.Integer,
-        db.ForeignKey('complexes.id'),
+        db.ForeignKey("complexes.id"),
         nullable=True,
     )
 
@@ -78,7 +78,7 @@ class Device(db.Model):
 
 
 class User(db.Model, UserMixin):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = db.Column(
         db.Integer,
@@ -110,7 +110,7 @@ class User(db.Model, UserMixin):
     )
     created_date = db.Column(
         db.String,
-        default=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
     admin = db.Column(
         db.Boolean,
@@ -122,28 +122,28 @@ class User(db.Model, UserMixin):
     )
 
     def __repr__(self):
-        return f'User ({self.id, self.login})'
+        return f"User ({self.id, self.login})"
 
 
 class UserFieldView(ModelView):
     column_list = (
-        'id',
-        'first_name',
-        'last_name',
-        'username',
-        'email',
-        'created_date',
-        'admin',
-        'can_upload_data',
-        'avatar',
+        "id",
+        "first_name",
+        "last_name",
+        "username",
+        "email",
+        "created_date",
+        "admin",
+        "can_upload_data",
+        "avatar",
     )
 
 
 class DeviceView(ModelView):
     column_list = (
-        'id',
-        'name',
-        'description',
-        'serial_number',
+        "id",
+        "name",
+        "description",
+        "serial_number",
     )
-    form_excluded_columns = ('show',)
+    form_excluded_columns = ("show",)

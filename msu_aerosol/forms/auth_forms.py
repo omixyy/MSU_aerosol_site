@@ -11,29 +11,29 @@ __all__: list = []
 
 
 class RegisterForm(FlaskForm):
-    login = StringField('Логин', validators=[DataRequired()])
+    login = StringField("Логин", validators=[DataRequired()])
     email = EmailField(
-        'Почта',
+        "Почта",
         validators=[DataRequired()],
     )
     password = PasswordField(
-        'Пароль',
+        "Пароль",
         validators=[DataRequired()],
     )
     password_again = PasswordField(
-        'Повторите пароль',
+        "Повторите пароль",
         validators=[DataRequired()],
     )
-    submit = SubmitField('Отправить')
+    submit = SubmitField("Отправить")
 
 
 class LoginForm(FlaskForm):
     login = StringField(
-        'Логин',
+        "Логин",
         validators=[DataRequired()],
     )
     password = PasswordField(
-        'Пароль',
+        "Пароль",
         validators=[DataRequired()],
     )
-    submit = SubmitField('Войти')
+    submit = SubmitField("Войти")
