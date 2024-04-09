@@ -43,7 +43,7 @@ class AdminHomeView(AdminIndexView):
         category=None,
         endpoint=None,
         url=None,
-        template="admin/index.html",
+        template='admin/index.html',
         menu_class_name=None,
         menu_icon_type=None,
         menu_icon_value=None,
@@ -59,86 +59,86 @@ class AdminHomeView(AdminIndexView):
             menu_icon_value,
         )
 
-    @expose("/", methods=["GET", "POST"])
+    @expose('/', methods=['GET', 'POST'])
     def admin_index(self) -> str:
         device_to_cols: dict = {}
         device_to_time_col: dict = {}
-        downloaded = os.listdir("data")
-        downloaded.remove(".gitignore")
+        downloaded = os.listdir('data')
+        downloaded.remove('.gitignore')
         if downloaded:
             for folder in downloaded:
-                file: str = os.listdir(f"data/{folder}")[0]
-                dialect = get_dialect(f"data/{folder}/{file}")
-                with Path(f"data/{folder}/{file}").open("r") as csv_file:
+                file: str = os.listdir(f'data/{folder}')[0]
+                dialect = get_dialect(f'data/{folder}/{file}')
+                with Path(f'data/{folder}/{file}').open('r') as csv_file:
                     header = list(csv.reader(csv_file, dialect=dialect))[0]
                     device_to_cols[folder] = list(
                         filter(
-                            lambda x: "date" not in x.lower()
-                            and "time" not in x.lower(),
+                            lambda x: 'date' not in x.lower()
+                            and 'time' not in x.lower(),
                             header,
                         ),
                     )
 
                     device_to_time_col[folder] = list(
                         filter(
-                            lambda x: "date" in x.lower()
-                            or "time" in x.lower(),
+                            lambda x: 'date' in x.lower()
+                            or 'time' in x.lower(),
                             header,
                         ),
                     )
 
-                with Path("msu_aerosol/config_devices.json").open("r") as cfg:
+                with Path('msu_aerosol/config_devices.json').open('r') as cfg:
                     data = json.load(cfg)
                     if folder not in data:
                         data[folder] = {
-                            "cols": [],
-                            "time_cols": [],
-                            "time_col": None,
-                            "format": None,
-                            "color_dict": None,
+                            'cols': [],
+                            'time_cols': [],
+                            'time_col': None,
+                            'format': None,
+                            'color_dict': None,
                         }
-                        data[folder]["cols"] = device_to_cols[folder]
-                        data[folder]["time_cols"] = device_to_time_col[folder]
+                        data[folder]['cols'] = device_to_cols[folder]
+                        data[folder]['time_cols'] = device_to_time_col[folder]
 
-                with Path("msu_aerosol/config_devices.json").open("w") as cfg:
+                with Path('msu_aerosol/config_devices.json').open('w') as cfg:
                     json.dump(data, cfg, indent=2)
 
-        if request.method == "GET":
-            with Path("msu_aerosol/config_devices.json").open("r") as config:
+        if request.method == 'GET':
+            with Path('msu_aerosol/config_devices.json').open('r') as config:
                 data = json.load(config)
 
-        elif request.method == "POST":
-            with Path("msu_aerosol/config_devices.json").open("r") as config:
+        elif request.method == 'POST':
+            with Path('msu_aerosol/config_devices.json').open('r') as config:
                 config_dev = json.load(config)
                 changed = [
                     k
                     for k, _ in config_dev.items()
-                    if request.form.getlist(f"{k}_cb") != config_dev[k]["cols"]
+                    if request.form.getlist(f'{k}_cb') != config_dev[k]['cols']
                     or not Path(
-                        f"templates/includes/devices/full/graph_{k}.html",
+                        f'templates/includes/devices/full/graph_{k}.html',
                     ).exists()
                 ]
-            with Path("msu_aerosol/config_devices.json").open("w") as config:
+            with Path('msu_aerosol/config_devices.json').open('w') as config:
                 for dev_name in changed:
-                    checkboxes = request.form.getlist(f"{dev_name}_cb")
+                    checkboxes = request.form.getlist(f'{dev_name}_cb')
                     time_format = request.form.get(
-                        f"datetime_format_{dev_name}",
+                        f'datetime_format_{dev_name}',
                     )
                     colors = get_spaced_colors(len(device_to_cols[dev_name]))
                     data[dev_name] = {
-                        "time_col": request.form.get(f"{dev_name}_rb"),
-                        "time_cols": device_to_time_col[dev_name],
-                        "cols": checkboxes,
-                        "format": (
+                        'time_col': request.form.get(f'{dev_name}_rb'),
+                        'time_cols': device_to_time_col[dev_name],
+                        'cols': checkboxes,
+                        'format': (
                             make_format_date(
                                 request.form.get(
-                                    f"datetime_format_{dev_name}",
+                                    f'datetime_format_{dev_name}',
                                 ),
                             )
-                            if data[dev_name]["format"]
+                            if data[dev_name]['format']
                             else time_format
                         ),
-                        "color_dict": {
+                        'color_dict': {
                             device_to_cols[dev_name][i]: colors[i]
                             for i in range(len(checkboxes))
                         },
@@ -148,8 +148,8 @@ class AdminHomeView(AdminIndexView):
 
             for device in changed:
                 preprocess_device_data(device)
-                make_graph(device, "full")
-                make_graph(device, "recent")
+                make_graph(device, 'full')
+                make_graph(device, 'recent')
 
             for dev in Device.query.all():
                 dev.show = True
@@ -157,18 +157,18 @@ class AdminHomeView(AdminIndexView):
             db.session.commit()
 
         return self.render(
-            "admin/admin_home.html",
+            'admin/admin_home.html',
             device_to_cols=device_to_cols,
             device_to_time_cols=device_to_time_col,
             data={
                 i: {
-                    "time_cols": j["time_cols"],
-                    "time_col": j["time_col"],
-                    "cols": j["cols"],
-                    "format": (
-                        make_visible_date_format(j["format"])
-                        if j["format"]
-                        else ""
+                    'time_cols': j['time_cols'],
+                    'time_col': j['time_col'],
+                    'cols': j['cols'],
+                    'format': (
+                        make_visible_date_format(j['format'])
+                        if j['format']
+                        else ''
                     ),
                 }
                 for i, j in data.items()
@@ -186,29 +186,29 @@ def get_complexes_dict() -> dict[Complex, list[Device]]:
 
 
 def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
-    with Path(path).open("r") as f:
+    with Path(path).open('r') as f:
         return csv.Sniffer().sniff(f.readline())
 
 
-@listens_for(Device, "after_insert")
+@listens_for(Device, 'after_insert')
 def after_insert(mapper, connection, target) -> None:
     download_device_data(target.link)
 
 
-@listens_for(Device, "after_delete")
+@listens_for(Device, 'after_delete')
 def after_delete(mapper, connection, target) -> None:
-    with Path("msu_aerosol/config_devices.json").open("r") as config:
+    with Path('msu_aerosol/config_devices.json').open('r') as config:
         data = json.load(config)
-        full_name = disk.get_public_meta(target.link)["name"]
+        full_name = disk.get_public_meta(target.link)['name']
         del data[full_name]
-        if Path(f"data/{full_name}").exists():
-            shutil.rmtree(f"data/{full_name}")
-    with Path("msu_aerosol/config_devices.json").open("w") as config:
+        if Path(f'data/{full_name}').exists():
+            shutil.rmtree(f'data/{full_name}')
+    with Path('msu_aerosol/config_devices.json').open('w') as config:
         json.dump(data, config, indent=2)
 
-    graph_full = f"templates/includes/devices/full/graph_{full_name}.html"
-    graph_rec = f"templates/includes/devices/recent/graph_{full_name}.html"
-    proc_data = f"proc_data/{full_name}"
+    graph_full = f'templates/includes/devices/full/graph_{full_name}.html'
+    graph_rec = f'templates/includes/devices/recent/graph_{full_name}.html'
+    proc_data = f'proc_data/{full_name}'
     if Path(graph_full).exists():
         Path(graph_full).unlink()
 
@@ -220,11 +220,11 @@ def after_delete(mapper, connection, target) -> None:
 
 
 admin: Admin = Admin(
-    template_mode="bootstrap4",
+    template_mode='bootstrap4',
     index_view=AdminHomeView(
-        name="Home",
-        template="admin/index.html",
-        url="/admin",
+        name='Home',
+        template='admin/index.html',
+        url='/admin',
     ),
 )
 
@@ -233,8 +233,8 @@ login_manager: LoginManager = LoginManager()
 scheduler: BackgroundScheduler = BackgroundScheduler()
 
 
-@listens_for(Device, "after_insert")
-@listens_for(Device, "after_delete")
+@listens_for(Device, 'after_insert')
+@listens_for(Device, 'after_delete')
 def init_schedule(mapper, connection, target) -> None:
     global scheduler
     devices: list[str] = [i.link for i in Device.query.all()]
@@ -243,9 +243,9 @@ def init_schedule(mapper, connection, target) -> None:
 
         scheduler.add_job(
             func=download_last_modified_file,
-            trigger="interval",
+            trigger='interval',
             seconds=5,
-            id="downloader",
+            id='downloader',
             args=[devices],
         )
         atexit.register(lambda: scheduler.shutdown())

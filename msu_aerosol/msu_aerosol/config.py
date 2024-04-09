@@ -8,33 +8,33 @@ __all__: list = []
 
 load_dotenv()
 basedir: Path = Path(os.path.dirname(__file__)).resolve().parent
-yadisk_token: str = os.getenv("YADISK_TOKEN", default="FAKE_TOKEN")
+yadisk_token: str = os.getenv('YADISK_TOKEN', default='FAKE_TOKEN')
 
 
 class Config:
     SECRET_KEY: str = os.getenv(
-        "SECRET_KEY",
-        default="FAKE_SECRET_KEY",
+        'SECRET_KEY',
+        default='FAKE_SECRET_KEY',
     )
     SQLALCHEMY_DATABASE_URI: str = os.getenv(
-        "DATABASE_URI",
-        default="sqlite:///database.db",
+        'DATABASE_URI',
+        default='sqlite:///database.db',
     )
     SESSION_COOKIE_NAME: str = os.getenv(
-        "SESSION_COOKIE_NAME",
-        default="FAKE_SESSION_COOKIE_NAME",
+        'SESSION_COOKIE_NAME',
+        default='FAKE_SESSION_COOKIE_NAME',
     )
-    STATIC_FOLDER: Path = basedir / "static_dev"
+    STATIC_FOLDER: Path = basedir / 'static'
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = True
 
 
 class ProdConfig(Config):
-    FLASK_ENV: str = "production"
+    FLASK_ENV: str = 'production'
     DEBUG: bool = False
 
 
 class DevConfig(Config):
-    FLASK_ENV: str = "development"
+    FLASK_ENV: str = 'development'
     DEBUG: bool = True
 
 

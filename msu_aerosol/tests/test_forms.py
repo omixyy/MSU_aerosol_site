@@ -13,7 +13,7 @@ __all__: list = []
 class TestRegisterForm(unittest.TestCase):
     def setUp(self) -> None:
         self.app = app
-        self.app.config["TESTING"] = True
+        self.app.config['TESTING'] = True
         self.client = self.app.test_client()
         self.app_context = self.app.app_context()
         self.app_context.push()
@@ -23,26 +23,26 @@ class TestRegisterForm(unittest.TestCase):
         [
             (
                 {
-                    "login": "TestLogin1",
-                    "email": "test1@email.ru",
-                    "password": "(@Q*DYqdw12)e23",
-                    "password_again": "(@Q*DYqdw12)e23",
+                    'login': 'TestLogin1',
+                    'email': 'test1@email.ru',
+                    'password': '(@Q*DYqdw12)e23',
+                    'password_again': '(@Q*DYqdw12)e23',
                 },
             ),
             (
                 {
-                    "login": "TestLogin2",
-                    "email": "test2@email.ru",
-                    "password": "asddsgfew32",
-                    "password_again": "asddsgfew32",
+                    'login': 'TestLogin2',
+                    'email': 'test2@email.ru',
+                    'password': 'asddsgfew32',
+                    'password_again': 'asddsgfew32',
                 },
             ),
             (
                 {
-                    "login": "TestLogin3",
-                    "email": "test3@email.ru",
-                    "password": "GEGW#Q@$GW",
-                    "password_again": "GEGW#Q@$GW",
+                    'login': 'TestLogin3',
+                    'email': 'test3@email.ru',
+                    'password': 'GEGW#Q@$GW',
+                    'password_again': 'GEGW#Q@$GW',
                 },
             ),
         ],
@@ -50,7 +50,7 @@ class TestRegisterForm(unittest.TestCase):
     def test_register_form_authenticated(self, data):
         with self.app.app_context(), self.app.test_request_context():
             self.client.post(
-                url_for("registration.register"),
+                url_for('registration.register'),
                 data=data,
                 follow_redirects=True,
             )
@@ -61,26 +61,26 @@ class TestRegisterForm(unittest.TestCase):
         [
             (
                 {
-                    "login": "TestLogin1",
-                    "email": "testl1@email.ru",
-                    "password": "(@Q*DYqdq3werw12)e23",
-                    "password_again": "(@Q*DYqdw12)e23",
+                    'login': 'TestLogin1',
+                    'email': 'testl1@email.ru',
+                    'password': '(@Q*DYqdq3werw12)e23',
+                    'password_again': '(@Q*DYqdw12)e23',
                 },
             ),
             (
                 {
-                    "login": "TestLogin2",
-                    "email": "testl2@email.ru",
-                    "password": "asddsgfew32",
-                    "password_again": "asddsasfg4ggfew32",
+                    'login': 'TestLogin2',
+                    'email': 'testl2@email.ru',
+                    'password': 'asddsgfew32',
+                    'password_again': 'asddsasfg4ggfew32',
                 },
             ),
             (
                 {
-                    "login": "TestLogin3",
-                    "email": "testl3@email.ru",
-                    "password": "GEGW#Q@$GW",
-                    "password_again": "GEGW#ase2w2@$GW",
+                    'login': 'TestLogin3',
+                    'email': 'testl3@email.ru',
+                    'password': 'GEGW#Q@$GW',
+                    'password_again': 'GEGW#ase2w2@$GW',
                 },
             ),
         ],
@@ -88,7 +88,7 @@ class TestRegisterForm(unittest.TestCase):
     def test_register_form_not_authenticated(self, data):
         with self.app.app_context(), self.app.test_request_context():
             self.client.post(
-                url_for("registration.register"),
+                url_for('registration.register'),
                 data=data,
                 follow_redirects=True,
             )
@@ -99,7 +99,7 @@ class TestRegisterForm(unittest.TestCase):
 class TestLoginForm(unittest.TestCase):
     def setUp(self):
         self.app = app
-        self.app.config["TESTING"] = True
+        self.app.config['TESTING'] = True
         self.client = self.app.test_client()
         self.app_context = self.app.app_context()
         self.app_context.push()
@@ -108,12 +108,12 @@ class TestLoginForm(unittest.TestCase):
     def test_auth(self):
         with self.app.app_context(), self.app.test_request_context():
             self.client.post(
-                url_for("registration.register"),
+                url_for('registration.register'),
                 data={
-                    "login": "TestLoginForm",
-                    "email": "testlogin@email.ru",
-                    "password": "_)@*(HF3-08fh)",
-                    "password_again": "_)@*(HF3-08fh)",
+                    'login': 'TestLoginForm',
+                    'email': 'testlogin@email.ru',
+                    'password': '_)@*(HF3-08fh)',
+                    'password_again': '_)@*(HF3-08fh)',
                 },
                 follow_redirects=True,
             )

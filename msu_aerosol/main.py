@@ -11,11 +11,11 @@ from views.users import profile_bp
 __all__: list = []
 
 app: Flask = config.initialize_flask_app(__name__)
-app.register_blueprint(home_bp, name="home")
-app.register_blueprint(device_bp, name="device_details")
-app.register_blueprint(register_bp, name="registration")
-app.register_blueprint(login_bp, name="login")
-app.register_blueprint(profile_bp, name="profile")
+app.register_blueprint(home_bp, name='home')
+app.register_blueprint(device_bp, name='device_details')
+app.register_blueprint(register_bp, name='registration')
+app.register_blueprint(login_bp, name='login')
+app.register_blueprint(profile_bp, name='profile')
 init_admin(app)
 db.init_app(app)
 
@@ -28,5 +28,5 @@ def main() -> None:
     app.run(use_reloader=False)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
