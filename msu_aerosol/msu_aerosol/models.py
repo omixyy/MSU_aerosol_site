@@ -3,14 +3,13 @@ from datetime import datetime
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import declared_attr
 
 __all__ = [
     "Complex",
     "Device",
     "db",
 ]
-
-from sqlalchemy.orm import declared_attr
 
 db: SQLAlchemy = SQLAlchemy()
 

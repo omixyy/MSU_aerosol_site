@@ -8,6 +8,7 @@ from views.device import device_bp
 from views.homepage import home_bp
 from views.users import login_bp, register_bp
 from views.users import profile_bp
+
 __all__: list = []
 
 app: Flask = config.initialize_flask_app(__name__)

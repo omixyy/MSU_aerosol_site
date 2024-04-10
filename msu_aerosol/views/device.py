@@ -96,10 +96,9 @@ def get_uploaded_file(device_id: int):
 
     try:
         link = Device.query.get(device_id).link
-        full_name = disk.get_public_meta(link)['name']
+        full_name = disk.get_public_meta(link)["name"]
         directory = Path(
-            f"{upload_folder}/"
-            f"{disk.get_public_meta(link)['name']}"
+            f"{upload_folder}/" f"{disk.get_public_meta(link)['name']}",
         )
         if not directory.exists():
             Path(directory).mkdir(parents=True)
@@ -124,7 +123,7 @@ def get_uploaded_file(device_id: int):
             message="Файл успешно получен",
         )
 
-    except Exception as _:
+    except Exception:
         return render_template(
             "device/device.html",
             now=datetime.now(),
