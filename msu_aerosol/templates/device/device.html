@@ -10,24 +10,34 @@
     }
   </style>
   <script type="text/javascript" src="{{ url_for('static', filename='js/handlers.js') }}"></script>
-  <div style="margin-left: 3%;">
+  <div style="margin-left: 3%; width: 95%">
     <div class="mx-auto" style="width: 50%; text-align: center;">
       <h1>Данные с прибора {{ device }}</h1>
     </div>
     <h3 style="margin-top: 2%">{{ device.name }}{% if device.serial_number %}, {{ device.serial_number }} {% endif %}</h3>
     <h5 style="margin-top: 2%;">Состоит в комплексе "{{ complex }}"</h5>
-    <form method="POST">
-      <div class="row" style="width: 30%; margin-top: 1%">
+    {% if error %}
+      <div class="alert alert-danger" role="alert" style="width: 20%">
+        {{ error }}
+      </div>
+    {% endif %}
+    {% if message %}
+      <div class="alert alert-success" role="alert" style="width: 20%">
+        {{ message }}
+      </div>
+    {% endif %}
+    <form method="POST" name="datetime_picker" action="{{ url_for('device_details.download_data_range', device_id=device.id) }}">
+      <div class="row" style="width: 40%; margin-top: 1%">
         <div class="col" style="width: 20%;">
           <label for="datetime_picker_start" class="control-label">Начало</label>
-          <input id="datetime_picker_start" name="datetime_picker_start" class="form-control" type="datetime-local" min={{ min_date }} max={{ max_date }} value={{ min_date }}>
+          <input id="datetime_picker_start" name="datetime_picker_start" class="form-control" type="datetime-local" min={{ min_date }} max={{ max_date }} value={{ min_date }} step="any">
         </div>
         <div style="width: 10%; text-align: center; line-height: 90px;">
           &rarr;
         </div>
-        <div class="col" style="width: 20%;">
+        <div class="col" style="width: 40%;">
           <label for="datetime_picker_end" class="control-label">Конец</label>
-          <input id="datetime_picker_end" name="datetime_picker_end" class="form-control" type="datetime-local" min={{ min_date }} max={{ max_date }} value={{ max_date }}>
+          <input id="datetime_picker_end" name="datetime_picker_end" class="form-control" type="datetime-local" min={{ min_date }} max={{ max_date }} value={{ max_date }} step="any">
         </div>
         <div class="col" style="width: 20%;">
           {% if user and user.is_authenticated %}
@@ -36,13 +46,28 @@
         </div>
       </div>
     </form>
-    <div>
-      <button onclick="updateGraph()" class="btn btn-dark" style="float: center;">Подтвердить</button>
-      {% if user and user.can_upload_data %}
-        <div class="form-file">
-          <input type="file" class="form-file-input" id="customFile">
+    <div class="fluid-container">
+      <div class="row">
+        <div class="col-1">
+          <button onclick="updateGraph()" class="btn btn-dark" style="float: center;">Подтвердить</button>
         </div>
-      {% endif %}
+        {% if user and user.can_upload_data %}
+          <div class="col-3">
+            <form method="POST" name="file_sender" enctype="multipart/form-data" action="{{ url_for('device_details.get_uploaded_file', device_id=device.id) }}">
+              <div class="fluid-container">
+                <div class="row">
+                  <div class="col" style="margin-right: 2%">
+                    <button type="submit" class="btn btn-dark" style="float: center;">Отправить</button>
+                  </div>
+                  <div class="form-file col mt-1">
+                    <input type="file" class="form-file-input" id="customFile" name="file">
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        {% endif %}
+      </div>
     </div>
   </div>
   <div style="width: 55%; height: 40%; margin-bottom: 0.5%; margin-top: 1%" id="graphDiv">

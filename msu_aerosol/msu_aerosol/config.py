@@ -9,6 +9,8 @@ __all__: list = []
 load_dotenv()
 basedir: Path = Path(os.path.dirname(__file__)).resolve().parent
 yadisk_token: str = os.getenv("YADISK_TOKEN", default="FAKE_TOKEN")
+upload_folder = "received_data"
+allowed_extensions = {"csv", "xlsx"}
 
 
 class Config:
@@ -26,8 +28,6 @@ class Config:
     )
     STATIC_FOLDER: Path = basedir / "static"
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = True
-    UPLOAD_FOLDER = "received_data"
-    ALLOWED_EXTENSIONS = {"csv", "xlsx"}
 
 
 class ProdConfig(Config):

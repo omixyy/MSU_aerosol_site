@@ -1,26 +1,28 @@
 {% extends "base.html" %}
 {% block title %}Домашняя страница{% endblock %}
 {% block content %}
-  <div class="mx-auto" style="width: 500px; text-align: center;">
-    <h1 style="margin-top: 15px; margin-bottom: 50px;">Данные Аэрозольного комплекса МГУ</h1>
-  </div>
-  {% for complex, devices in complex_to_device.items() %}
-    <div id="com{{ complex.id }}">
-      <h2 class="ms-3 mb-2">{{ complex }}</h2>
+  <div style="width: 95%">
+    <div class="mx-auto" style="width: 500px; text-align: center;">
+      <h1 style="margin-top: 15px; margin-bottom: 50px;">Данные Аэрозольного комплекса МГУ</h1>
     </div>
-    <div class="pt-0 my-5 ms-3">
-      <div class="row"> 
-        {% for device in devices %}   
-          {% if device.show %}
-            <div id="dev{{ device.id }}" style="width: 700px; height: 600px; text-align: center;">
-              <h4 style="margin-top: 15px; margin-bottom: 20px;">{{ device.name }}</h4>
-              <hr>
-              {% include "includes/devices/recent/graph_" ~ device_to_name[device.name] ~ ".html" %}
-              <a class="btn btn-dark" style="width: 400px;" href="{{ url_for('device_details.device', device_id=device.id) }}">Подробнее</a>
-            </div>
-          {% endif %}
-        {% endfor %}
+    {% for complex, devices in complex_to_device.items() %}
+      <div id="com{{ complex.id }}">
+        <h2 class="ms-3 mb-2">{{ complex }}</h2>
       </div>
-    </div>
-  {% endfor %}
+      <div class="pt-0 my-5 ms-3">
+        <div class="row">
+          {% for device in devices %}
+            {% if device.show %}
+              <div id="dev{{ device.id }}" style="width: 700px; height: 600px; text-align: center;">
+                <h4 style="margin-top: 15px; margin-bottom: 20px;">{{ device.name }}</h4>
+                <hr>
+                {% include "includes/devices/recent/graph_" ~ device_to_name[device.name] ~ ".html" %}
+                <a class="btn btn-dark" style="width: 400px;" href="{{ url_for('device_details.device', device_id=device.id) }}">Подробнее</a>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock %}
