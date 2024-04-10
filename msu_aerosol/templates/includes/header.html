@@ -20,7 +20,7 @@
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'devices' %} active {% endif %}" href="#">Контакты</a>
         </li>
-        {% if user.admin %}
+        {% if user and user.admin %}
           <li class="nav-item">
             <a class="nav-link {% if view_name == 'devices' %} active {% endif %}" href="{{ url_for('admin.admin_index') }}">Админка</a>
           </li>
