@@ -95,13 +95,15 @@ def get_uploaded_file(device_id: int):
     filename = secure_filename(file.filename)
 
     if file and allowed_file(filename):
-        directory = Path(f"{upload_folder}/{Device.query.get(device_id)}")
+        link = Device.query.get(device_id).link
+        directory = Path(
+            f"{upload_folder}/"
+            f"{disk.get_public_meta(link)['name']}"
+        )
         if not directory.exists():
-            Path(f"{upload_folder}/{Device.query.get(device_id)}").mkdir(
-                parents=True,
-            )
+            Path(directory).mkdir(parents=True)
         file.save(
-            Path(f"{upload_folder}/{Device.query.get(device_id)}", filename),
+            Path(directory, filename),
         )
         return render_template(
             "device/device.html",

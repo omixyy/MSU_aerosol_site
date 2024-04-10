@@ -10,11 +10,13 @@ __all__ = [
     "db",
 ]
 
+from sqlalchemy.orm import declared_attr
+
 db: SQLAlchemy = SQLAlchemy()
 
 
-class Complex(db.Model):
-    __tablename__ = "complexes"
+class BaseModel(db.Model):
+    __abstract__ = True
 
     id = db.Column(
         db.Integer,
@@ -26,6 +28,22 @@ class Complex(db.Model):
         db.String,
         unique=True,
     )
+
+
+class BaseColumnModel(BaseModel):
+    __abstract__ = True
+
+    @declared_attr
+    def device_id(self):
+        return db.Column(
+            db.Integer,
+            db.ForeignKey("devices.id"),
+            nullable=False,
+        )
+
+
+class Complex(BaseModel):
+    __tablename__ = "complexes"
 
     devices = db.relationship(
         "Device",
@@ -41,20 +59,8 @@ class Complex(db.Model):
         return self.name
 
 
-class Device(db.Model):
+class Device(BaseModel):
     __tablename__ = "devices"
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-
-    name = db.Column(
-        db.String,
-        nullable=False,
-        unique=True,
-    )
 
     serial_number = db.Column(
         db.String,
@@ -84,21 +90,10 @@ class Device(db.Model):
         return self.name
 
 
-class User(db.Model, UserMixin):
+class User(BaseModel, UserMixin):
     __tablename__ = "users"
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-
-    first_name = db.Column(
-        db.String,
-        nullable=True,
-    )
-
-    last_name = db.Column(
+    surname = db.Column(
         db.String,
         nullable=True,
     )
@@ -135,19 +130,8 @@ class User(db.Model, UserMixin):
         return f"User ({self.id, self.login})"
 
 
-class Role(db.Model):
+class Role(BaseModel):
     __tablename__ = "roles"
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-
-    name = db.Column(
-        db.String,
-        unique=True,
-    )
 
     access_key = db.Column(db.String)
 
@@ -189,4 +173,4 @@ class DeviceView(ModelView):
         "name",
         "serial_number",
     )
-    form_excluded_columns = ("show",)
+    form_excluded_columns = ("show", "columns")

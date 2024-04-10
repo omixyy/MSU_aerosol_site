@@ -51,7 +51,7 @@
         <div class="col-2">
           <button onclick="updateGraph()" class="btn btn-dark" style="float: center;">Подтвердить</button>
         </div>
-        {% if user and user.role.can_upload_data %}
+        {% if user.is_authenticated and user.role.can_upload_data %}
             <div class="col-3">
             <form method="POST" name="file_sender" enctype="multipart/form-data" action="{{ url_for('device_details.get_uploaded_file', device_id=device.id) }}">
               <div class="fluid-container">

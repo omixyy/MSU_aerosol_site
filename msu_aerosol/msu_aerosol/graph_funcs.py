@@ -23,7 +23,6 @@ def load_json(path: str) -> dict[str, dict[str, Any]]:
     return json.load(open(path, "r"))
 
 
-disk_path = "external_data"
 main_path = "data"
 disk = YaDisk(token=yadisk_token)
 base_url = "https://cloud-api.yandex.net/v1/disk/public/resources/download?"
