@@ -29,9 +29,9 @@ from msu_aerosol.models import (
     db,
     Device,
     DeviceView,
+    Role,
     User,
     UserFieldView,
-    Role,
 )
 
 __all__ = []

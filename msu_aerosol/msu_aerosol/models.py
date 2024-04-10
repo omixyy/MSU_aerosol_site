@@ -128,7 +128,7 @@ class User(db.Model, UserMixin):
 
     role_id = db.Column(
         db.Integer,
-        db.ForeignKey('roles.id'),
+        db.ForeignKey("roles.id"),
     )
 
     def __repr__(self):
@@ -149,9 +149,7 @@ class Role(db.Model):
         unique=True,
     )
 
-    access_key = db.Column(
-        db.String
-    )
+    access_key = db.Column(db.String)
 
     can_access_admin = db.Column(
         db.Boolean,
@@ -172,7 +170,6 @@ class Role(db.Model):
 
     def __repr__(self):
         return self.name
-
 
 
 class UserFieldView(ModelView):

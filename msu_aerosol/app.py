@@ -2,8 +2,8 @@ from flask import Flask
 
 from msu_aerosol import config
 from msu_aerosol.admin import init_admin, init_schedule
-from msu_aerosol.models import db
 from msu_aerosol.commands import create_superuser
+from msu_aerosol.models import db
 from views.device import device_bp
 from views.homepage import home_bp
 from views.users import login_bp, register_bp
