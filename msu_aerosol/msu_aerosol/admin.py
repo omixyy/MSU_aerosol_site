@@ -31,6 +31,7 @@ from msu_aerosol.models import (
     DeviceView,
     User,
     UserFieldView,
+    Role,
 )
 
 __all__ = []
@@ -260,3 +261,4 @@ def init_admin(app: Flask) -> None:
     admin.add_view(ModelView(Complex, db.session))
     admin.add_view(DeviceView(Device, db.session))
     admin.add_view(UserFieldView(User, db.session))
+    admin.add_view(ModelView(Role, db.session))

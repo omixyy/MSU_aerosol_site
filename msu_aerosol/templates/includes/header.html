@@ -20,7 +20,7 @@
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'devices' %} active {% endif %}" href="#">Контакты</a>
         </li>
-        {% if user and user.admin %}
+        {% if user and user.is_authenticated and user.role.can_access_admin %}
           <li class="nav-item">
             <a class="nav-link {% if view_name == 'devices' %} active {% endif %}" href="{{ url_for('admin.admin_index') }}">Админка</a>
           </li>
@@ -59,7 +59,7 @@
         </div>
       </ul>
     </div>
-    {% if user and user.admin %}
+    {% if user and user.is_authenticated and user.role.can_access_admin %}
       <span class="badge bg-warning text-dark">Admin</span>
     {% endif %}
     {% if user and not user.is_authenticated %}

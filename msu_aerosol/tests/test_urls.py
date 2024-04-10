@@ -3,7 +3,7 @@ import unittest
 
 from flask import request, url_for
 
-from main import app
+from app import app
 
 __all__: list = []
 

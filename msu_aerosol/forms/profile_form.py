@@ -19,22 +19,8 @@ class ProfileForm(FlaskForm):
         "Почта",
         validators=[DataRequired()],
     )
-    admin = StringField(
-        "Является ли админом",
-        render_kw={
-            "readonly": True,
-            "disabled": True,
-        },
-    )
-    created_date = StringField(
-        "Когда зарегистрирован",
-        render_kw={
-            "readonly": True,
-            "disabled": True,
-        },
-    )
-    can_upload_data = StringField(
-        "Может ли загруать данные",
+    role = StringField(
+        "Роль",
         render_kw={
             "readonly": True,
             "disabled": True,

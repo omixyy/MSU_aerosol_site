@@ -21,13 +21,15 @@ class Complex(db.Model):
         primary_key=True,
         autoincrement=True,
     )
+
     name = db.Column(
         db.String,
         unique=True,
     )
+
     devices = db.relationship(
         "Device",
-        backref="Complex",
+        backref="complexes",
         lazy=True,
         cascade="all, delete-orphan",
     )
@@ -47,23 +49,28 @@ class Device(db.Model):
         primary_key=True,
         autoincrement=True,
     )
+
     name = db.Column(
         db.String,
         nullable=False,
         unique=True,
     )
+
     serial_number = db.Column(
         db.String,
     )
+
     show = db.Column(
         db.Boolean,
         nullable=True,
         default=False,
     )
+
     link = db.Column(
         db.String,
         nullable=False,
     )
+
     complex_id = db.Column(
         db.Integer,
         db.ForeignKey("complexes.id"),
@@ -85,57 +92,97 @@ class User(db.Model, UserMixin):
         primary_key=True,
         autoincrement=True,
     )
+
     first_name = db.Column(
         db.String,
         nullable=True,
     )
+
     last_name = db.Column(
         db.String,
         nullable=True,
     )
+
     login = db.Column(
         db.String,
         nullable=False,
         unique=True,
     )
+
     email = db.Column(
         db.String,
         index=True,
         unique=True,
         nullable=True,
     )
+
     password = db.Column(
         db.String,
         nullable=False,
     )
+
     created_date = db.Column(
         db.String,
         default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
-    admin = db.Column(
-        db.Boolean,
-        default=False,
-    )
-    can_upload_data = db.Column(
-        db.Boolean,
-        default=False,
+
+    role_id = db.Column(
+        db.Integer,
+        db.ForeignKey('roles.id'),
     )
 
     def __repr__(self):
         return f"User ({self.id, self.login})"
 
 
+class Role(db.Model):
+    __tablename__ = "roles"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    name = db.Column(
+        db.String,
+        unique=True,
+    )
+
+    access_key = db.Column(
+        db.String
+    )
+
+    can_access_admin = db.Column(
+        db.Boolean,
+        default=False,
+    )
+
+    can_upload_data = db.Column(
+        db.Boolean,
+        default=False,
+    )
+
+    users = db.relationship(
+        "User",
+        backref="role",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self):
+        return self.name
+
+
+
 class UserFieldView(ModelView):
     column_list = (
         "id",
+        "login",
         "first_name",
         "last_name",
-        "username",
         "email",
         "created_date",
-        "admin",
-        "can_upload_data",
-        "avatar",
     )
 
 
@@ -143,7 +190,6 @@ class DeviceView(ModelView):
     column_list = (
         "id",
         "name",
-        "description",
         "serial_number",
     )
     form_excluded_columns = ("show",)

@@ -4,7 +4,7 @@ from flask import url_for
 from flask_login import current_user
 import parameterized
 
-from main import app
+from app import app
 from msu_aerosol.models import db
 
 __all__: list = []
