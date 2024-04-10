@@ -72,7 +72,8 @@ def preprocess_device_data(name_folder: str) -> None:
             Path(f"{main_path}/{name_folder}/{name_file}").unlink()
     for name_file in os.listdir(f"{main_path}/{name_folder}"):
         preprocessing_one_file(
-            name_folder, f"{main_path}/{name_folder}/{name_file}",
+            name_folder,
+            f"{main_path}/{name_folder}/{name_file}",
         )
 
 
@@ -82,10 +83,10 @@ def preprocessing_one_file(device: str, path: str) -> None:
     config_device_open = config_devices_open[device]
     time_col = config_device_open["time_col"]
     if any(
-            (
-                    i not in list(df.columns)
-                    for i in [time_col] + config_device_open["cols"]
-            ),
+        (
+            i not in list(df.columns)
+            for i in [time_col] + config_device_open["cols"]
+        ),
     ):
         raise KeyError
     df = df[[time_col] + config_device_open["cols"]]
