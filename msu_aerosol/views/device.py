@@ -12,10 +12,10 @@ from flask_login import current_user
 from werkzeug.utils import secure_filename
 
 from msu_aerosol.admin import get_complexes_dict
+from msu_aerosol.config import allowed_extensions, upload_folder
 from msu_aerosol.graph_funcs import choose_range, disk
 from msu_aerosol.graph_funcs import make_graph
 from msu_aerosol.models import Complex, Device
-from msu_aerosol.config import upload_folder, allowed_extensions
 
 __all__: list = []
 
@@ -24,9 +24,8 @@ device_bp: Blueprint = Blueprint("device", __name__, url_prefix="/")
 
 def allowed_file(filename):
     return (
-            "." in filename and
-            filename.rsplit(".", 1)[1].lower()
-            in allowed_extensions
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower() in allowed_extensions
     )
 
 
@@ -98,8 +97,12 @@ def get_uploaded_file(device_id: int):
     if file and allowed_file(filename):
         directory = Path(f"{upload_folder}/{Device.query.get(device_id)}")
         if not directory.exists():
-            Path(f"{upload_folder}/{Device.query.get(device_id)}").mkdir(parents=True)
-        file.save(Path(f"{upload_folder}/{Device.query.get(device_id)}", filename))
+            Path(f"{upload_folder}/{Device.query.get(device_id)}").mkdir(
+                parents=True,
+            )
+        file.save(
+            Path(f"{upload_folder}/{Device.query.get(device_id)}", filename),
+        )
         return render_template(
             "device/device.html",
             now=datetime.now(),
