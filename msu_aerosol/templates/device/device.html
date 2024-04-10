@@ -56,10 +56,10 @@
             <form method="POST" name="file_sender" enctype="multipart/form-data" action="{{ url_for('device_details.get_uploaded_file', device_id=device.id) }}">
               <div class="fluid-container">
                 <div class="row">
-                  <div class="col" style="margin-right: 2%">
+                  <div class="col-4" style="margin-right: 2%">
                     <button type="submit" class="btn btn-dark" style="float: center;">Отправить</button>
                   </div>
-                  <div class="form-file col mt-1">
+                  <div class="form-file col-5 mt-1">
                     <input type="file" class="form-file-input" id="customFile" name="file">
                   </div>
                 </div>
