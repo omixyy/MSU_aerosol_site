@@ -13,7 +13,6 @@ import plotly.express as px
 import plotly.offline as offline
 import requests
 from yadisk import YaDisk
-
 from msu_aerosol.config import yadisk_token
 
 __all__ = []
@@ -36,23 +35,20 @@ def make_visible_date_format(date: str) -> str:
     return date.replace("%", "")
 
 
-def download_last_modified_file(links: str) -> None:
+def download_last_modified_file(links) -> None:
     list_data_path = []
     for link in links:
         full_name = disk.get_public_meta(link)["name"]
-        last_modified_file = sorted(
-            disk.get_public_meta(link)["embedded"]["items"],
-            key=lambda x: x["modified"],
-        )[-1]
+        last_modified_file = sorted(disk.get_public_meta(link)["embedded"]["items"], key=lambda x: x["modified"])[-1]
         download_response = requests.get(last_modified_file["file"])
         file_path = f'data/{full_name}/{last_modified_file["name"]}'
-        list_data_path.append([file_path, full_name])
+        list_data_path.append([full_name, file_path])
         with Path(file_path).open("wb") as f:
             f.write(download_response.content)
-    for i in list(filter(lambda x: x[0].endswith(".csv"), list_data_path)):
-        preprocessing_one_file(i[0])
-        make_graph(i[1], spec_act="full")
-        make_graph(i[1], spec_act="recent")
+    for i in list_data_path:
+        preprocessing_one_file(i[0], i[1])
+        make_graph(i[0], spec_act="full")
+        make_graph(i[0], spec_act="recent")
 
 
 def download_device_data(url: str) -> str:
@@ -72,23 +68,27 @@ def preprocess_device_data(name_folder: str) -> None:
         if not name_file.endswith(".csv"):
             Path(f"{main_path}/{name_folder}/{name_file}").unlink()
     for name_file in os.listdir(f"{main_path}/{name_folder}"):
-        preprocessing_one_file(f"{main_path}/{name_folder}/{name_file}")
+        preprocessing_one_file(name_folder, f"{main_path}/{name_folder}/{name_file}")
 
 
-def preprocessing_one_file(path: str) -> None:
+def preprocessing_one_file(device: str, path: str) -> None:
     config_devices_open = load_json("msu_aerosol/config_devices.json")
-    _, device, file_name = path.split("/")
     df = pd.read_csv(path, sep=None, engine="python", decimal=",")
     config_device_open = config_devices_open[device]
     time_col = config_device_open["time_col"]
+    if any([i not in list(df.columns) for i in [time_col] + config_device_open["cols"]]):
+        raise KeyError
     df = df[[time_col] + config_device_open["cols"]]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
     if not Path(f"proc_data/{device}").exists():
         Path(f"proc_data/{device}").mkdir(parents=True)
-    df[time_col] = pd.to_datetime(
-        df[time_col],
-        format=config_device_open["format"],
+    try:
+        df[time_col] = pd.to_datetime(
+            df[time_col],
+            format=config_device_open["format"],
     )
+    except Exception:
+        raise ValueError
     df = df.sort_values(by=time_col)
     diff_mode = df[time_col].diff().mode().values[0] * 1.1
     new_rows = []
@@ -101,9 +101,16 @@ def preprocessing_one_file(path: str) -> None:
             new_row2 = {time_col: new_date2}
             new_rows.extend([new_row1, new_row2])
     df = pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True)
-    df = df.sort_values(by=time_col)
-    name = re.split("[-_]", file_name)
-    df.to_csv(f"proc_data/{device}/{name[0]}_{name[1]}.csv", index=False)
+    for year in df[time_col].dt.year.unique():
+        for month in df[time_col].dt.month.unique():
+            df_month = df.loc[((df[time_col].dt.month == month) & (df[time_col].dt.year == year))]
+            month = "0" + str(month) if month < 10 else str(month)
+            file_path = f"proc_data/{device}/{year}_{month}.csv"
+            if os.path.exists(file_path):
+                df_month = pd.concat([pd.read_csv(file_path), df_month], ignore_index=True)
+            df_month.drop_duplicates()
+            df_month = df_month.sort_values(by=time_col)
+            df_month.to_csv(file_path, index=False)
 
 
 def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
@@ -157,10 +164,10 @@ def get_spaced_colors(n: int) -> list:
 
 
 def make_graph(
-    device: str,
-    spec_act,
-    begin_record_date=None,
-    end_record_date=None,
+        device: str,
+        spec_act,
+        begin_record_date=None,
+        end_record_date=None,
 ) -> None | BytesIO:
     resample = "60 min"
     if spec_act == "download":
@@ -203,7 +210,7 @@ def make_graph(
         combined_data = combined_data.loc[
             (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
             & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
-        ]
+            ]
     combined_data.set_index(time_col, inplace=True)
     combined_data = combined_data.replace(
         ",",
@@ -216,7 +223,7 @@ def make_graph(
         combined_data = combined_data.loc[
             (begin_record_date <= pd.to_datetime(combined_data[time_col]))
             & (pd.to_datetime(combined_data[time_col]) <= end_record_date)
-        ]
+            ]
         combined_data.to_csv(buffer, index=False)
         buffer.seek(0)
         return buffer

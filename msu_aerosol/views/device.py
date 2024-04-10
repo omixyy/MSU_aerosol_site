@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 
 from msu_aerosol.admin import get_complexes_dict
 from msu_aerosol.config import allowed_extensions, upload_folder
-from msu_aerosol.graph_funcs import choose_range, disk
+from msu_aerosol.graph_funcs import choose_range, disk, preprocessing_one_file
 from msu_aerosol.graph_funcs import make_graph
 from msu_aerosol.models import Complex, Device
 
@@ -94,8 +94,9 @@ def get_uploaded_file(device_id: int):
     file = request.files["file"]
     filename = secure_filename(file.filename)
 
-    if file and allowed_file(filename):
+    try:
         link = Device.query.get(device_id).link
+        full_name = disk.get_public_meta(link)['name']
         directory = Path(
             f"{upload_folder}/"
             f"{disk.get_public_meta(link)['name']}"
@@ -105,6 +106,9 @@ def get_uploaded_file(device_id: int):
         file.save(
             Path(directory, filename),
         )
+        preprocessing_one_file(full_name, Path(directory, filename))
+        make_graph(device, "full")
+        make_graph(device, "recent")
         return render_template(
             "device/device.html",
             now=datetime.now(),
@@ -120,17 +124,18 @@ def get_uploaded_file(device_id: int):
             message="Файл успешно получен",
         )
 
-    return render_template(
-        "device/device.html",
-        now=datetime.now(),
-        view_name="device",
-        device=device_orm_obj,
-        complex=complex_orm_obj,
-        complex_to_device=complex_to_device,
-        user=current_user,
-        device_to_name=device_to_name,
-        min_date=str(min_date).replace(" ", "T"),
-        max_date=str(max_date).replace(" ", "T"),
-        device_id=device_id,
-        error="Ошибка при загрузке файла",
-    )
+    except Exception as _:
+        return render_template(
+            "device/device.html",
+            now=datetime.now(),
+            view_name="device",
+            device=device_orm_obj,
+            complex=complex_orm_obj,
+            complex_to_device=complex_to_device,
+            user=current_user,
+            device_to_name=device_to_name,
+            min_date=str(min_date).replace(" ", "T"),
+            max_date=str(max_date).replace(" ", "T"),
+            device_id=device_id,
+            error="Ошибка при загрузке файла",
+        )
