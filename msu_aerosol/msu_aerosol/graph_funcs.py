@@ -17,12 +17,12 @@ from msu_aerosol.models import Device
 __all__ = []
 
 
-def get_device_by_name(name: str) -> Device | None:
-    for i in Device.query.all():
-        if disk.get_public_meta(i.link)["name"] == name:
-            return i
+def get_device_by_name(name: str, app=None) -> Device | None:
+    if app:
+        with app.app_context():
+            return Device.query.filter_by(full_name=name).first()
 
-    return None
+    return Device.query.filter_by(full_name=name).first()
 
 
 main_path = "data"
@@ -38,23 +38,27 @@ def make_visible_date_format(date: str) -> str:
     return date.replace("%", "")
 
 
-def download_last_modified_file(links) -> None:
+def download_last_modified_file(links, app=None) -> None:
+    print("DOWNLOADING")
     list_data_path = []
     for link in links:
         full_name = disk.get_public_meta(link)["name"]
         last_modified_file = sorted(
-            disk.get_public_meta(link)["embedded"]["items"],
+            filter(
+                lambda y: y["name"].endswith(".csv"),
+                disk.get_public_meta(link)["embedded"]["items"],
+            ),
             key=lambda x: x["modified"],
-        )[-1]
+        )[0]
         download_response = requests.get(last_modified_file["file"])
         file_path = f'data/{full_name}/{last_modified_file["name"]}'
         list_data_path.append([full_name, file_path])
         with Path(file_path).open("wb") as f:
             f.write(download_response.content)
     for i in list_data_path:
-        preprocessing_one_file(i[0], i[1])
-        make_graph(i[0], spec_act="full")
-        make_graph(i[0], spec_act="recent")
+        preprocessing_one_file(i[0], i[1], app=app)
+        make_graph(i[0], spec_act="full", app=app)
+        make_graph(i[0], spec_act="recent", app=app)
 
 
 def download_device_data(url: str) -> str:
@@ -72,6 +76,7 @@ def download_device_data(url: str) -> str:
 def preprocess_device_data(name_folder: str) -> None:
     for name_file in os.listdir(f"{main_path}/{name_folder}"):
         if not name_file.endswith(".csv"):
+            print(name_file)
             Path(f"{main_path}/{name_folder}/{name_file}").unlink()
     for name_file in os.listdir(f"{main_path}/{name_folder}"):
         preprocessing_one_file(
@@ -80,9 +85,9 @@ def preprocess_device_data(name_folder: str) -> None:
         )
 
 
-def preprocessing_one_file(device: str, path: str) -> None:
+def preprocessing_one_file(device: str, path: str, app=None) -> None:
     df = pd.read_csv(path, sep=None, engine="python", decimal=",")
-    device_obj = get_device_by_name(device)
+    device_obj = get_device_by_name(device, app=app)
     time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
     columns = [j.name for j in device_obj.columns if j.use]
     if any(
@@ -136,9 +141,11 @@ def preprocessing_one_file(device: str, path: str) -> None:
             df_month.to_csv(file_path, index=False)
 
 
-def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
+def choose_range(device: str, app=None) -> tuple[pd.Timestamp, pd.Timestamp]:
     time_col = [
-        i.name for i in get_device_by_name(device).time_columns if i.use
+        i.name
+        for i in get_device_by_name(device, app=app).time_columns
+        if i.use
     ][0]
     list_files = os.listdir(f"proc_data/{device}")
     return (
@@ -189,6 +196,7 @@ def make_graph(
     spec_act,
     begin_record_date=None,
     end_record_date=None,
+    app=None,
 ) -> None | BytesIO:
     resample = "60 min"
     if spec_act == "download":
@@ -208,10 +216,10 @@ def make_graph(
                 else "%Y-%m-%dT%H:%M:%S"
             ),
         )
-    device_obj = get_device_by_name(device)
+    device_obj = get_device_by_name(device, app=app)
     time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
     if not begin_record_date or not end_record_date:
-        begin_record_date, end_record_date = choose_range(device)
+        begin_record_date, end_record_date = choose_range(device, app=app)
     if spec_act == "recent":
         begin_record_date = end_record_date - timedelta(days=3)
     current_date, combined_data = begin_record_date, pd.DataFrame()

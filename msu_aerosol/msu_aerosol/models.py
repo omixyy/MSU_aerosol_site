@@ -78,9 +78,9 @@ class Complex(BaseModel):
 class Device(BaseModel):
     __tablename__ = "devices"
 
-    serial_number = db.Column(
-        db.String,
-    )
+    full_name = db.Column(db.String)
+
+    serial_number = db.Column(db.String)
 
     show = db.Column(
         db.Boolean,
@@ -96,14 +96,14 @@ class Device(BaseModel):
     columns = db.relationship(
         "DeviceDataColumn",
         backref="device",
-        lazy=True,
+        lazy="subquery",
         cascade="all, delete-orphan",
     )
 
     time_columns = db.relationship(
         "DeviceTimeColumn",
         backref="device",
-        lazy=True,
+        lazy="subquery",
         cascade="all, delete-orphan",
     )
 
@@ -223,4 +223,5 @@ class DeviceView(ModelView):
         "columns",
         "time_format",
         "time_columns",
+        "full_name",
     )

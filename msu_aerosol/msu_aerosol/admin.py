@@ -109,6 +109,7 @@ class AdminHomeView(AdminIndexView):
                 for j in DeviceTimeColumn.query.filter_by(name=radio):
                     j.use = True
                 dev.time_format = time_format
+                dev.full_name = disk.get_public_meta(dev.link)["name"]
                 db.session.commit()
 
                 preprocess_device_data(full_name)
@@ -204,18 +205,19 @@ atexit.register(lambda: scheduler.shutdown())
 
 @listens_for(Device, "after_insert")
 @listens_for(Device, "after_delete")
-def init_schedule(mapper, connection, target) -> None:
+def init_schedule(mapper, connection, target, app=None) -> None:
     global scheduler
-    devices: list[str] = [i.link for i in Device.query.all()]
+    links: list[str] = [i.link for i in Device.query.all()]
     if scheduler.running or not (mapper and connection and target):
         scheduler.remove_all_jobs()
 
         scheduler.add_job(
             func=download_last_modified_file,
             trigger="interval",
-            seconds=60,
+            seconds=15,
             id="downloader",
-            args=[devices],
+            args=[links],
+            kwargs={"app": app},
         )
 
     if not scheduler.running:

@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 
 from msu_aerosol.admin import get_complexes_dict
 from msu_aerosol.config import allowed_extensions, upload_folder
-from msu_aerosol.graph_funcs import choose_range, disk, preprocessing_one_file
+from msu_aerosol.graph_funcs import choose_range, preprocessing_one_file
 from msu_aerosol.graph_funcs import make_graph
 from msu_aerosol.models import Complex, Device
 
@@ -35,8 +35,7 @@ def device(device_id: int) -> str | Response:
     complex_orm_obj: Complex = Complex.query.get(device_orm_obj.complex_id)
     complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
     device_to_name: dict[str, str] = {
-        dev.name: disk.get_public_meta(dev.link)["name"]
-        for dev in Device.query.all()
+        dev.name: dev.full_name for dev in Device.query.all()
     }
     min_date, max_date = choose_range(device_to_name[device_orm_obj.name])
     return render_template(
@@ -61,8 +60,7 @@ def download_data_range(device_id: int) -> Response:
     data_range = request.form.get(
         "datetime_picker_start",
     ), request.form.get("datetime_picker_end")
-    dev = Device.query.get(device_id)
-    full_name = disk.get_public_meta(dev.link)["name"]
+    full_name = Device.query.get(device_id).full_name
     buffer = make_graph(
         full_name,
         "download",
@@ -85,20 +83,15 @@ def get_uploaded_file(device_id: int):
     device_orm_obj: Device = Device.query.get_or_404(device_id)
     complex_orm_obj: Complex = Complex.query.get(device_orm_obj.complex_id)
     complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
-    device_to_name: dict[str, str] = {
-        dev.name: disk.get_public_meta(dev.link)["name"]
-        for dev in Device.query.all()
-    }
-    min_date, max_date = choose_range(device_to_name[device_orm_obj.name])
+    min_date, max_date = choose_range(device_orm_obj.full_name)
 
     file = request.files["file"]
     filename = secure_filename(file.filename)
 
     try:
-        link = Device.query.get(device_id).link
-        full_name = disk.get_public_meta(link)["name"]
+        full_name = Device.query.get(device_id).full_name
         directory = Path(
-            f"{upload_folder}/" f"{disk.get_public_meta(link)['name']}",
+            f"{upload_folder}/{full_name}",
         )
         if not directory.exists():
             Path(directory).mkdir(parents=True)
@@ -116,7 +109,6 @@ def get_uploaded_file(device_id: int):
             complex=complex_orm_obj,
             complex_to_device=complex_to_device,
             user=current_user,
-            device_to_name=device_to_name,
             min_date=str(min_date).replace(" ", "T"),
             max_date=str(max_date).replace(" ", "T"),
             device_id=device_id,
@@ -132,7 +124,7 @@ def get_uploaded_file(device_id: int):
             complex=complex_orm_obj,
             complex_to_device=complex_to_device,
             user=current_user,
-            device_to_name=device_to_name,
+            device_to_name=device_orm_obj.full_name,
             min_date=str(min_date).replace(" ", "T"),
             max_date=str(max_date).replace(" ", "T"),
             device_id=device_id,

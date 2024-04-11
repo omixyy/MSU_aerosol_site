@@ -23,7 +23,7 @@ with app.app_context():
     db.init_app(app)
     db.create_all()
     init_admin(app)
-    init_schedule(None, None, None)
+    init_schedule(None, None, None, app=app)
 
 
 def main() -> None:
