@@ -35,10 +35,31 @@ from msu_aerosol.models import (
 
 __all__ = []
 
+application = None
+
 
 class AdminHomeView(AdminIndexView):
-    def __init__(self, name) -> None:
-        super().__init__(name)
+    def __init__(
+        self,
+        name=None,
+        category=None,
+        endpoint=None,
+        url=None,
+        template="admin/index.html",
+        menu_class_name=None,
+        menu_icon_type=None,
+        menu_icon_value=None,
+    ) -> None:
+        super().__init__(
+            name,
+            category,
+            endpoint,
+            url,
+            template,
+            menu_class_name,
+            menu_icon_type,
+            menu_icon_value,
+        )
 
     @expose("/", methods=["GET", "POST"])
     def admin_index(self) -> str:
@@ -188,6 +209,9 @@ atexit.register(lambda: scheduler.shutdown())
 @listens_for(Device, "after_delete")
 def init_schedule(mapper, connection, target, app=None) -> None:
     global scheduler
+    global application
+    if app:
+        application = app
     links: list[str] = [i.link for i in Device.query.all()]
     if scheduler.running or not (mapper and connection and target):
         scheduler.remove_all_jobs()
@@ -198,7 +222,7 @@ def init_schedule(mapper, connection, target, app=None) -> None:
             seconds=15,
             id="downloader",
             args=[links],
-            kwargs={"app": app},
+            kwargs={"app": application},
         )
 
     if not scheduler.running:
