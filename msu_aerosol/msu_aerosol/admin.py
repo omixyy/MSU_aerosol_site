@@ -37,27 +37,8 @@ __all__ = []
 
 
 class AdminHomeView(AdminIndexView):
-    def __init__(
-        self,
-        name=None,
-        category=None,
-        endpoint=None,
-        url=None,
-        template="admin/index.html",
-        menu_class_name=None,
-        menu_icon_type=None,
-        menu_icon_value=None,
-    ) -> None:
-        super().__init__(
-            name,
-            category,
-            endpoint,
-            url,
-            template,
-            menu_class_name,
-            menu_icon_type,
-            menu_icon_value,
-        )
+    def __init__(self, name) -> None:
+        super().__init__(name)
 
     @expose("/", methods=["GET", "POST"])
     def admin_index(self) -> str:

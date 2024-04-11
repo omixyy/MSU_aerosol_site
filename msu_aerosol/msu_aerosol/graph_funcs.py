@@ -39,7 +39,6 @@ def make_visible_date_format(date: str) -> str:
 
 
 def download_last_modified_file(links, app=None) -> None:
-    print("DOWNLOADING")
     list_data_path = []
     for link in links:
         full_name = disk.get_public_meta(link)["name"]
@@ -76,7 +75,6 @@ def download_device_data(url: str) -> str:
 def preprocess_device_data(name_folder: str) -> None:
     for name_file in os.listdir(f"{main_path}/{name_folder}"):
         if not name_file.endswith(".csv"):
-            print(name_file)
             Path(f"{main_path}/{name_folder}/{name_file}").unlink()
     for name_file in os.listdir(f"{main_path}/{name_folder}"):
         preprocessing_one_file(
