@@ -29,8 +29,19 @@ class BaseModel(db.Model):
     )
 
 
-class BaseColumnModel(BaseModel):
+class BaseColumnModel(db.Model):
     __abstract__ = True
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    name = db.Column(
+        db.String,
+        unique=False,
+    )
 
     @declared_attr
     def device_id(self):
@@ -40,13 +51,19 @@ class BaseColumnModel(BaseModel):
             nullable=False,
         )
 
+    use = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False,
+    )
+
 
 class Complex(BaseModel):
     __tablename__ = "complexes"
 
     devices = db.relationship(
         "Device",
-        backref="complexes",
+        backref="complex",
         lazy=True,
         cascade="all, delete-orphan",
     )
@@ -74,6 +91,25 @@ class Device(BaseModel):
     link = db.Column(
         db.String,
         nullable=False,
+    )
+
+    columns = db.relationship(
+        "DeviceDataColumn",
+        backref="device",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    time_columns = db.relationship(
+        "DeviceTimeColumn",
+        backref="device",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    time_format = db.Column(
+        db.String,
+        nullable=True,
     )
 
     complex_id = db.Column(
@@ -155,6 +191,16 @@ class Role(BaseModel):
         return self.name
 
 
+class DeviceDataColumn(BaseColumnModel):
+    __tablename__ = "column"
+
+    color = db.Column(db.String)
+
+
+class DeviceTimeColumn(BaseColumnModel):
+    __tablename__ = "time_column"
+
+
 class UserFieldView(ModelView):
     column_list = (
         "id",
@@ -172,4 +218,9 @@ class DeviceView(ModelView):
         "name",
         "serial_number",
     )
-    form_excluded_columns = ("show", "columns")
+    form_excluded_columns = (
+        "show",
+        "columns",
+        "time_format",
+        "time_columns",
+    )

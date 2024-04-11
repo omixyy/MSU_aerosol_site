@@ -1,6 +1,5 @@
 import atexit
 import csv
-import json
 import os
 from pathlib import Path
 import shutil
@@ -19,15 +18,15 @@ from msu_aerosol.graph_funcs import (
     download_device_data,
     download_last_modified_file,
     get_spaced_colors,
-    make_format_date,
     make_graph,
-    make_visible_date_format,
     preprocess_device_data,
 )
 from msu_aerosol.models import (
     Complex,
     db,
     Device,
+    DeviceDataColumn,
+    DeviceTimeColumn,
     DeviceView,
     Role,
     User,
@@ -62,117 +61,69 @@ class AdminHomeView(AdminIndexView):
 
     @expose("/", methods=["GET", "POST"])
     def admin_index(self) -> str:
-        device_to_cols: dict = {}
-        device_to_time_col: dict = {}
         downloaded = os.listdir("data")
         downloaded.remove(".gitignore")
-        if downloaded:
-            for folder in downloaded:
-                file: str = os.listdir(f"data/{folder}")[0]
-                dialect = get_dialect(f"data/{folder}/{file}")
-                with Path(f"data/{folder}/{file}").open("r") as csv_file:
-                    header = list(csv.reader(csv_file, dialect=dialect))[0]
-                    device_to_cols[folder] = list(
-                        filter(
-                            lambda x: "date" not in x.lower()
-                            and "time" not in x.lower(),
-                            header,
-                        ),
-                    )
+        all_devices = Device.query.all()
 
-                    device_to_time_col[folder] = list(
-                        filter(
-                            lambda x: "date" in x.lower()
-                            or "time" in x.lower(),
-                            header,
-                        ),
-                    )
-
-                with Path("msu_aerosol/config_devices.json").open("r") as cfg:
-                    data = json.load(cfg)
-                    if folder not in data:
-                        data[folder] = {
-                            "cols": [],
-                            "time_cols": [],
-                            "time_col": None,
-                            "format": None,
-                            "color_dict": None,
-                        }
-                        data[folder]["cols"] = device_to_cols[folder]
-                        data[folder]["time_cols"] = device_to_time_col[folder]
-
-                with Path("msu_aerosol/config_devices.json").open("w") as cfg:
-                    json.dump(data, cfg, indent=2)
-
-        if request.method == "GET":
-            with Path("msu_aerosol/config_devices.json").open("r") as config:
-                data = json.load(config)
-
-        elif request.method == "POST":
-            with Path("msu_aerosol/config_devices.json").open("r") as config:
-                config_dev = json.load(config)
-                changed = [
-                    k
-                    for k, _ in config_dev.items()
-                    if request.form.getlist(f"{k}_cb") != config_dev[k]["cols"]
-                    or request.form.get(f"{k}_rb") != config_dev[k]["time_col"]
-                    or make_format_date(
-                        request.form.get(f"datetime_format_{k}"),
-                    )
-                    != config_dev[k]["format"]
+        if request.method == "POST":
+            changed: list = []
+            for dev in all_devices:
+                full_name = disk.get_public_meta(dev.link)["name"]
+                usable_cols = [i.name for i in dev.columns if i.use]
+                time_col = [i.name for i in dev.time_columns if i.use]
+                if (
+                    request.form.getlist(f"{full_name}_cb") != usable_cols
+                    or not usable_cols
+                    or request.form.get(f"{full_name}_rb") != time_col[0]
+                    or request.form.get(f"datetime_format_{full_name}")
+                    != dev.time_format
                     or not Path(
-                        f"templates/includes/devices/full/graph_{k}.html",
+                        f"templates/"
+                        f"includes/"
+                        f"devices/"
+                        f"full/"
+                        f"graph_{full_name}.html",
                     ).exists()
-                ]
-            with Path("msu_aerosol/config_devices.json").open("w") as config:
-                for dev_name in changed:
-                    checkboxes = request.form.getlist(f"{dev_name}_cb")
-                    colors = get_spaced_colors(len(device_to_cols[dev_name]))
-                    data[dev_name] = {
-                        "time_col": request.form.get(f"{dev_name}_rb"),
-                        "time_cols": device_to_time_col[dev_name],
-                        "cols": checkboxes,
-                        "format": (
-                            make_format_date(
-                                request.form.get(
-                                    f"datetime_format_{dev_name}",
-                                ),
-                            )
-                        ),
-                        "color_dict": {
-                            device_to_cols[dev_name][i]: colors[i]
-                            for i in range(len(checkboxes))
-                        },
-                    }
+                ):
+                    changed.append(dev)
 
-                json.dump(data, config, indent=2)
+            for dev in changed:
+                for col in DeviceDataColumn.query.filter_by(
+                    use=True,
+                    device_id=dev.id,
+                ):
+                    col.use = False
+                time = DeviceTimeColumn.query.filter_by(
+                    use=True,
+                    device_id=dev.id,
+                ).first()
+                if time:
+                    time.use = False
+                full_name = disk.get_public_meta(dev.link)["name"]
+                checkboxes = request.form.getlist(f"{full_name}_cb")
+                radio = request.form.get(f"{full_name}_rb")
+                time_format = request.form.get(f"datetime_format_{full_name}")
+                for i in checkboxes:
+                    for k in DeviceDataColumn.query.filter_by(name=i):
+                        k.use = True
+                for j in DeviceTimeColumn.query.filter_by(name=radio):
+                    j.use = True
+                dev.time_format = time_format
+                db.session.commit()
 
-            for device in changed:
-                preprocess_device_data(device)
-                make_graph(device, "full")
-                make_graph(device, "recent")
+                preprocess_device_data(full_name)
+                make_graph(full_name, "full")
+                make_graph(full_name, "recent")
 
-            for dev in Device.query.all():
+            for dev in all_devices:
                 dev.show = True
-
-            db.session.commit()
+                db.session.commit()
 
         return self.render(
             "admin/admin_home.html",
-            device_to_cols=device_to_cols,
-            device_to_time_cols=device_to_time_col,
-            data={
-                i: {
-                    "time_cols": j["time_cols"],
-                    "time_col": j["time_col"],
-                    "cols": j["cols"],
-                    "format": (
-                        make_visible_date_format(j["format"])
-                        if j["format"]
-                        else ""
-                    ),
-                }
-                for i, j in data.items()
+            name_to_device={
+                disk.get_public_meta(dev.link)["name"]: dev
+                for dev in all_devices
             },
         )
 
@@ -194,19 +145,35 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
 @listens_for(Device, "after_insert")
 def after_insert(mapper, connection, target) -> None:
     download_device_data(target.link)
+    full_name = disk.get_public_meta(target.link)["name"]
+    file: str = os.listdir(f"data/{full_name}")[0]
+    dialect = get_dialect(f"data/{full_name}/{file}")
+    with Path(f"data/{full_name}/{file}").open("r") as csv_file:
+        header = list(csv.reader(csv_file, dialect=dialect))[0]
+        colors = get_spaced_colors(len(header))
+
+    @listens_for(db.session, "after_flush", once=True)
+    def receive_after_flush(session, context):
+        for column, color in zip(header, colors):
+            if "time" in column.lower() or "date" in column.lower():
+                col = DeviceTimeColumn(
+                    name=column,
+                    device_id=target.id,
+                )
+                db.session.add(col)
+
+            elif "time" not in column.lower() or "date" not in column.lower():
+                time_col = DeviceDataColumn(
+                    name=column,
+                    device_id=target.id,
+                    color=color,
+                )
+                db.session.add(time_col)
 
 
 @listens_for(Device, "after_delete")
 def after_delete(mapper, connection, target) -> None:
-    with Path("msu_aerosol/config_devices.json").open("r") as config:
-        data = json.load(config)
-        full_name = disk.get_public_meta(target.link)["name"]
-        del data[full_name]
-        if Path(f"data/{full_name}").exists():
-            shutil.rmtree(f"data/{full_name}")
-    with Path("msu_aerosol/config_devices.json").open("w") as config:
-        json.dump(data, config, indent=2)
-
+    full_name = disk.get_public_meta(target.link)["name"]
     graph_full = f"templates/includes/devices/full/graph_{full_name}.html"
     graph_rec = f"templates/includes/devices/recent/graph_{full_name}.html"
     proc_data = f"proc_data/{full_name}"

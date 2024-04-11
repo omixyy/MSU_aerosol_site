@@ -1,9 +1,7 @@
 from datetime import timedelta
 from io import BytesIO
-import json
 import os
 from pathlib import Path
-from typing import Any
 from urllib.parse import urlencode
 from zipfile import ZipFile
 
@@ -14,12 +12,17 @@ import requests
 from yadisk import YaDisk
 
 from msu_aerosol.config import yadisk_token
+from msu_aerosol.models import Device
 
 __all__ = []
 
 
-def load_json(path: str) -> dict[str, dict[str, Any]]:
-    return json.load(open(path, "r"))
+def get_device_by_name(name: str) -> Device | None:
+    for i in Device.query.all():
+        if disk.get_public_meta(i.link)["name"] == name:
+            return i
+
+    return None
 
 
 main_path = "data"
@@ -78,25 +81,22 @@ def preprocess_device_data(name_folder: str) -> None:
 
 
 def preprocessing_one_file(device: str, path: str) -> None:
-    config_devices_open = load_json("msu_aerosol/config_devices.json")
     df = pd.read_csv(path, sep=None, engine="python", decimal=",")
-    config_device_open = config_devices_open[device]
-    time_col = config_device_open["time_col"]
+    device_obj = get_device_by_name(device)
+    time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
+    columns = [j.name for j in device_obj.columns if j.use]
     if any(
-        (
-            i not in list(df.columns)
-            for i in [time_col] + config_device_open["cols"]
-        ),
+        (i not in list(df.columns) for i in [time_col] + columns),
     ):
         raise KeyError
-    df = df[[time_col] + config_device_open["cols"]]
+    df = df[[time_col] + columns]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
     if not Path(f"proc_data/{device}").exists():
         Path(f"proc_data/{device}").mkdir(parents=True)
     try:
         df[time_col] = pd.to_datetime(
             df[time_col],
-            format=config_device_open["format"],
+            format=make_format_date(device_obj.time_format),
         )
     except Exception:
         raise ValueError
@@ -123,21 +123,23 @@ def preprocessing_one_file(device: str, path: str) -> None:
             month = "0" + str(month) if month < 10 else str(month)
             file_path = f"proc_data/{device}/{year}_{month}.csv"
             if Path(file_path).exists():
+                df_help = pd.read_csv(file_path)
+                df_help[time_col] = pd.to_datetime(df_help[time_col])
                 df_month = pd.concat(
-                    [pd.read_csv(file_path), df_month],
+                    [df_help, df_month],
                     ignore_index=True,
                 )
             df_month.drop_duplicates()
+            if len(df_month) == 0:
+                continue
             df_month = df_month.sort_values(by=time_col)
             df_month.to_csv(file_path, index=False)
 
 
 def choose_range(device: str) -> tuple[pd.Timestamp, pd.Timestamp]:
-    time_col = load_json(
-        "msu_aerosol/config_devices.json",
-    )[
-        device
-    ]["time_col"]
+    time_col = [
+        i.name for i in get_device_by_name(device).time_columns if i.use
+    ][0]
     list_files = os.listdir(f"proc_data/{device}")
     return (
         pd.to_datetime(
@@ -206,8 +208,8 @@ def make_graph(
                 else "%Y-%m-%dT%H:%M:%S"
             ),
         )
-    device_dict = load_json("msu_aerosol/config_devices.json")[device]
-    time_col = device_dict["time_col"]
+    device_obj = get_device_by_name(device)
+    time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
     if not begin_record_date or not end_record_date:
         begin_record_date, end_record_date = choose_range(device)
     if spec_act == "recent":
@@ -216,7 +218,9 @@ def make_graph(
     while current_date <= end_record_date + timedelta(days=100):
         try:
             data = pd.read_csv(
-                f'proc_data/{device}/{current_date.strftime("%Y_%m")}.csv',
+                f"proc_data/"
+                f"{device}/"
+                f'{current_date.strftime("%Y_%m")}.csv',
             )
             combined_data = pd.concat([combined_data, data], ignore_index=True)
             current_date += timedelta(days=29)
@@ -251,7 +255,7 @@ def make_graph(
     fig = px.line(
         combined_data,
         x=time_col,
-        y=device_dict["cols"],
+        y=[i.name for i in device_obj.columns if i.use],
     )
     fig.update_layout(
         title=str(device),
