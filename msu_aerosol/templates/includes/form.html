@@ -12,21 +12,23 @@
     {{ form.csrf_token }}
   </div>
   {% for field in form if field.name != 'csrf_token' %}
-    <div class="mb-3">
-      {% if field.name != 'submit' %}
-        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-        {{ field(class="form-control") }}
-        {% if field.help_text %}
-          <div class="form-text">{{ field.help_text }}</div>
-        {% endif %}
-      {% else %}
-        <div class="mx-auto">
-          {{ field(class="btn btn-dark mt-5", type="submit") }}
-          {% if view_name == 'profile' %}
-            <a type="button" href="{{ url_for('login.logout') }}" class="btn btn-dark mt-5" style="margin-right: 15px">Выйти</a>
+    {% if field.name != 'role' or user.role %}
+      <div class="mb-3">
+        {% if field.name != 'submit' %}
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {{ field(class="form-control") }}
+          {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
           {% endif %}
-        </div>
-      {% endif %}
-    </div>
+        {% else %}
+          <div class="mx-auto">
+            {{ field(class="btn btn-dark mt-5", type="submit") }}
+            {% if view_name == 'profile' %}
+              <a type="button" href="{{ url_for('login.logout') }}" class="btn btn-dark mt-5" style="margin-right: 15px">Выйти</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
   {% endfor %}
 </form>

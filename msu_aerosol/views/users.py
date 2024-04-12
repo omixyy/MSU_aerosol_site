@@ -32,6 +32,54 @@ login_bp: Blueprint = Blueprint("login", __name__, url_prefix="/")
 profile_bp: Blueprint = Blueprint("profile", __name__, url_prefix="/")
 
 
+def is_safe(password: str) -> bool:
+    return (
+        len(password) > 8
+        and len(list(filter(lambda x: x.isdigit(), password))) >= 2
+        and len(list(filter(lambda x: x.isalpha(), password))) >= 5
+    )
+
+
+def get_registration_template(error: str | None) -> str:
+    complex_to_device = get_complexes_dict()
+    form = RegisterForm()
+    return render_template(
+        "users/register.html",
+        form=form,
+        message_error=error,
+        complex_to_device=complex_to_device,
+        now=datetime.now(),
+        view_name="registration",
+    )
+
+
+def get_profile_template(message: str | None, form: ProfileForm) -> str:
+    complex_to_device = get_complexes_dict()
+    return render_template(
+        "users/profile.html",
+        now=datetime.now(),
+        complex_to_device=complex_to_device,
+        view_name="profile",
+        user=current_user,
+        form=form,
+        message_success=message,
+    )
+
+
+def get_login_template(error: str | None) -> str:
+    complex_to_device = get_complexes_dict()
+    form = LoginForm()
+    return render_template(
+        "users/login.html",
+        form=form,
+        message_error=error,
+        complex_to_device=complex_to_device,
+        now=datetime.now(),
+        view_name="login",
+        user=current_user,
+    )
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -40,7 +88,6 @@ def load_user(user_id):
 @profile_bp.route("/profile", methods=["GET", "POST"])
 @login_required
 def user_profile() -> str:
-    complex_to_device = get_complexes_dict()
     form = ProfileForm(obj=current_user)
     if request.method == "POST":
         if form.validate_on_submit():
@@ -49,30 +96,13 @@ def user_profile() -> str:
             current_user.last_name = request.form.get("last_name")
             current_user.email = request.form.get("email")
             db.session.commit()
+        return get_profile_template("Данные успешно сохранены", form)
 
-        return render_template(
-            "users/profile.html",
-            now=datetime.now(),
-            complex_to_device=complex_to_device,
-            view_name="profile",
-            user=current_user,
-            form=form,
-            message_success="Данные успешно сохранены",
-        )
-
-    return render_template(
-        "users/profile.html",
-        now=datetime.now(),
-        complex_to_device=complex_to_device,
-        view_name="profile",
-        user=current_user,
-        form=form,
-    )
+    return get_profile_template(None, form)
 
 
 @login_bp.route("/login", methods=["GET", "POST"])
 def login() -> Response | str:
-    complex_to_device = get_complexes_dict()
     form = LoginForm()
     if request.method == "POST":
         if form.validate_on_submit():
@@ -85,34 +115,11 @@ def login() -> Response | str:
                     login_user(user)
                     return redirect(url_for("home.index", user=user))
 
-                return render_template(
-                    "users/login.html",
-                    form=form,
-                    message_error="Неверный пароль",
-                    complex_to_device=complex_to_device,
-                    now=datetime.now(),
-                    view_name="login",
-                    user=current_user,
-                )
+                return get_login_template("Неверный пароль")
 
-            return render_template(
-                "users/login.html",
-                form=form,
-                message_error="Не существует такого пользователя",
-                complex_to_device=complex_to_device,
-                now=datetime.now(),
-                view_name="login",
-                user=current_user,
-            )
+            return get_login_template("Не существует такого пользователя")
 
-    return render_template(
-        "users/login.html",
-        form=form,
-        complex_to_device=complex_to_device,
-        now=datetime.now(),
-        view_name="login",
-        user=current_user,
-    )
+    return get_login_template(None)
 
 
 @login_bp.route("/logout", methods=["GET", "POST"])
@@ -124,41 +131,24 @@ def logout() -> Response:
 
 @register_bp.route("/register", methods=["GET", "POST"])
 def register() -> str | Response:
-    complex_to_device = get_complexes_dict()
-    form = RegisterForm()
     if request.method == "GET":
-        return render_template(
-            "users/register.html",
-            title="Регистрация",
-            form=form,
-            complex_to_device=complex_to_device,
-            now=datetime.now(),
-            view_name="registration",
-            user=current_user,
-        )
+        return get_registration_template(None)
 
     user_login = request.form.get("login")
     password = request.form.get("password")
     password_again = request.form.get("password_again")
     email = request.form.get("email")
     if password != password_again:
-        return render_template(
-            "users/register.html",
-            form=form,
-            message_error="Пароли не совпадают",
-            complex_to_device=complex_to_device,
-            now=datetime.now(),
-            view_name="registration",
+        return get_registration_template("Пароли не совпадают")
+
+    if not is_safe(password):
+        return get_registration_template(
+            "Пароль должен содержать не менее трёх цифр и не менее пяти букв",
         )
 
     if User.query.filter_by(login=user_login).first():
-        return render_template(
-            "users/register.html",
-            form=form,
-            message_error="Пользователь с таким именем уже существует",
-            complex_to_device=complex_to_device,
-            now=datetime.now(),
-            view_name="registration",
+        return get_registration_template(
+            "Пользователь с таким именем уже существует",
         )
 
     new_user = User(

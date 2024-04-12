@@ -6,22 +6,24 @@ from msu_aerosol.models import db, Role, User
 
 __all__ = []
 
-activate: Blueprint = Blueprint("activate", __name__)
+create_superuser: Blueprint = Blueprint("activate", __name__)
 
 
-@activate.cli.command("createsuperuser")
+@create_superuser.cli.command("createsuperuser")
 @click.option("--login", prompt=True)
+@click.option("--email", prompt=True)
 @click.option(
     "--password",
     prompt=True,
     hide_input=True,
     confirmation_prompt=True,
 )
-def create_superuser(login, password):
+def create_superuser(login, email, password):
     admin_role = Role.query.filter_by(name="Admin").first()
     if not admin_role:
         admin_role = Role(
             name="Admin",
+            email=email,
             can_access_admin=True,
             can_upload_data=True,
         )

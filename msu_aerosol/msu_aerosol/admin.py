@@ -6,11 +6,11 @@ import shutil
 from typing import Type
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask, request
+from flask import abort, Flask, request
 from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
-from flask_login import LoginManager
+from flask_login import current_user, LoginManager
 from sqlalchemy.event import listens_for
 
 from msu_aerosol.graph_funcs import (
@@ -63,6 +63,12 @@ class AdminHomeView(AdminIndexView):
 
     @expose("/", methods=["GET", "POST"])
     def admin_index(self) -> str:
+        if (
+            not current_user.is_authenticated
+            or not current_user.role
+            or not current_user.role.can_access_admin
+        ):
+            abort(403)
         downloaded = os.listdir("data")
         downloaded.remove(".gitignore")
         all_devices = Device.query.all()
@@ -124,10 +130,7 @@ class AdminHomeView(AdminIndexView):
 
         return self.render(
             "admin/admin_home.html",
-            name_to_device={
-                disk.get_public_meta(dev.link)["name"]: dev
-                for dev in all_devices
-            },
+            name_to_device={dev.full_name: dev for dev in all_devices},
         )
 
 

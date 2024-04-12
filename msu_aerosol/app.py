@@ -11,22 +11,22 @@ from views.users import profile_bp
 
 __all__: list = []
 
-app: Flask = config.initialize_flask_app(__name__)
-app.register_blueprint(home_bp, name="home")
-app.register_blueprint(device_bp, name="device_details")
-app.register_blueprint(register_bp, name="registration")
-app.register_blueprint(login_bp, name="login")
-app.register_blueprint(profile_bp, name="profile")
-app.cli.add_command(create_superuser)
-
-with app.app_context():
-    db.init_app(app)
-    db.create_all()
-    init_admin(app)
-    init_schedule(None, None, None, app=app)
-
 
 def main() -> None:
+    app: Flask = config.initialize_flask_app(__name__)
+    app.register_blueprint(home_bp, name="home")
+    app.register_blueprint(device_bp, name="device_details")
+    app.register_blueprint(register_bp, name="registration")
+    app.register_blueprint(login_bp, name="login")
+    app.register_blueprint(profile_bp, name="profile")
+    app.cli.add_command(create_superuser)
+
+    with app.app_context():
+        db.init_app(app)
+        db.create_all()
+        init_admin(app)
+        init_schedule(None, None, None, app=app)
+
     app.run(use_reloader=False)
 
 
