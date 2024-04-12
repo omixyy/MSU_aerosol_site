@@ -35,10 +35,10 @@ profile_bp: Blueprint = Blueprint("profile", __name__, url_prefix="/")
 
 def is_safe(password: str) -> bool:
     return not (
-        len(password) < 10 or
-        len(re.findall(r"\d", password)) < 4 or
-        len(re.findall(r"[a-zA-Z]", password)) < 4 or
-        len(re.findall(r"[!@#$%^&*()-_+=]", password)) < 2
+        len(password) < 10
+        or len(re.findall(r"\d", password)) < 4
+        or len(re.findall(r"[a-zA-Z]", password)) < 4
+        or len(re.findall(r"[!@#$%^&*()-_+=]", password)) < 2
     )
 
 
