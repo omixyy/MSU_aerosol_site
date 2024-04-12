@@ -13,8 +13,8 @@ class ProfileForm(FlaskForm):
         "Логин",
         validators=[DataRequired()],
     )
-    first_name = StringField("Имя")
-    last_name = StringField("Фамилия")
+    name = StringField("Имя")
+    surname = StringField("Фамилия")
     email = StringField(
         "Почта",
         validators=[DataRequired()],

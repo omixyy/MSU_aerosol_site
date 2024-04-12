@@ -94,10 +94,12 @@ def user_profile() -> str:
     if request.method == "POST":
         if form.validate_on_submit():
             current_user.login = request.form.get("login")
-            current_user.first_name = request.form.get("first_name")
-            current_user.last_name = request.form.get("last_name")
+            current_user.name = request.form.get("name")
+            current_user.surname = request.form.get("surname")
+            print(current_user.name, current_user.surname)
             current_user.email = request.form.get("email")
             db.session.commit()
+
         return get_profile_template("Данные успешно сохранены", form)
 
     return get_profile_template(None, form)
@@ -144,8 +146,6 @@ def register() -> str | Response:
         return get_registration_template("Пароли не совпадают")
 
     if not is_safe(password):
-        print(password)
-        print("NOT SAFE")
         return get_registration_template(
             "Пароль должен содержать не менее двух цифр и "
             "не менее четырёх букв",

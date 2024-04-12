@@ -1,5 +1,6 @@
 {% block footer %}
-<footer class="border-top text-center py-3;" style="position: relative; clear: both">
+<footer class="border-top text-center py-3;" {% if view_name in ['profile', 'registration', 'login'] %}style="position: fixed;bottom: 0;width: 100%;"{% else %}style="position: relative; clear: both"{% endif %}>
   МГУ, {{ now.year }}
 </footer>
 {% endblock footer %}
+
