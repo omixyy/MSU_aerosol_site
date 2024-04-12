@@ -216,7 +216,9 @@ class DeviceView(ModelView):
     column_list = (
         "id",
         "name",
+        "full_name",
         "serial_number",
+        "complex_id",
     )
     form_excluded_columns = (
         "show",

@@ -35,8 +35,8 @@ profile_bp: Blueprint = Blueprint("profile", __name__, url_prefix="/")
 def is_safe(password: str) -> bool:
     return (
         len(password) > 8
-        and len(list(filter(lambda x: x.isdigit(), password))) >= 2
-        and len(list(filter(lambda x: x.isalpha(), password))) >= 5
+        and 4 >= len(list(filter(lambda x: x.isdigit(), password))) >= 2
+        and 4 >= len(list(filter(lambda x: x.isupper(), password))) >= 2
     )
 
 
@@ -143,7 +143,8 @@ def register() -> str | Response:
 
     if not is_safe(password):
         return get_registration_template(
-            "Пароль должен содержать не менее трёх цифр и не менее пяти букв",
+            "Пароль должен содержать от двух до четырёх цифр и "
+            "от двух до четырёх чисел",
         )
 
     if User.query.filter_by(login=user_login).first():

@@ -98,7 +98,11 @@ def get_uploaded_file(device_id: int):
         file.save(
             Path(directory, filename),
         )
-        preprocessing_one_file(full_name, Path(directory, filename))
+        preprocessing_one_file(
+            full_name,
+            Path(directory, filename),
+            user_upload=True,
+        )
         make_graph(device, "full")
         make_graph(device, "recent")
         return render_template(

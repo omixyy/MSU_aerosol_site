@@ -23,7 +23,6 @@ def create_superuser(login, email, password):
     if not admin_role:
         admin_role = Role(
             name="Admin",
-            email=email,
             can_access_admin=True,
             can_upload_data=True,
         )
@@ -32,6 +31,7 @@ def create_superuser(login, email, password):
 
     user = User(
         login=login,
+        email=email,
         password=generate_password_hash(password),
         role_id=admin_role.id,
     )

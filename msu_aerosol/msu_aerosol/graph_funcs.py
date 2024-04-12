@@ -12,6 +12,7 @@ import requests
 from yadisk import YaDisk
 
 from msu_aerosol.config import yadisk_token
+from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
 from msu_aerosol.models import Device
 
 __all__ = []
@@ -39,7 +40,6 @@ def make_visible_date_format(date: str) -> str:
 
 
 def download_last_modified_file(links, app=None) -> None:
-    print("DOWNLOADING")
     list_data_path = []
     for link in links:
         full_name = disk.get_public_meta(link)["name"]
@@ -56,9 +56,13 @@ def download_last_modified_file(links, app=None) -> None:
         with Path(file_path).open("wb") as f:
             f.write(download_response.content)
     for i in list_data_path:
-        preprocessing_one_file(i[0], i[1], app=app)
-        make_graph(i[0], spec_act="full", app=app)
-        make_graph(i[0], spec_act="recent", app=app)
+        try:
+            preprocessing_one_file(i[0], i[1], app=app)
+            make_graph(i[0], spec_act="full", app=app)
+            make_graph(i[0], spec_act="recent", app=app)
+
+        except (KeyError, Exception):
+            pass
 
 
 def download_device_data(url: str) -> str:
@@ -84,7 +88,12 @@ def preprocess_device_data(name_folder: str) -> None:
         )
 
 
-def preprocessing_one_file(device: str, path: str, app=None) -> None:
+def preprocessing_one_file(
+    device: str,
+    path: str,
+    user_upload=False,
+    app=None,
+) -> None:
     df = pd.read_csv(path, sep=None, engine="python", decimal=",")
     device_obj = get_device_by_name(device, app=app)
     time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
@@ -92,7 +101,7 @@ def preprocessing_one_file(device: str, path: str, app=None) -> None:
     if any(
         (i not in list(df.columns) for i in [time_col] + columns),
     ):
-        raise KeyError
+        raise ColumnsMatchError("Проблемы с совпадением столбцов")
     df = df[[time_col] + columns]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
     if not Path(f"proc_data/{device}").exists():
@@ -102,8 +111,10 @@ def preprocessing_one_file(device: str, path: str, app=None) -> None:
             df[time_col],
             format=make_format_date(device_obj.time_format),
         )
-    except Exception:
-        raise ValueError
+    except (TypeError, ValueError):
+        if not app:
+            raise TimeFormatError("Проблемы с форматом времени")
+        return
     df = df.sort_values(by=time_col)
     diff_mode = df[time_col].diff().mode().values[0] * 1.1
     new_rows = []
@@ -126,14 +137,14 @@ def preprocessing_one_file(device: str, path: str, app=None) -> None:
             ]
             month = "0" + str(month) if month < 10 else str(month)
             file_path = f"proc_data/{device}/{year}_{month}.csv"
-            if Path(file_path).exists():
+            if Path(file_path).exists() and user_upload:
                 df_help = pd.read_csv(file_path)
                 df_help[time_col] = pd.to_datetime(df_help[time_col])
                 df_month = pd.concat(
                     [df_help, df_month],
                     ignore_index=True,
                 )
-            df_month.drop_duplicates()
+                df_month.drop_duplicates()
             if len(df_month) == 0:
                 continue
             df_month = df_month.sort_values(by=time_col)

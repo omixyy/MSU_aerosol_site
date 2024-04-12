@@ -13,6 +13,10 @@ from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, LoginManager
 from sqlalchemy.event import listens_for
 
+from msu_aerosol.exceptions import (
+    ColumnsMatchError,
+    TimeFormatError,
+)
 from msu_aerosol.graph_funcs import (
     disk,
     download_device_data,
@@ -36,6 +40,17 @@ from msu_aerosol.models import (
 __all__ = []
 
 application = None
+
+
+def get_admin_template(obj: AdminIndexView, message: str | None) -> str:
+    return obj.render(
+        "admin/admin_home.html",
+        name_to_device={
+            disk.get_public_meta(dev.link)["name"]: dev
+            for dev in Device.query.all()
+        },
+        message_error=message,
+    )
 
 
 class AdminHomeView(AdminIndexView):
@@ -117,21 +132,46 @@ class AdminHomeView(AdminIndexView):
                 for j in DeviceTimeColumn.query.filter_by(name=radio):
                     j.use = True
                 dev.time_format = time_format
-                dev.full_name = disk.get_public_meta(dev.link)["name"]
+                dev.full_name = full_name
                 db.session.commit()
 
-                preprocess_device_data(full_name)
-                make_graph(full_name, "full")
-                make_graph(full_name, "recent")
+                try:
+                    preprocess_device_data(full_name)
+                    make_graph(full_name, "full")
+                    make_graph(full_name, "recent")
+
+                except TimeFormatError:
+                    return get_admin_template(
+                        self,
+                        "Формат времени не подходит под столбец",
+                    )
+
+                except ColumnsMatchError:
+                    return get_admin_template(
+                        self,
+                        "Обнаружено несовпадение столбцов",
+                    )
+
+                except ValueError as e:
+                    print(e)
+                    return get_admin_template(
+                        self,
+                        "Невозможно предобработать данные "
+                        "по выбранным столбцам",
+                    )
+
+                except Exception as e:
+                    error = e.__class__.__name__
+                    return get_admin_template(
+                        self,
+                        f"Непредвиденная ошибка: {error}",
+                    )
 
             for dev in all_devices:
                 dev.show = True
                 db.session.commit()
 
-        return self.render(
-            "admin/admin_home.html",
-            name_to_device={dev.full_name: dev for dev in all_devices},
-        )
+        return get_admin_template(self, None)
 
 
 def get_complexes_dict() -> dict[Complex, list[Device]]:
@@ -151,9 +191,11 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
 @listens_for(Device, "after_insert")
 def after_insert(mapper, connection, target) -> None:
     download_device_data(target.link)
-    full_name = disk.get_public_meta(target.link)["name"]
+    full_name: str = disk.get_public_meta(target.link)["name"]
+    target.full_name = full_name
     file: str = os.listdir(f"data/{full_name}")[0]
     dialect = get_dialect(f"data/{full_name}/{file}")
+    target.full_name = full_name
     with Path(f"data/{full_name}/{file}").open("r") as csv_file:
         header = list(csv.reader(csv_file, dialect=dialect))[0]
         colors = get_spaced_colors(len(header))
@@ -166,6 +208,7 @@ def after_insert(mapper, connection, target) -> None:
                     name=column,
                     device_id=target.id,
                 )
+
                 db.session.add(col)
 
             elif "time" not in column.lower() or "date" not in column.lower():
@@ -174,6 +217,7 @@ def after_insert(mapper, connection, target) -> None:
                     device_id=target.id,
                     color=color,
                 )
+
                 db.session.add(time_col)
 
 
