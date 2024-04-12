@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from flask import (
@@ -33,10 +34,11 @@ profile_bp: Blueprint = Blueprint("profile", __name__, url_prefix="/")
 
 
 def is_safe(password: str) -> bool:
-    return (
-        len(password) > 8
-        and 4 >= len(list(filter(lambda x: x.isdigit(), password))) >= 2
-        and 4 >= len(list(filter(lambda x: x.isupper(), password))) >= 2
+    return not (
+        len(password) < 10 or
+        len(re.findall(r"\d", password)) < 4 or
+        len(re.findall(r"[a-zA-Z]", password)) < 4 or
+        len(re.findall(r"[!@#$%^&*()-_+=]", password)) < 2
     )
 
 
@@ -142,9 +144,11 @@ def register() -> str | Response:
         return get_registration_template("Пароли не совпадают")
 
     if not is_safe(password):
+        print(password)
+        print("NOT SAFE")
         return get_registration_template(
-            "Пароль должен содержать от двух до четырёх цифр и "
-            "от двух до четырёх чисел",
+            "Пароль должен содержать не менее двух цифр и "
+            "не менее четырёх букв",
         )
 
     if User.query.filter_by(login=user_login).first():

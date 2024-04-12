@@ -53,4 +53,5 @@ class TestStaticURL(unittest.TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         with self.app.app_context(), self.app.test_request_context():
             response = self.client.get(url_for("profile.user_profile"))
+
         self.assertEqual(response.status_code, HTTPStatus.OK)

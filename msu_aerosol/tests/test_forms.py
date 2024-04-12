@@ -33,16 +33,16 @@ class TestRegisterForm(unittest.TestCase):
                 {
                     "login": "TestLogin2",
                     "email": "test2@email.ru",
-                    "password": "asddsgfew32",
-                    "password_again": "asddsgfew32",
+                    "password": "asddsgfe0(*w32123",
+                    "password_again": "asddsgfe0(*w32123",
                 },
             ),
             (
                 {
                     "login": "TestLogin3",
                     "email": "test3@email.ru",
-                    "password": "GEGW#Q@$GW",
-                    "password_again": "GEGW#Q@$GW",
+                    "password": "GEGW#Q@$GW432412",
+                    "password_again": "GEGW#Q@$GW432412",
                 },
             ),
         ],
@@ -112,8 +112,8 @@ class TestLoginForm(unittest.TestCase):
                 data={
                     "login": "TestLoginForm",
                     "email": "testlogin@email.ru",
-                    "password": "_)@*(HF3-08fh)",
-                    "password_again": "_)@*(HF3-08fh)",
+                    "password": "_)@*(HF3-081234ADsdssdadqwfh)",
+                    "password_again": "_)@*(HF3-081234ADsdssdadqwfh)",
                 },
                 follow_redirects=True,
             )
