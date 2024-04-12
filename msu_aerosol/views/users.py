@@ -1,5 +1,5 @@
-import re
 from datetime import datetime
+import re
 
 from flask import (
     Blueprint,
