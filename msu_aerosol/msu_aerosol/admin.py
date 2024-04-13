@@ -153,7 +153,6 @@ class AdminHomeView(AdminIndexView):
                     )
 
                 except ValueError as e:
-                    print(e)
                     return get_admin_template(
                         self,
                         "Невозможно предобработать данные "
