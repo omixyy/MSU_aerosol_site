@@ -29,8 +29,9 @@ def allowed_file(filename):
     )
 
 
-@device_bp.route("/devices/<int:device_id>", methods=["GET", "POST"])
-def device(device_id: int) -> str | Response:
+def get_device_template(device_id: int, **kwargs):
+    message = kwargs["message"] if "message" in kwargs else None
+    error = kwargs["error"] if "error" in kwargs else None
     device_orm_obj: Device = Device.query.get_or_404(device_id)
     complex_orm_obj: Complex = Complex.query.get(device_orm_obj.complex_id)
     complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
@@ -49,7 +50,14 @@ def device(device_id: int) -> str | Response:
         device_to_name=device_to_name,
         min_date=str(min_date).replace(" ", "T"),
         max_date=str(max_date).replace(" ", "T"),
+        message=message,
+        error=error,
     )
+
+
+@device_bp.route("/devices/<int:device_id>", methods=["GET", "POST"])
+def device(device_id: int) -> str | Response:
+    return get_device_template(device_id)
 
 
 @device_bp.route(
@@ -80,11 +88,6 @@ def download_data_range(device_id: int) -> Response:
     methods=["POST"],
 )
 def get_uploaded_file(device_id: int):
-    device_orm_obj: Device = Device.query.get_or_404(device_id)
-    complex_orm_obj: Complex = Complex.query.get(device_orm_obj.complex_id)
-    complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
-    min_date, max_date = choose_range(device_orm_obj.full_name)
-
     file = request.files["file"]
     filename = secure_filename(file.filename)
 
@@ -105,32 +108,9 @@ def get_uploaded_file(device_id: int):
         )
         make_graph(device, "full")
         make_graph(device, "recent")
-        return render_template(
-            "device/device.html",
-            now=datetime.now(),
-            view_name="device",
-            device=device_orm_obj,
-            complex=complex_orm_obj,
-            complex_to_device=complex_to_device,
-            user=current_user,
-            min_date=str(min_date).replace(" ", "T"),
-            max_date=str(max_date).replace(" ", "T"),
-            device_id=device_id,
-            message="Файл успешно получен",
-        )
+        return get_device_template(device_id, message="Файл успешно получен")
 
     except Exception:
-        return render_template(
-            "device/device.html",
-            now=datetime.now(),
-            view_name="device",
-            device=device_orm_obj,
-            complex=complex_orm_obj,
-            complex_to_device=complex_to_device,
-            user=current_user,
-            device_to_name=device_orm_obj.full_name,
-            min_date=str(min_date).replace(" ", "T"),
-            max_date=str(max_date).replace(" ", "T"),
-            device_id=device_id,
-            error="Ошибка при загрузке файла",
+        return get_device_template(
+            device_id, error="Ошибка при загрузке файла"
         )
