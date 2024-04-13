@@ -112,5 +112,6 @@ def get_uploaded_file(device_id: int):
 
     except Exception:
         return get_device_template(
-            device_id, error="Ошибка при загрузке файла"
+            device_id,
+            error="Ошибка при загрузке файла",
         )
