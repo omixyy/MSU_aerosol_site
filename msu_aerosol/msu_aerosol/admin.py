@@ -152,7 +152,7 @@ class AdminHomeView(AdminIndexView):
                         "Обнаружено несовпадение столбцов",
                     )
 
-                except ValueError as e:
+                except ValueError:
                     return get_admin_template(
                         self,
                         "Невозможно предобработать данные "
