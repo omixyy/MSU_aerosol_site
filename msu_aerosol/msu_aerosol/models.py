@@ -16,32 +16,15 @@ db: SQLAlchemy = SQLAlchemy()
 
 class BaseModel(db.Model):
     __abstract__ = True
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-
-    name = db.Column(
-        db.String,
-        unique=True,
-    )
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String, unique=True)
 
 
 class BaseColumnModel(db.Model):
     __abstract__ = True
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-
-    name = db.Column(
-        db.String,
-        unique=False,
-    )
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String, unique=False)
+    use = db.Column(db.Boolean, nullable=False, default=False)
 
     @declared_attr
     def device_id(self):
@@ -51,16 +34,9 @@ class BaseColumnModel(db.Model):
             nullable=False,
         )
 
-    use = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False,
-    )
-
 
 class Complex(BaseModel):
     __tablename__ = "complexes"
-
     devices = db.relationship(
         "Device",
         backref="complex",
@@ -77,21 +53,11 @@ class Complex(BaseModel):
 
 class Device(BaseModel):
     __tablename__ = "devices"
-
     full_name = db.Column(db.String)
-
     serial_number = db.Column(db.String)
-
-    show = db.Column(
-        db.Boolean,
-        nullable=True,
-        default=False,
-    )
-
-    link = db.Column(
-        db.String,
-        nullable=False,
-    )
+    show = db.Column(db.Boolean, nullable=True, default=False)
+    link = db.Column(db.String, nullable=False)
+    time_format = db.Column(db.String, nullable=True)
 
     columns = db.relationship(
         "DeviceDataColumn",
@@ -99,19 +65,12 @@ class Device(BaseModel):
         lazy="subquery",
         cascade="all, delete-orphan",
     )
-
     time_columns = db.relationship(
         "DeviceTimeColumn",
         backref="device",
         lazy="subquery",
         cascade="all, delete-orphan",
     )
-
-    time_format = db.Column(
-        db.String,
-        nullable=True,
-    )
-
     complex_id = db.Column(
         db.Integer,
         db.ForeignKey("complexes.id"),
@@ -127,38 +86,15 @@ class Device(BaseModel):
 
 class User(BaseModel, UserMixin):
     __tablename__ = "users"
-
-    surname = db.Column(
-        db.String,
-        nullable=True,
-    )
-
-    login = db.Column(
-        db.String,
-        nullable=False,
-        unique=True,
-    )
-
-    email = db.Column(
-        db.String,
-        index=True,
-        unique=True,
-        nullable=True,
-    )
-
-    password = db.Column(
-        db.String,
-        nullable=False,
-    )
+    surname = db.Column(db.String, nullable=True)
+    login = db.Column(db.String, nullable=False, unique=True)
+    email = db.Column(db.String, index=True, unique=True, nullable=True)
+    password = db.Column(db.String, nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
 
     created_date = db.Column(
         db.String,
         default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-    )
-
-    role_id = db.Column(
-        db.Integer,
-        db.ForeignKey("roles.id"),
     )
 
     def __repr__(self):
@@ -167,16 +103,8 @@ class User(BaseModel, UserMixin):
 
 class Role(BaseModel):
     __tablename__ = "roles"
-
-    can_access_admin = db.Column(
-        db.Boolean,
-        default=False,
-    )
-
-    can_upload_data = db.Column(
-        db.Boolean,
-        default=False,
-    )
+    can_access_admin = db.Column(db.Boolean, default=False)
+    can_upload_data = db.Column(db.Boolean, default=False)
 
     users = db.relationship(
         "User",
@@ -191,7 +119,6 @@ class Role(BaseModel):
 
 class DeviceDataColumn(BaseColumnModel):
     __tablename__ = "column"
-
     color = db.Column(db.String)
 
 
