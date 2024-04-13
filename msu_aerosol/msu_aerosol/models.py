@@ -168,8 +168,6 @@ class User(BaseModel, UserMixin):
 class Role(BaseModel):
     __tablename__ = "roles"
 
-    access_key = db.Column(db.String)
-
     can_access_admin = db.Column(
         db.Boolean,
         default=False,
