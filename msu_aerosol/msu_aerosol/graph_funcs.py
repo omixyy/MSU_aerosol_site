@@ -8,9 +8,11 @@ from typing import Any
 from urllib.parse import urlencode
 from zipfile import ZipFile
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
+from random import randint
 import requests
 from yadisk import YaDisk
 from msu_aerosol.config import yadisk_token
@@ -143,25 +145,30 @@ def hexx(num: int) -> str:
     return hex(num)[2:].zfill(2)
 
 
-def get_spaced_colors(n: int) -> list:
-    return [
-        "#"
-        + "".join(
-            (
-                hexx(int(i[:2], 16)),
-                hexx(int(i[2:4], 16)),
-                hexx(int(i[4:], 16)),
-            ),
-        ).upper()
-        for i in [
-            hex(j)[2:].zfill(6)
-            for j in range(
-                int(16581375 / n),
-                16581375,
-                int(16581375 / n),
-            )
-        ]
-    ]
+def get_spaced_colors(n):
+    colors = []
+    for R in range(16):
+        for G in range(16):
+            for B in range(16):
+                colors.append((R, G, B))
+    colors, out = colors + [(255, 0, 0), (0, 0, 255), (0, 255, 0)], ['#FF0000', '#0000FF', '#00FF00']
+    for i in range(n):
+        bef1, bef2, bef3 = colors[-1], colors[-2], colors[-3]
+        now = (randint(0, 255), randint(0, 255), randint(0, 255))
+        while (
+                (np.sqrt((bef1[0] - now[0]) ** 2 + (bef1[1] - now[1]) ** 2 + (bef1[2] - now[2]) ** 2) < 200) and
+                (np.sqrt((bef2[0] - now[0]) ** 2 + (bef2[1] - now[1]) ** 2 + (bef2[2] - now[2]) ** 2) < 200) and
+                (np.sqrt((bef3[0] - now[0]) ** 2 + (bef3[1] - now[1]) ** 2 + (bef3[2] - now[2]) ** 2) < 200) and
+                now not in colors):
+            now = (randint(0, 255), randint(0, 255), randint(0, 255))
+        color_hex = "#{:02X}{:02X}{:02X}".format(now[0], now[1], now[2])
+        out.append(color_hex)
+        for j in now:
+            n = []
+            for c in range(-2, 2):
+                n.append(j + c)
+            colors.append(tuple(n))
+    return out
 
 
 def make_graph(
