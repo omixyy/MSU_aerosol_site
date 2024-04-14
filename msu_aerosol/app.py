@@ -1,4 +1,5 @@
 from flask import Flask
+import logging
 
 from msu_aerosol import config
 from msu_aerosol.admin import init_admin, init_schedule
@@ -19,7 +20,18 @@ app.register_blueprint(register_bp, name='registration')
 app.register_blueprint(login_bp, name='login')
 app.register_blueprint(profile_bp, name='profile')
 app.register_blueprint(about_bp, name='about')
+
 app.cli.add_command(create_superuser)
+app.logger.setLevel(logging.INFO)
+log = logging.getLogger('werkzeug')
+log.info(f" * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)")
+log.disabled = True
+logging.getLogger('apscheduler.executors.default').propagate = False
+logging.basicConfig(
+    level=logging.INFO,
+    filename='download_log.log',
+    filemode='w',
+)
 
 with app.app_context():
     db.init_app(app)

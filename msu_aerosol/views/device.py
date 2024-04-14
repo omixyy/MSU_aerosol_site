@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+import logging
 
 from flask import (
     Blueprint,
@@ -64,16 +65,23 @@ def device(device_id: int) -> str | Response:
     '/devices/<int:device_id>/download',
     methods=['GET', 'POST'],
 )
-def download_data_range(device_id: int) -> Response:
-    data_range = request.form.get(
-        'datetime_picker_start',
-    ), request.form.get('datetime_picker_end')
+def send_data_range(device_id: int) -> Response:
+    data_range = (
+        request.form.get('datetime_picker_start'),
+        request.form.get('datetime_picker_end'),
+    )
     full_name = Device.query.get(device_id).full_name
     buffer = make_graph(
         full_name,
         'download',
         begin_record_date=data_range[0],
         end_record_date=data_range[1],
+    )
+    logging.info(
+        f'{current_user.login} downloaded '
+        f'{full_name} data for '
+        f'{[i.replace("T", " ") for i in data_range]} '
+        f'period'
     )
     return send_file(
         buffer,
