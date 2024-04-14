@@ -96,7 +96,8 @@ class AdminHomeView(AdminIndexView):
                 time_col = [i.name for i in dev.time_columns if i.use]
                 if (
                     request.form.getlist(f'{full_name}_cb') != usable_cols
-                    or not usable_cols or not time_col
+                    or not usable_cols
+                    or not time_col
                     or request.form.get(f'{full_name}_rb') != time_col[0]
                     or request.form.get(f'datetime_format_{full_name}')
                     != dev.time_format
