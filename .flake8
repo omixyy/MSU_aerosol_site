@@ -1,7 +1,7 @@
 [flake8]
 application_import_names=msu_aerosol, forms, tests, views, app
 import-order-style=google
-inline-quotes=double
+inline-quotes=single
 exclude=.venv,venv,*/migrations/*,.git,__pycache__
 plugins =
     flake8-commas

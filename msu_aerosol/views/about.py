@@ -8,16 +8,16 @@ from msu_aerosol.models import Complex, Device
 
 __all__: list = []
 
-home_bp: Blueprint = Blueprint('home', __name__, url_prefix='/')
+about_bp: Blueprint = Blueprint('about', __name__, url_prefix='/')
 
 
-@home_bp.route('/')
-def index() -> str:
+@about_bp.route('/about', methods=['GET'])
+def about() -> str:
     complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
     return render_template(
-        'homepage/home.html',
+        'about/about.html',
         now=datetime.now(),
-        view_name='homepage',
+        view_name='about',
         complex_to_device=complex_to_device,
         user=current_user,
     )

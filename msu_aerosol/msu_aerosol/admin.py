@@ -44,9 +44,9 @@ application = None
 
 def get_admin_template(obj: AdminIndexView, message: str | None) -> str:
     return obj.render(
-        "admin/admin_home.html",
+        'admin/admin_home.html',
         name_to_device={
-            disk.get_public_meta(dev.link)["name"]: dev
+            disk.get_public_meta(dev.link)['name']: dev
             for dev in Device.query.all()
         },
         message_error=message,
@@ -60,7 +60,7 @@ class AdminHomeView(AdminIndexView):
         category=None,
         endpoint=None,
         url=None,
-        template="admin/index.html",
+        template='admin/index.html',
         menu_class_name=None,
         menu_icon_type=None,
         menu_icon_value=None,
@@ -76,7 +76,7 @@ class AdminHomeView(AdminIndexView):
             menu_icon_value,
         )
 
-    @expose("/", methods=["GET", "POST"])
+    @expose('/', methods=['GET', 'POST'])
     def admin_index(self) -> str:
         if (
             not current_user.is_authenticated
@@ -84,28 +84,28 @@ class AdminHomeView(AdminIndexView):
             or not current_user.role.can_access_admin
         ):
             abort(403)
-        downloaded = os.listdir("data")
-        downloaded.remove(".gitignore")
+        downloaded = os.listdir('data')
+        downloaded.remove('.gitignore')
         all_devices = Device.query.all()
 
-        if request.method == "POST":
+        if request.method == 'POST':
             changed: list = []
             for dev in all_devices:
-                full_name = disk.get_public_meta(dev.link)["name"]
+                full_name = disk.get_public_meta(dev.link)['name']
                 usable_cols = [i.name for i in dev.columns if i.use]
                 time_col = [i.name for i in dev.time_columns if i.use]
                 if (
-                    request.form.getlist(f"{full_name}_cb") != usable_cols
+                    request.form.getlist(f'{full_name}_cb') != usable_cols
                     or not usable_cols
-                    or request.form.get(f"{full_name}_rb") != time_col[0]
-                    or request.form.get(f"datetime_format_{full_name}")
+                    or request.form.get(f'{full_name}_rb') != time_col[0]
+                    or request.form.get(f'datetime_format_{full_name}')
                     != dev.time_format
                     or not Path(
-                        f"templates/"
-                        f"includes/"
-                        f"devices/"
-                        f"full/"
-                        f"graph_{full_name}.html",
+                        f'templates/'
+                        f'includes/'
+                        f'devices/'
+                        f'full/'
+                        f'graph_{full_name}.html',
                     ).exists()
                 ):
                     changed.append(dev)
@@ -122,10 +122,10 @@ class AdminHomeView(AdminIndexView):
                 ).first()
                 if time:
                     time.use = False
-                full_name = disk.get_public_meta(dev.link)["name"]
-                checkboxes = request.form.getlist(f"{full_name}_cb")
-                radio = request.form.get(f"{full_name}_rb")
-                time_format = request.form.get(f"datetime_format_{full_name}")
+                full_name = disk.get_public_meta(dev.link)['name']
+                checkboxes = request.form.getlist(f'{full_name}_cb')
+                radio = request.form.get(f'{full_name}_rb')
+                time_format = request.form.get(f'datetime_format_{full_name}')
                 for i in checkboxes:
                     for k in DeviceDataColumn.query.filter_by(name=i):
                         k.use = True
@@ -137,33 +137,33 @@ class AdminHomeView(AdminIndexView):
 
                 try:
                     preprocess_device_data(full_name)
-                    make_graph(full_name, "full")
-                    make_graph(full_name, "recent")
+                    make_graph(full_name, 'full')
+                    make_graph(full_name, 'recent')
 
                 except TimeFormatError:
                     return get_admin_template(
                         self,
-                        "Формат времени не подходит под столбец",
+                        'Формат времени не подходит под столбец',
                     )
 
                 except ColumnsMatchError:
                     return get_admin_template(
                         self,
-                        "Обнаружено несовпадение столбцов",
+                        'Обнаружено несовпадение столбцов',
                     )
 
                 except ValueError:
                     return get_admin_template(
                         self,
-                        "Невозможно предобработать данные "
-                        "по выбранным столбцам",
+                        'Невозможно предобработать данные '
+                        'по выбранным столбцам',
                     )
 
                 except Exception as e:
                     error = e.__class__.__name__
                     return get_admin_template(
                         self,
-                        f"Непредвиденная ошибка: {error}",
+                        f'Непредвиденная ошибка: {error}',
                     )
 
             for dev in all_devices:
@@ -183,26 +183,26 @@ def get_complexes_dict() -> dict[Complex, list[Device]]:
 
 
 def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
-    with Path(path).open("r") as f:
+    with Path(path).open('r') as f:
         return csv.Sniffer().sniff(f.readline())
 
 
-@listens_for(Device, "after_insert")
+@listens_for(Device, 'after_insert')
 def after_insert(mapper, connection, target) -> None:
     download_device_data(target.link)
-    full_name: str = disk.get_public_meta(target.link)["name"]
+    full_name: str = disk.get_public_meta(target.link)['name']
     target.full_name = full_name
-    file: str = os.listdir(f"data/{full_name}")[0]
-    dialect = get_dialect(f"data/{full_name}/{file}")
+    file: str = os.listdir(f'data/{full_name}')[0]
+    dialect = get_dialect(f'data/{full_name}/{file}')
     target.full_name = full_name
-    with Path(f"data/{full_name}/{file}").open("r") as csv_file:
+    with Path(f'data/{full_name}/{file}').open('r') as csv_file:
         header = list(csv.reader(csv_file, dialect=dialect))[0]
         colors = get_spaced_colors(len(header))
 
-    @listens_for(db.session, "after_flush", once=True)
+    @listens_for(db.session, 'after_flush', once=True)
     def receive_after_flush(session, context):
         for column, color in zip(header, colors):
-            if "time" in column.lower() or "date" in column.lower():
+            if 'time' in column.lower() or 'date' in column.lower():
                 col = DeviceTimeColumn(
                     name=column,
                     device_id=target.id,
@@ -210,7 +210,7 @@ def after_insert(mapper, connection, target) -> None:
 
                 db.session.add(col)
 
-            elif "time" not in column.lower() or "date" not in column.lower():
+            elif 'time' not in column.lower() or 'date' not in column.lower():
                 time_col = DeviceDataColumn(
                     name=column,
                     device_id=target.id,
@@ -220,12 +220,12 @@ def after_insert(mapper, connection, target) -> None:
                 db.session.add(time_col)
 
 
-@listens_for(Device, "after_delete")
+@listens_for(Device, 'after_delete')
 def after_delete(mapper, connection, target) -> None:
-    full_name = disk.get_public_meta(target.link)["name"]
-    graph_full = f"templates/includes/devices/full/graph_{full_name}.html"
-    graph_rec = f"templates/includes/devices/recent/graph_{full_name}.html"
-    proc_data = f"proc_data/{full_name}"
+    full_name = disk.get_public_meta(target.link)['name']
+    graph_full = f'templates/includes/devices/full/graph_{full_name}.html'
+    graph_rec = f'templates/includes/devices/recent/graph_{full_name}.html'
+    proc_data = f'proc_data/{full_name}'
     if Path(graph_full).exists():
         Path(graph_full).unlink()
 
@@ -237,11 +237,11 @@ def after_delete(mapper, connection, target) -> None:
 
 
 admin: Admin = Admin(
-    template_mode="bootstrap4",
+    template_mode='bootstrap4',
     index_view=AdminHomeView(
-        name="Home",
-        template="admin/index.html",
-        url="/admin",
+        name='Home',
+        template='admin/index.html',
+        url='/admin',
     ),
 )
 
@@ -251,8 +251,8 @@ scheduler: BackgroundScheduler = BackgroundScheduler()
 atexit.register(lambda: scheduler.shutdown())
 
 
-@listens_for(Device, "after_insert")
-@listens_for(Device, "after_delete")
+@listens_for(Device, 'after_insert')
+@listens_for(Device, 'after_delete')
 def init_schedule(mapper, connection, target, app=None) -> None:
     global scheduler
     global application
@@ -264,11 +264,11 @@ def init_schedule(mapper, connection, target, app=None) -> None:
 
         scheduler.add_job(
             func=download_last_modified_file,
-            trigger="interval",
+            trigger='interval',
             seconds=15,
-            id="downloader",
+            id='downloader',
             args=[links],
-            kwargs={"app": application},
+            kwargs={'app': application},
         )
 
     if not scheduler.running:

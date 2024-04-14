@@ -6,9 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import declared_attr
 
 __all__ = [
-    "Complex",
-    "Device",
-    "db",
+    'Complex',
+    'Device',
+    'db',
 ]
 
 db: SQLAlchemy = SQLAlchemy()
@@ -30,18 +30,18 @@ class BaseColumnModel(db.Model):
     def device_id(self):
         return db.Column(
             db.Integer,
-            db.ForeignKey("devices.id"),
+            db.ForeignKey('devices.id'),
             nullable=False,
         )
 
 
 class Complex(BaseModel):
-    __tablename__ = "complexes"
+    __tablename__ = 'complexes'
     devices = db.relationship(
-        "Device",
-        backref="complex",
+        'Device',
+        backref='complex',
         lazy=True,
-        cascade="all, delete-orphan",
+        cascade='all, delete-orphan',
     )
 
     def __repr__(self):
@@ -52,7 +52,7 @@ class Complex(BaseModel):
 
 
 class Device(BaseModel):
-    __tablename__ = "devices"
+    __tablename__ = 'devices'
     full_name = db.Column(db.String)
     serial_number = db.Column(db.String)
     show = db.Column(db.Boolean, nullable=True, default=False)
@@ -60,20 +60,20 @@ class Device(BaseModel):
     time_format = db.Column(db.String, nullable=True)
 
     columns = db.relationship(
-        "DeviceDataColumn",
-        backref="device",
-        lazy="subquery",
-        cascade="all, delete-orphan",
+        'DeviceDataColumn',
+        backref='device',
+        lazy='subquery',
+        cascade='all, delete-orphan',
     )
     time_columns = db.relationship(
-        "DeviceTimeColumn",
-        backref="device",
-        lazy="subquery",
-        cascade="all, delete-orphan",
+        'DeviceTimeColumn',
+        backref='device',
+        lazy='subquery',
+        cascade='all, delete-orphan',
     )
     complex_id = db.Column(
         db.Integer,
-        db.ForeignKey("complexes.id"),
+        db.ForeignKey('complexes.id'),
         nullable=True,
     )
 
@@ -85,32 +85,32 @@ class Device(BaseModel):
 
 
 class User(BaseModel, UserMixin):
-    __tablename__ = "users"
+    __tablename__ = 'users'
     surname = db.Column(db.String, nullable=True)
     login = db.Column(db.String, nullable=False, unique=True)
     email = db.Column(db.String, index=True, unique=True, nullable=True)
     password = db.Column(db.String, nullable=False)
-    role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
     created_date = db.Column(
         db.String,
-        default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        default=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     )
 
     def __repr__(self):
-        return f"User ({self.id, self.login})"
+        return f'User ({self.id, self.login})'
 
 
 class Role(BaseModel):
-    __tablename__ = "roles"
+    __tablename__ = 'roles'
     can_access_admin = db.Column(db.Boolean, default=False)
     can_upload_data = db.Column(db.Boolean, default=False)
 
     users = db.relationship(
-        "User",
-        backref="role",
+        'User',
+        backref='role',
         lazy=True,
-        cascade="all, delete-orphan",
+        cascade='all, delete-orphan',
     )
 
     def __repr__(self):
@@ -118,37 +118,37 @@ class Role(BaseModel):
 
 
 class DeviceDataColumn(BaseColumnModel):
-    __tablename__ = "column"
+    __tablename__ = 'column'
     color = db.Column(db.String)
 
 
 class DeviceTimeColumn(BaseColumnModel):
-    __tablename__ = "time_column"
+    __tablename__ = 'time_column'
 
 
 class UserFieldView(ModelView):
     column_list = (
-        "id",
-        "login",
-        "first_name",
-        "last_name",
-        "email",
-        "created_date",
+        'id',
+        'login',
+        'first_name',
+        'last_name',
+        'email',
+        'created_date',
     )
 
 
 class DeviceView(ModelView):
     column_list = (
-        "id",
-        "name",
-        "full_name",
-        "serial_number",
-        "complex_id",
+        'id',
+        'name',
+        'full_name',
+        'serial_number',
+        'complex_id',
     )
     form_excluded_columns = (
-        "show",
-        "columns",
-        "time_format",
-        "time_columns",
-        "full_name",
+        'show',
+        'columns',
+        'time_format',
+        'time_columns',
+        'full_name',
     )

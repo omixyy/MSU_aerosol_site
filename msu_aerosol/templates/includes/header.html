@@ -15,7 +15,7 @@
           <a class="nav-link {% if view_name == 'homepage' %} active {% endif %}" href="{% if view_name != 'homepage' %} {{ url_for('home.index') }} {% else %} # {% endif %}">Главная</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if view_name == 'about' %} active {% endif %}" href="#">О сайте</a>
+          <a class="nav-link {% if view_name == 'about' %} active {% endif %}" href="{% if view_name != 'about' %} {{ url_for('about.about') }} {% else %} # {% endif %}">О сайте</a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'devices' %} active {% endif %}" href="#">Контакты</a>

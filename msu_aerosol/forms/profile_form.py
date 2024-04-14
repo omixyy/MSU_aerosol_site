@@ -10,20 +10,20 @@ __all__: list = []
 
 class ProfileForm(FlaskForm):
     login = StringField(
-        "Логин",
+        'Логин',
         validators=[DataRequired()],
     )
-    name = StringField("Имя")
-    surname = StringField("Фамилия")
+    name = StringField('Имя')
+    surname = StringField('Фамилия')
     email = StringField(
-        "Почта",
+        'Почта',
         validators=[DataRequired()],
     )
     role = StringField(
-        "Роль",
+        'Роль',
         render_kw={
-            "readonly": True,
-            "disabled": True,
+            'readonly': True,
+            'disabled': True,
         },
     )
-    submit = SubmitField("Сохранить")
+    submit = SubmitField('Сохранить')
