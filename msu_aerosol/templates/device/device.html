@@ -26,7 +26,7 @@
         {{ message }}
       </div>
     {% endif %}
-    <form method="POST" name="datetime_picker" action="{{ url_for('device_details.download_data_range', device_id=device.id) }}">
+    <form method="POST" name="datetime_picker" action="{{ url_for('device_details.send_data_range', device_id=device.id) }}">
       <div class="row" style="width: 40%; margin-top: 1%">
         <div class="col" style="width: 20%;">
           <label for="datetime_picker_start" class="control-label">Начало</label>
