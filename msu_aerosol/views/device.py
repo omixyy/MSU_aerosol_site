@@ -1,6 +1,6 @@
 from datetime import datetime
-from pathlib import Path
 import logging
+from pathlib import Path
 
 from flask import (
     Blueprint,
@@ -81,7 +81,7 @@ def send_data_range(device_id: int) -> Response:
         f'{current_user.login} downloaded '
         f'{full_name} data for '
         f'{[i.replace("T", " ") for i in data_range]} '
-        f'period'
+        f'period',
     )
     return send_file(
         buffer,
