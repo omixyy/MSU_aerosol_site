@@ -1,14 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ device }}{% endblock %}
 {% block content %}
-  <style>
-    ::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-    }
-    input {
-      color-scheme: dark;
-    }
-  </style>
   <script type="text/javascript" src="{{ url_for('static', filename='js/handlers.js') }}"></script>
   <div style="margin-left: 3%; width: 95%">
     <div class="mx-auto" style="width: 50%; text-align: center;">
