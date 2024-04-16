@@ -7,11 +7,11 @@ from msu_aerosol.admin import init_admin, init_schedule
 from msu_aerosol.commands import create_superuser
 from msu_aerosol.models import db
 from views.about import about_bp
+from views.contacts import contacts_bp
 from views.device import device_bp
 from views.homepage import home_bp
 from views.users import login_bp, register_bp
 from views.users import profile_bp
-from views.contacts import contacts_bp
 
 __all__: list = []
 
