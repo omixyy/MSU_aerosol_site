@@ -31,13 +31,14 @@ def allowed_file(filename):
 
 
 def get_device_template(device_id: int, **kwargs):
-    message = kwargs['message'] if 'message' in kwargs else None
-    error = kwargs['error'] if 'error' in kwargs else None
+    message = kwargs.get('message')
+    error = kwargs.get('error')
     device_orm_obj: Device = Device.query.get_or_404(device_id)
     complex_orm_obj: Complex = Complex.query.get(device_orm_obj.complex_id)
     complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
     device_to_name: dict[str, str] = {
-        dev.name: dev.full_name for dev in Device.query.all()
+        dev.name: dev.full_name
+        for dev in Device.query.all()
     }
     min_date, max_date = choose_range(device_to_name[device_orm_obj.name])
     return render_template(

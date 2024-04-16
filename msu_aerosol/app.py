@@ -11,6 +11,7 @@ from views.device import device_bp
 from views.homepage import home_bp
 from views.users import login_bp, register_bp
 from views.users import profile_bp
+from views.contacts import contacts_bp
 
 __all__: list = []
 
@@ -21,11 +22,11 @@ app.register_blueprint(register_bp, name='registration')
 app.register_blueprint(login_bp, name='login')
 app.register_blueprint(profile_bp, name='profile')
 app.register_blueprint(about_bp, name='about')
+app.register_blueprint(contacts_bp, name='contacts')
 
 app.cli.add_command(create_superuser)
 app.logger.setLevel(logging.INFO)
 log = logging.getLogger('werkzeug')
-log.info(' * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)')
 log.disabled = True
 logging.getLogger('apscheduler.executors.default').propagate = False
 logging.basicConfig(
