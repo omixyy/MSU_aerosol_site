@@ -96,7 +96,6 @@ def user_profile() -> str:
             current_user.login = request.form.get('login')
             current_user.name = request.form.get('name')
             current_user.surname = request.form.get('surname')
-            print(current_user.name, current_user.surname)
             current_user.email = request.form.get('email')
             db.session.commit()
 
