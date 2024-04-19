@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Домашняя страница{% endblock %}
 {% block content %}
-  <div class="mx-auto" style="width: 500px; text-align: center;">
-    <h1 style="margin-top: 15px; margin-bottom: 50px;">Аэрозольные комплексы МГУ</h1>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/home/homepage.css') }}">
+  <div class="mx-auto head">
+    <h1>Аэрозольные комплексы МГУ</h1>
   </div>
   {% for complex, devices in complex_to_device.items() %}
     <div id="com{{ complex.id }}">
@@ -13,11 +14,14 @@
         <div class="row">
           {% for device in devices %}
             {% if device.show %}
-              <div id="dev{{ device.id }}" style="width: 700px; height: 600px; text-align: center;">
-                <h4 style="margin-top: 15px; margin-bottom: 20px;">{{ device.name }}</h4>
+              <div id="dev{{ device.id }}" class="device_content">
+                <h4>{{ device.name }}</h4>
                 <hr>
                 {% include "includes/devices/recent/graph_" ~ device.full_name ~ ".html" %}
-                <a class="btn btn-dark" style="width: 400px;" href="{{ url_for('device_details.device', device_id=device.id) }}">Подробнее</a>
+                <a class="btn btn-dark device_link"
+                   href="{{ url_for('device_details.device', device_id=device.id) }}">
+                  Подробнее
+                </a>
               </div>
             {% endif %}
           {% endfor %}

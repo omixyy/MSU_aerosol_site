@@ -15,7 +15,7 @@ home_bp: Blueprint = Blueprint('home', __name__, url_prefix='/')
 def index() -> str:
     complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
     return render_template(
-        'homepage/home.html',
+        'home/homepage.html',
         now=datetime.now(),
         view_name='homepage',
         complex_to_device=complex_to_device,
