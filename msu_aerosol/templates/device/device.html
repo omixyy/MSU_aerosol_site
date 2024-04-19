@@ -1,55 +1,74 @@
 {% extends "base.html" %}
 {% block title %}{{ device }}{% endblock %}
 {% block content %}
-  <script type="text/javascript" src="{{ url_for('static', filename='js/handlers.js') }}"></script>
-  <div style="margin-left: 3%; width: 95%">
-    <div class="mx-auto" style="width: 50%; text-align: center;">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/device/device.css') }}">
+  <script type="text/javascript" src="{{ url_for('static', filename='js/device/handlers.js') }}"></script>
+  <div class="content">
+    <div class="mx-auto head">
       <h1>Данные с прибора {{ device }}</h1>
     </div>
-    <h3 style="margin-top: 2%">{{ device.name }}{% if device.serial_number %}, {{ device.serial_number }} {% endif %}</h3>
-    <h5 style="margin-top: 2%;">Состоит в комплексе "{{ complex }}"</h5>
+    <h3 class="text">{{ device.name }}{% if device.serial_number %}, {{ device.serial_number }} {% endif %}</h3>
+    <h5 class="text">Состоит в комплексе "{{ complex }}"</h5>
     {% if error %}
-      <div class="alert alert-danger" role="alert" style="width: 20%">
+      <div class="alert alert-danger message" role="alert">
         {{ error }}
       </div>
     {% endif %}
     {% if message %}
-      <div class="alert alert-success" role="alert" style="width: 20%">
+      <div class="alert alert-success message" role="alert">
         {{ message }}
       </div>
     {% endif %}
     <form method="POST" name="datetime_picker" action="{{ url_for('device_details.send_data_range', device_id=device.id) }}">
-      <div class="row" style="width: 40%; margin-top: 1%">
-        <div class="col" style="width: 20%;">
+      <div class="row calendar_row">
+        <div class="col calendars">
           <label for="datetime_picker_start" class="control-label">Начало</label>
-          <input id="datetime_picker_start" name="datetime_picker_start" class="form-control" type="datetime-local" min={{ min_date }} max={{ max_date }} value={{ min_date }} step="any">
+          <input
+                  id="datetime_picker_start"
+                  name="datetime_picker_start"
+                  class="form-control"
+                  type="datetime-local"
+                  min={{ min_date }}
+                  max={{ max_date }}
+                  value={{ min_date }}
+                  step="any"
+          >
         </div>
-        <div style="width: 10%; text-align: center; line-height: 90px;">
+        <div class="arrow">
           &rarr;
         </div>
-        <div class="col" style="width: 40%;">
+        <div class="col calendars">
           <label for="datetime_picker_end" class="control-label">Конец</label>
-          <input id="datetime_picker_end" name="datetime_picker_end" class="form-control" type="datetime-local" min={{ min_date }} max={{ max_date }} value={{ max_date }} step="any">
+          <input
+                  id="datetime_picker_end"
+                  name="datetime_picker_end"
+                  class="form-control"
+                  type="datetime-local"
+                  min={{ min_date }}
+                  max={{ max_date }}
+                  value={{ max_date }}
+                  step="any"
+          >
         </div>
-        <div class="col" style="width: 20%;">
+        <div class="col download">
           {% if user and user.is_authenticated %}
             <button type="submit" id="download" class="btn btn-outline-dark my-4">Скачать</button>
           {% endif %}
         </div>
       </div>
     </form>
-    <div class="fluid-container" style="width: 65%">
+    <div class="fluid-container button_row_container">
       <div class="row">
         <div class="col-2">
-          <button onclick="updateGraph()" class="btn btn-dark" style="float: center;">Подтвердить</button>
+          <button onclick="updateGraph()" class="btn btn-dark">Подтвердить</button>
         </div>
         {% if user.is_authenticated and user.role.can_upload_data %}
             <div class="col-3">
             <form method="POST" name="file_sender" enctype="multipart/form-data" action="{{ url_for('device_details.get_uploaded_file', device_id=device.id) }}">
               <div class="fluid-container">
                 <div class="row">
-                  <div class="col-7" style="margin-right: 2%">
-                    <button type="submit" class="btn btn-dark" style="float: center;">Отправить</button>
+                  <div class="col-7 send_button">
+                    <button type="submit" class="btn btn-dark commit_button">Отправить</button>
                   </div>
                   <div class="form-file col-4 mt-1">
                     <input type="file" class="form-file-input" id="customFile" name="file">
@@ -62,7 +81,7 @@
       </div>
     </div>
   </div>
-  <div style="width: 55%; height: 40%; margin-bottom: 0.5%; margin-top: 1%" id="graphDiv">
+  <div class="graph_container" id="graphDiv">
     {% include "includes/devices/full/graph_" ~ device.full_name ~ ".html"  %}
   </div>
 {% endblock %}

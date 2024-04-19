@@ -1,5 +1,6 @@
 {% extends 'admin/master.html' %}
 {% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_style.css') }}">
 <a href="{{ url_for('home.index') }}">На главную</a>
 {% for name, _ in name_to_device.items() %}
   <a href="#{{ name }}">{{ name }}</a>
@@ -28,8 +29,8 @@
       </div>
     <br>
     <h6>Опишите формат времени в файлах с данными</h6>
-    <input type="datetime_format" class="form-control" name={{ "datetime_format_" ~ name }} id={{ "datetime_format" ~ dev.id }} placeholder="Datetime format" style="width: 30%" value={% if not dev.time_format %} "" {% else %} "{{ dev.time_format }}" {% endif %}>
-    <label class="form-control-label mb-4" for={{ "datetime_format" ~ dev.id }} style="font-size:13px;">
+    <input type="datetime_format" class="datetime_input form-control" name={{ "datetime_format_" ~ name }} id={{ "datetime_format" ~ dev.id }} placeholder="Datetime format" value={% if not dev.time_format %} "" {% else %} "{{ dev.time_format }}" {% endif %}>
+    <label class="input_label form-control-label mb-4" for={{ "datetime_format" ~ dev.id }}>
       Например d-m-Y H:M:S
     </label>
     <br>
@@ -44,6 +45,6 @@
     {% endfor %}
     <hr>
   {% endfor %}
-  <button type="submit" class="btn btn-primary mb-3" style="margin-top: 50px">Подтвердить</button>
+  <button type="submit" class="btn btn-primary mb-3 button_accept">Подтвердить</button>
 </form>
 {% endblock %}
