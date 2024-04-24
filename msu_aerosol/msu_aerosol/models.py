@@ -17,7 +17,7 @@ db: SQLAlchemy = SQLAlchemy()
 class BaseModel(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String, unique=True, nullable=False)
+    name = db.Column(db.String, unique=True)
 
 
 class BaseColumnModel(db.Model):
@@ -86,6 +86,7 @@ class Device(BaseModel):
 
 class User(BaseModel, UserMixin):
     __tablename__ = 'users'
+    name = db.Column(db.String, unique=False)
     surname = db.Column(db.String, nullable=True)
     login = db.Column(db.String, nullable=False, unique=True)
     email = db.Column(db.String, index=True, unique=True, nullable=True)
