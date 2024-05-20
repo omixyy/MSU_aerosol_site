@@ -40,6 +40,7 @@ def make_visible_date_format(date: str) -> str:
 
 
 def download_last_modified_file(links, app=None) -> None:
+    print("DOWNLOADING")
     list_data_path = []
     for link in links:
         full_name = disk.get_public_meta(link)['name']

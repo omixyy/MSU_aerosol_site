@@ -2,10 +2,12 @@
   {% if message_success %}
     <div class="alert alert-success" role="alert">
       {{ message_success }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right"></button>
     </div>
   {% elif message_error %}
     <div class="alert alert-danger" role="alert">
       {{ message_error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right"></button>
     </div>
   {% endif %}
   <div>

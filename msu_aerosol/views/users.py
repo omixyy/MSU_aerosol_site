@@ -50,6 +50,7 @@ def get_registration_template(error: str | None) -> str:
         form=form,
         message_error=error,
         complex_to_device=complex_to_device,
+        user=current_user,
         now=datetime.now(),
         view_name='registration',
     )

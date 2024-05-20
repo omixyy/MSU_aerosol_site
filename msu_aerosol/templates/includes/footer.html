@@ -1,9 +1,48 @@
 {% block footer %}
-<footer class="border-top text-center py-3;"
-        {% if view_name in ['profile', 'registration', 'login'] %}
-        style="position: fixed;bottom: 0;width: 100%;"
-        {% else %}style="position: relative; clear: both"{% endif %}>
-  МГУ, {{ now.year }}
+<footer>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts/font-awesome.min.css') }}">
+  <div class="footer">
+    <img src="{{ url_for('static', filename='img/MSU_logo.png') }}" width="150" height="150" alt=""
+           style="float: right; margin-right: 2%; margin-top: 1.6%">
+    <div class="container-fluid">
+      <div class="row">
+        <ul>
+          <li>
+            <a href="https://t.me/omixyy" target="_blank">
+              <i class="fa fa-telegram"></i>
+            </a>
+          </li>
+          <li>
+            <a href="https://vk.com/omixyy" target="_blank">
+              <i class="fa fa-vk">
+              </i>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/omixyy/MSU_aerosol_site" target="_blank">
+              <i class="fa fa-github"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="row">
+        <ul>
+          <li style="width: 100%">
+            <a href="#">О разработчиках</a>
+          </li>
+          <li style="width: 100%">
+            <a href="#"
+               target="_blank">О проекте</a></li>
+          <li style="width: 100%">
+            <a href="https://docs.google.com/document/d/1XUAOWDH5BiUpLWlzUY5nufzMrlXIQJ5WAbPt9FmOL-I/edit#heading=h.109n0s50517r">Описание проекта</a>
+          </li>
+        </ul>
+      </div>
+      <div class="row" style="margin-left: 2%">
+        MSU Copyright © {{ now.year }} MSU - All rights reserved
+      </div>
+    </div>
+  </div>
 </footer>
 {% endblock footer %}
 

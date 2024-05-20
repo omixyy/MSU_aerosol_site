@@ -266,7 +266,7 @@ def init_schedule(mapper, connection, target, app=None) -> None:
         scheduler.add_job(
             func=download_last_modified_file,
             trigger='interval',
-            seconds=15,
+            seconds=60,
             id='downloader',
             args=[links],
             kwargs={'app': application},

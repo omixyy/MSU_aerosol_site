@@ -1,7 +1,3 @@
-.head {
-  width: 50%;
-  text-align: center;
-}
 .content {
   margin-left: 3%;
   width: 95%
@@ -33,6 +29,6 @@ commit_button {
 .graph_container {
   width: 55%;
   height: 40%;
-  margin-bottom: 0.5%;
+  margin-bottom: 3%;
   margin-top: 1%;
 }

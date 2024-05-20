@@ -8,6 +8,9 @@
 {% if message_error %}
   <div class="alert alert-danger" role="alert">
     {{ message_error }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
   </div>
 {% endif %}
 <form method="POST">

@@ -10,3 +10,13 @@
 input[type="datetime-local"], input[type="file"] {
   color-scheme: dark;
 }
+
+.head {
+  width: 50%;
+  text-align: center;
+}
+
+.centered-text {
+  color: #888C8D;
+  text-align: left;
+}
