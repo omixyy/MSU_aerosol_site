@@ -42,12 +42,6 @@ body {
   margin: 0% 1%;
 }
 
-@media (max-width:720px) {
-.footer {
-  text-align: left;
-  padding: 5%;
-}
-
 .footer .row a i {
   margin: 0% 3%;
 }

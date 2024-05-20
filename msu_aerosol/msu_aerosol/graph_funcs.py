@@ -49,12 +49,13 @@ def download_last_modified_file(links, app=None) -> None:
                 disk.get_public_meta(link)['embedded']['items'],
             ),
             key=lambda x: x['modified'],
-        )[0]
+        )[-1]
         download_response = requests.get(last_modified_file['file'])
         file_path = f'data/{full_name}/{last_modified_file["name"]}'
         list_data_path.append([full_name, file_path])
-        with Path(file_path).open('wb') as f:
-            f.write(download_response.content)
+        if not Path(file_path).exists():
+            with Path(file_path).open('wb') as f:
+                f.write(download_response.content)
     for i in list_data_path:
         try:
             preprocessing_one_file(i[0], i[1], app=app)
@@ -268,7 +269,9 @@ def make_graph(
         combined_data.to_csv(buffer, index=False)
         buffer.seek(0)
         return buffer
-    combined_data = combined_data.resample(resample).mean()
+
+    if spec_act == 'recent':
+        combined_data = combined_data.resample(resample).mean()
     combined_data.reset_index(inplace=True)
     fig = px.line(
         combined_data,
