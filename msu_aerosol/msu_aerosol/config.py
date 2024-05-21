@@ -28,6 +28,7 @@ class Config:
     )
     STATIC_FOLDER: Path = basedir / 'static'
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = True
+    TEMPLATES_AUTO_RELOAD: bool = True
 
 
 class ProdConfig(Config):

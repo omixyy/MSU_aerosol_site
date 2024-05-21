@@ -114,8 +114,8 @@ def get_uploaded_file(device_id: int):
             Path(directory, filename),
             user_upload=True,
         )
-        make_graph(device, 'full')
-        make_graph(device, 'recent')
+        make_graph(full_name, 'full')
+        make_graph(full_name, 'recent')
         return get_device_template(device_id, message='Файл успешно получен')
 
     except Exception:

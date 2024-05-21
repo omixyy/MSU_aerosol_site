@@ -12,11 +12,13 @@
     {% if error %}
       <div class="alert alert-danger message" role="alert">
         {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right"></button>
       </div>
     {% endif %}
     {% if message %}
       <div class="alert alert-success message" role="alert">
         {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right"></button>
       </div>
     {% endif %}
     <form method="POST" name="datetime_picker" action="{{ url_for('device_details.send_data_range', device_id=device.id) }}">
