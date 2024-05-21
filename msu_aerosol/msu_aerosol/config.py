@@ -46,5 +46,5 @@ def initialize_flask_app(filename: str) -> Flask:
         instance_relative_config=False,
         static_folder=Config.STATIC_FOLDER,
     )
-    app.config.from_object(DevConfig)
+    app.config.from_object(ProdConfig)
     return app
