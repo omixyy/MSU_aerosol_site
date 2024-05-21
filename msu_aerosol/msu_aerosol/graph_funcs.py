@@ -5,6 +5,8 @@ from pathlib import Path
 from urllib.parse import urlencode
 from zipfile import ZipFile
 
+from hsluv import hsluv_to_rgb
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
@@ -177,34 +179,26 @@ def choose_range(device: str, app=None) -> tuple[pd.Timestamp, pd.Timestamp]:
     )
 
 
-def hexx(num: int) -> str:
-    return hex(num)[2:].zfill(2)
-
-
 def get_spaced_colors(n: int) -> list:
+    color_h = np.random.uniform(low=0, high=360, size=(1, n))
+    color_l = np.random.normal(loc=66, scale=10, size=(1, n))
+    color_s = np.random.uniform(low=80, high=100, size=(1, n))
+
+    image = np.dstack((color_h, color_s, color_l))
+    image = np.apply_along_axis(hsluv_to_rgb, 2, image)
     return [
-        '#'
-        + ''.join(
-            (
-                hexx(int(i[:2], 16)),
-                hexx(int(i[2:4], 16)),
-                hexx(int(i[4:], 16)),
-            ),
-        ).upper()
-        for i in [
-            hex(j)[2:].zfill(6)
-            for j in range(
-                int(16581375 / n),
-                16581375,
-                int(16581375 / n),
-            )
-        ]
+        '#{:02x}{:02x}{:02x}'.format(
+            int(rgb[0] * 255),
+            int(rgb[1] * 255),
+            int(rgb[2] * 255),
+        )
+        for rgb in image[0]
     ]
 
 
 def make_graph(
     device: str,
-    spec_act,
+    spec_act: str,
     begin_record_date=None,
     end_record_date=None,
     app=None,

@@ -2,17 +2,16 @@
   width: 500px;
   text-align: center;
 }
-h1 {
-  margin-top: 15px;
-  margin-bottom: 50px;
-}
+
 h4 {
   margin-top: 15px;
   margin-bottom: 20px;
 }
+
 .device_link {
   width: 400px;
 }
+
 .device_content {
   width: 700px;
   height: 600px;

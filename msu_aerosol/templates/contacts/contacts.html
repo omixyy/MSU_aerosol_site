@@ -1,1 +1,54 @@
 {% extends "base.html" %}
+{% block title %}Контакты{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/contacts/contacts.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts/font-awesome.min.css') }}">
+  <div class="member_holder my-5 ms-5">
+    <img
+            class="round"
+            src="{{ url_for('static', filename='img/devs/back_and_front.jpg') }}"
+            width="222"
+            align="left"
+            hspace="2%"
+            alt=""
+    />
+    <img
+            src="{{ url_for('static', filename='img/qrs/qr1.png') }}"
+            width="222"
+            align="left"
+            hspace="2%"
+    >
+    <br><br>
+    <p style="width: 40%">
+      Backend и frontend разработчик, тестировщик
+      <p><a href="https://t.me/omixyy" target="_blank"><i class="fa fa-telegram"></i></a>
+      <a href="https://github.com/omixyy" target="_blank"><i class="fa fa-github"></i></a></p>
+    </p>
+  </div>
+  <br><br><br><br>
+  <div class="member_holder my-5 ms-5" style="margin-top: 100%;">
+    <img
+            class="round"
+            src="{{ url_for('static', filename='img/devs/datascientist.jpg') }}"
+            width="222"
+            align="left"
+            hspace="2%"
+            style="margin-bottom: 2.55%; "
+            alt=""
+    />
+    <img
+            src="{{ url_for('static', filename='img/qrs/qr2.png') }}"
+            width="222"
+            align="left"
+            hspace="2%"
+    >
+    <br><br>
+    <p style="width: 40%">
+      Аналитик данных, разработчик Телеграм-бота.
+      <p><a href="https://t.me/lotossoks" target="_blank"><i class="fa fa-telegram"></i></a>
+      <a href="https://github.com/lotoossoks" target="_blank"><i class="fa fa-github"></i></a></p>
+    </p>
+  </div>
+
+{% endblock %}

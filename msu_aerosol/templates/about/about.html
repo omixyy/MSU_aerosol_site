@@ -2,7 +2,25 @@
 {% block title %}О сайте{% endblock %}
 {% block content %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/about/about.css') }}">
   <div class="mx-auto head">
     <h1>О сайте</h1>
+  </div>
+  <div class="content_container">
+    <video controls width="600">
+      <source src="{{ url_for('static', filename='video/example.mp4') }}" type="video/mp4">
+    </video>
+
+    <p class="pt-0 my-5 ms-3">
+      Этот сайт предназначен для отслеживания данных, получаемых с приборов аэрозольных комплексов МГУ.
+      На главной странице отображаются данные за последние 2 дня (усредненные),
+      на индивидуальной странице прибора - за последние 2 недели.
+    </p>
+
+    <p class="pt-0 my-5 ms-3">
+      Графики сами по себе интерактивные, они предоставляют пользователю все удобства для изучения данных:
+      изменение масштаба, выбор диапазона времени, просмотр значений переменных при наведении мышкой,
+      скрытие переменных на графике.
+    </p>
   </div>
 {% endblock %}

@@ -1,0 +1,15 @@
+video {
+  float: right;
+  margin-right: 1%;
+}
+
+.content_container {
+  width: 80%;
+  margin: 0 auto;
+  margin-bottom: 11.05%;
+}
+
+p {
+  font-size: 18px;
+  width: 40%;
+}
