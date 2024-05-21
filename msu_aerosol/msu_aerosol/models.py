@@ -99,7 +99,7 @@ class User(BaseModel, UserMixin):
     )
 
     def __repr__(self):
-        return f'User ({self.id, self.login})'
+        return self.login
 
 
 class Role(BaseModel):
