@@ -227,6 +227,7 @@ def after_delete(mapper, connection, target) -> None:
     graph_full = f'templates/includes/devices/full/graph_{full_name}.html'
     graph_rec = f'templates/includes/devices/recent/graph_{full_name}.html'
     proc_data = f'proc_data/{full_name}'
+    data = f'data/{full_name}'
     if Path(graph_full).exists():
         Path(graph_full).unlink()
 
@@ -235,6 +236,9 @@ def after_delete(mapper, connection, target) -> None:
 
     if Path(proc_data).exists():
         shutil.rmtree(proc_data)
+
+    if Path(data).exists():
+        shutil.rmtree(data)
 
 
 admin: Admin = Admin(
