@@ -224,6 +224,8 @@ def make_graph(
     time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
     if not begin_record_date or not end_record_date:
         begin_record_date, end_record_date = choose_range(device, app=app)
+    if spec_act == 'full':
+        begin_record_date = end_record_date - timedelta(days=14)
     if spec_act == 'recent':
         begin_record_date = end_record_date - timedelta(days=3)
     current_date, combined_data = begin_record_date, pd.DataFrame()
@@ -241,10 +243,16 @@ def make_graph(
     combined_data[time_col] = pd.to_datetime(combined_data[time_col])
     m = max(combined_data[time_col])
     last_48_hours = [m.replace(day=(m.day - 2)), m]
+    last_2_weeks = [m.replace(day=(m.day - 14)), m]
     if spec_act == 'recent':
         combined_data = combined_data.loc[
             (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
             & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
+        ]
+    if spec_act == "full":
+        combined_data = combined_data.loc[
+            (last_2_weeks[0] <= pd.to_datetime(combined_data[time_col]))
+            & (pd.to_datetime(combined_data[time_col]) <= last_2_weeks[1])
         ]
     combined_data.set_index(time_col, inplace=True)
     combined_data = combined_data.replace(
