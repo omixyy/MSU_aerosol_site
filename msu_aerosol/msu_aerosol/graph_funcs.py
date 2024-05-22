@@ -203,7 +203,6 @@ def make_graph(
     end_record_date=None,
     app=None,
 ) -> None | BytesIO:
-    resample = '60 min'
     if spec_act == 'download':
         begin_record_date = pd.to_datetime(
             begin_record_date,
@@ -264,7 +263,7 @@ def make_graph(
         buffer.seek(0)
         return buffer
 
-    if spec_act == "recent":
+    if spec_act == 'recent':
         q1, q3 = combined_data.quantile(0.1), combined_data.quantile(0.9)
         iqr = combined_data.quantile(0.9) - combined_data.quantile(0.1)
         lower_bound, upper_bound = q1 - 1.5 * iqr, q3 + 1.5 * iqr
