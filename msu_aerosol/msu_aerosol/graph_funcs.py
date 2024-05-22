@@ -249,7 +249,7 @@ def make_graph(
             (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
             & (pd.to_datetime(combined_data[time_col]) <= last_48_hours[1])
         ]
-    if spec_act == "full":
+    if spec_act == 'full':
         combined_data = combined_data.loc[
             (last_2_weeks[0] <= pd.to_datetime(combined_data[time_col]))
             & (pd.to_datetime(combined_data[time_col]) <= last_2_weeks[1])
