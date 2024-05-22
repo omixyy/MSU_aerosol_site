@@ -264,8 +264,25 @@ def make_graph(
         buffer.seek(0)
         return buffer
 
-    if spec_act == 'recent':
-        combined_data = combined_data.resample(resample).mean()
+    if spec_act == "recent":
+        q1, q3 = combined_data.quantile(0.1), combined_data.quantile(0.9)
+        iqr = combined_data.quantile(0.9) - combined_data.quantile(0.1)
+        lower_bound, upper_bound = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+        filtered_df = combined_data[
+            (
+                (combined_data >= lower_bound) & (combined_data <= upper_bound)
+            ).all(axis=1)
+        ]
+        std = filtered_df.std()
+        mask = (combined_data.diff().abs().div(std) <= 1).all(axis=1)
+        consecutive_true = mask & mask.shift(1, fill_value=False)
+        mask[(consecutive_true.cumsum() % 2 == 0) & consecutive_true] = False
+        combined_data.loc[mask, :] = (
+            combined_data.loc[mask, :].values
+            + combined_data.loc[mask.shift(-1, fill_value=False), :].values
+        ) / 2
+        mask_shifted = mask.shift(-1, fill_value=False)
+        combined_data = combined_data[~mask_shifted]
     combined_data.reset_index(inplace=True)
     fig = px.line(
         combined_data,
