@@ -18,10 +18,7 @@ class Config:
         'SECRET_KEY',
         default='FAKE_SECRET_KEY',
     )
-    SQLALCHEMY_DATABASE_URI: str = os.getenv(
-        'DATABASE_URI',
-        default='sqlite:///database.db',
-    )
+    SQLALCHEMY_DATABASE_URI: str = 'sqlite:///database.db'
     SESSION_COOKIE_NAME: str = os.getenv(
         'SESSION_COOKIE_NAME',
         default='FAKE_SESSION_COOKIE_NAME',

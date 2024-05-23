@@ -7,6 +7,7 @@ from msu_aerosol.admin import init_admin, init_schedule
 from msu_aerosol.commands import create_superuser
 from msu_aerosol.models import db
 from views.about import about_bp
+from views.archive import archive_bp
 from views.contacts import contacts_bp
 from views.device import device_bp
 from views.homepage import home_bp
@@ -22,6 +23,7 @@ app.register_blueprint(register_bp, name='registration')
 app.register_blueprint(login_bp, name='login')
 app.register_blueprint(profile_bp, name='profile')
 app.register_blueprint(about_bp, name='about')
+app.register_blueprint(archive_bp, name='archive')
 app.register_blueprint(contacts_bp, name='contacts')
 
 app.cli.add_command(create_superuser)
