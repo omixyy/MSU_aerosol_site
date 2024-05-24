@@ -161,8 +161,9 @@ def choose_range(device: str, app=None) -> tuple[pd.Timestamp, pd.Timestamp]:
         if i.use
     ][0]
     list_files = os.listdir(f'proc_data/{device}')
+    proc_data = f'proc_data/{device}/{max(list_files)}'
     max_date = pd.to_datetime(
-        pd.read_csv(f'proc_data/{device}/{max(list_files)}')[time_col].iloc[-1],
+        pd.read_csv(proc_data)[time_col].iloc[-1],
     )
     min_date = max_date - timedelta(days=14)
     return min_date, max_date
