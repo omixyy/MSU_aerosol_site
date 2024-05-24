@@ -288,7 +288,7 @@ def make_graph(
     )
     fig.update_layout(
         title=str(device),
-        xaxis={'title': 'Time'},
+        xaxis={'title': [i.name for i in device_obj.time_columns if i.use][0]},
         plot_bgcolor='white',
         paper_bgcolor='white',
         showlegend=True,
