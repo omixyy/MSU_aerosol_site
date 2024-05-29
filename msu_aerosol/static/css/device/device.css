@@ -2,33 +2,49 @@
   margin-left: 3%;
   width: 95%
 }
+
 .text {
   margin-top: 2%;
 }
+
+.text.up {
+  margin-top: 1%;
+}
+
 .message, calendars, download {
   width: 20%;
 }
+
 .calendar_row {
   width: 40%;
   margin-top: 1%;
 }
+
 .button_row_container {
   width: 65%;
 }
+
 .arrow {
   width: 10%;
   text-align: center;
   line-height: 90px;
 }
+
 commit_button {
   float: center;
 }
+
 .send_button {
   margin-right: 2%;
 }
+
 .graph_container {
   width: 55%;
   height: 40%;
   margin-bottom: 3%;
   margin-top: 1%;
+}
+
+h5 {
+  margin-top: -1%;
 }

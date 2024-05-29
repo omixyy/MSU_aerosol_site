@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Архив {{ device.name }}{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/archive/archive.css') }}">
+  <div class="mx-auto head">
+    <h1>Архив прибора {{ device.name }}</h1>
+  </div>
+  <h4>
+    Доступные данные
+  </h4>
+  <div class="list-group">
+    {% for i in files %}
+      <a
+              target="_blank"
+              href="data/{{ i }}"
+              class="list-group-item list-group-item-action"
+              download="{{ i }}"
+      >
+        {{ i }}
+      </a>
+    {% endfor %}
+  </div>
+{% endblock %}

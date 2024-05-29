@@ -9,6 +9,7 @@
     </div>
     <h3 class="text">{{ device.name }}{% if device.serial_number %}, {{ device.serial_number }} {% endif %}</h3>
     <h5 class="text">Состоит в комплексе "{{ complex }}"</h5>
+    <h5 class="text up"><a href="{{ url_for('archive.get_device_from_archive', device_id=device.id) }}">Перейти в архив</a></h5>
     {% if error %}
       <div class="alert alert-danger message" role="alert">
         {{ error }}

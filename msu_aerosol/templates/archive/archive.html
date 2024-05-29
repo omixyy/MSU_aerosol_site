@@ -1,24 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Архив данных{% endblock %}
 {% block content %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/archive/archive.css') }}">
   <div class="mx-auto head">
     <h1>Архив данных</h1>
   </div>
-  <form method="POST">
-    <div class="form-group">
-      <label for="devices" class="control-label">
-        Выберите прибор &nbsp;
-      </label>
-      <select class="form-control" data-allow-blank="0" data-role="select" id="devices" name="devices">
-        {% for com, devs in complex_to_device.items() %}
-          {% for dev in devs %}
-            <option selected value="{{ dev }}">{{ com }} - {{ dev }}</option>
-          {% endfor %}
-        {% endfor %}
-      </select>
-      <button type="submit" id="download" class="btn btn-dark my-4">Скачать</button>
-    </div>
-  </form>
+  <h4>
+    Выберите прибор
+  </h4>
+  <div class="list-group" style="float: center;">
+    {% for com, devs in complex_to_device.items() %}
+      {% for dev in devs %}
+        <a href="{{ url_for('archive.get_device_from_archive', device_id=dev.id) }}" class="list-group-item list-group-item-action">
+          {{ com }} - {{ dev }}
+        </a>
+      {% endfor %}
+    {% endfor %}
+  </div>
 {% endblock %}
