@@ -1,7 +1,10 @@
 from datetime import datetime
+from io import BytesIO
 import os
+from pathlib import Path
+from zipfile import ZipFile
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, send_file
 from flask_login import current_user
 
 from msu_aerosol.admin import get_complexes_dict
@@ -24,11 +27,28 @@ def archive() -> str:
     )
 
 
-@archive_bp.route('/archive/<int:device_id>', methods=['GET'])
+@archive_bp.route('/archive/<int:device_id>', methods=['GET', 'POST'])
 def get_device_from_archive(device_id: int) -> str:
     device: Device = Device.query.get_or_404(device_id)
     complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
-    files = os.listdir(f'data/{device.full_name}')
+    path = f'data/{device.full_name}'
+    files = os.listdir(path)
+    if request.method == 'POST' and request.form['button'] == 'download':
+        memory_file = BytesIO()
+        with ZipFile(memory_file, 'w') as zf:
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    file_path = Path(root) / file
+                    zf.write(file_path, os.path.relpath(file_path, path))
+
+        memory_file.seek(0)
+        return send_file(
+            memory_file,
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name='data.zip',
+        )
+
     return render_template(
         'archive/device_archive.html',
         now=datetime.now(),
