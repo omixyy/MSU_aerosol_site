@@ -8,7 +8,7 @@ from msu_aerosol.models import Complex, Device
 
 __all__: list = []
 
-contacts_bp: Blueprint = Blueprint('about', __name__, url_prefix='/')
+contacts_bp: Blueprint = Blueprint('contacts', __name__, url_prefix='/')
 
 
 @contacts_bp.route('/contacts', methods=['GET'])
