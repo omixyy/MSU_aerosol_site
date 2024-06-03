@@ -55,7 +55,7 @@ def get_admin_template(obj: AdminIndexView, message: str | None) -> str:
 
 class AdminHomeView(AdminIndexView):
     def __init__(self, name=None, url=None) -> None:
-        super().__init__(name=name, url=url, template='admin/index.html')
+        super().__init__(name=name, url=url, template='admin/admin_home.html')
 
     @expose('/', methods=['GET', 'POST'])
     def admin_index(self) -> str:
