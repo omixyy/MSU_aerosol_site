@@ -53,6 +53,7 @@ class Complex(BaseModel):
 
 class Device(BaseModel):
     __tablename__ = 'devices'
+    name = db.Column(db.String, unique=True, nullable=False)
     full_name = db.Column(db.String)
     serial_number = db.Column(db.String)
     show = db.Column(db.Boolean, nullable=True, default=False)
