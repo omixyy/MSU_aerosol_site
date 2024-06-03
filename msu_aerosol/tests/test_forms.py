@@ -50,7 +50,7 @@ class TestRegisterForm(unittest.TestCase):
     def test_register_form_authenticated(self, data):
         with self.app.app_context(), self.app.test_request_context():
             self.client.post(
-                url_for('registration.register'),
+                url_for('register'),
                 data=data,
                 follow_redirects=True,
             )
@@ -88,7 +88,7 @@ class TestRegisterForm(unittest.TestCase):
     def test_register_form_not_authenticated(self, data):
         with self.app.app_context(), self.app.test_request_context():
             self.client.post(
-                url_for('registration.register'),
+                url_for('register'),
                 data=data,
                 follow_redirects=True,
             )
@@ -108,7 +108,7 @@ class TestLoginForm(unittest.TestCase):
     def test_auth(self):
         with self.app.app_context(), self.app.test_request_context():
             self.client.post(
-                url_for('registration.register'),
+                url_for('register'),
                 data={
                     'login': 'TestLoginForm',
                     'email': 'testlogin@email.ru',

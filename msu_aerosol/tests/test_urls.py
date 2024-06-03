@@ -18,28 +18,28 @@ class TestStaticURL(unittest.TestCase):
 
     def test_url(self):
         with self.app.app_context(), self.app.test_request_context():
-            response = self.client.get(url_for('home.index'))
+            response = self.client.get(url_for('home'))
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_login(self):
         with self.app.app_context(), self.app.test_request_context():
-            response = self.client.get(url_for('login.login'))
+            response = self.client.get(url_for('login'))
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_registration(self):
         with self.app.app_context(), self.app.test_request_context():
-            response = self.client.get(url_for('registration.register'))
+            response = self.client.get(url_for('register'))
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_profile_unauthorized(self):
         with self.app.app_context(), self.app.test_request_context():
-            response = self.client.get(url_for('profile.user_profile'))
+            response = self.client.get(url_for('profile'))
         self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
 
     def test_authorization(self):
         with self.app.app_context(), self.app.test_request_context():
             response = self.client.post(
-                url_for('registration.register'),
+                url_for('register'),
                 data={
                     'login': 'TestLogin',
                     'email': 'test@email.com',
@@ -48,10 +48,10 @@ class TestStaticURL(unittest.TestCase):
                 },
                 follow_redirects=True,
             )
-            self.assertEqual(request.path, url_for('home.index'))
+            self.assertEqual(request.path, url_for('home'))
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         with self.app.app_context(), self.app.test_request_context():
-            response = self.client.get(url_for('profile.user_profile'))
+            response = self.client.get(url_for('profile'))
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
