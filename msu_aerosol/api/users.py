@@ -132,7 +132,7 @@ class Login(Resource):
 
             return get_login_template('Не существует такого пользователя')
 
-        return get_login_template(None)
+        return self.get()
 
 
 class Logout(Resource):
