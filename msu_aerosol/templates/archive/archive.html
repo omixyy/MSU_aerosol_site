@@ -11,7 +11,7 @@
   <div class="list-group" style="float: center;">
     {% for com, devs in complex_to_device.items() %}
       {% for dev in devs %}
-        <a href="{{ url_for('archive.get_device_from_archive', device_id=dev.id) }}" class="list-group-item list-group-item-action">
+        <a href="{{ url_for('devicearchive', device_id=dev.id) }}" class="list-group-item list-group-item-action">
           {{ com }} - {{ dev }}
         </a>
       {% endfor %}

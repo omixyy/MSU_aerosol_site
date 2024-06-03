@@ -9,7 +9,7 @@
     </div>
     <h3 class="text">{{ device.name }}{% if device.serial_number %}, {{ device.serial_number }} {% endif %}</h3>
     <h5 class="text">Состоит в комплексе "{{ complex }}"</h5>
-    <h5 class="text up"><a href="{{ url_for('archive.get_device_from_archive', device_id=device.id) }}">Перейти в архив</a></h5>
+    <h5 class="text up"><a href="{{ url_for('devicearchive', device_id=device.id) }}">Перейти в архив</a></h5>
     {% if error %}
       <div class="alert alert-danger message" role="alert">
         {{ error }}
@@ -22,7 +22,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right"></button>
       </div>
     {% endif %}
-    <form method="POST" name="datetime_picker" action="{{ url_for('device_details.send_data_range', device_id=device.id) }}">
+    <form method="POST" name="datetime_picker" action="{{ url_for('devicedownload', device_id=device.id) }}">
       <div class="row calendar_row">
         <div class="col calendars">
           <label for="datetime_picker_start" class="control-label">Начало</label>
@@ -67,7 +67,7 @@
         </div>
         {% if user.is_authenticated and user.role.can_upload_data %}
             <div class="col-3">
-            <form method="POST" name="file_sender" enctype="multipart/form-data" action="{{ url_for('device_details.get_uploaded_file', device_id=device.id) }}">
+            <form method="POST" name="file_sender" enctype="multipart/form-data" action="{{ url_for('deviceupload', device_id=device.id) }}">
               <div class="fluid-container">
                 <div class="row">
                   <div class="col-7 send_button">

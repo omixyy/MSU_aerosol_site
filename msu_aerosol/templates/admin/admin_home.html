@@ -1,7 +1,7 @@
 {% extends 'admin/master.html' %}
 {% block body %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_style.css') }}">
-<a href="{{ url_for('home.index') }}">На главную</a>
+<a href="{{ url_for('home') }}">На главную</a>
 {% for name, _ in name_to_device.items() %}
   <a href="#{{ name }}">{{ name }}</a>
 {% endfor %}

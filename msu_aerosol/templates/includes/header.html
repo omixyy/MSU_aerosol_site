@@ -2,7 +2,7 @@
 <header>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand"
-       href="{% if view_name != 'homepage' %} {{ url_for('home.index') }} {% else %} # {% endif %}">
+       href="{% if view_name != 'homepage' %} {{ url_for('home') }} {% else %} # {% endif %}">
       <img src="{{ url_for('static', filename='img/MSU_logo.png') }}" width="30" height="30" alt=""
            style="margin-left: 15px;">
     </a>
@@ -14,25 +14,25 @@
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'homepage' %} active {% endif %}"
-             href="{% if view_name != 'homepage' %} {{ url_for('home.index') }} {% else %} # {% endif %}">
+             href="{% if view_name != 'homepage' %} {{ url_for('home') }} {% else %} # {% endif %}">
             Главная
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'about' %} active {% endif %}"
-             href="{% if view_name != 'about' %} {{ url_for('about.about') }} {% else %} # {% endif %}">
+             href="{% if view_name != 'about' %} {{ url_for('about') }} {% else %} # {% endif %}">
             О сайте
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'contacts' %} active {% endif %}"
-             href="{% if view_name != 'contacts' %} {{ url_for('contacts.contacts') }} {% else %} # {% endif %}">
+             href="{% if view_name != 'contacts' %} {{ url_for('contacts') }} {% else %} # {% endif %}">
             Контакты
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'archive' %} active {% endif %}"
-             href="{{ url_for('archive.archive') }}">
+             href="{{ url_for('archive') }}">
             Архив
           </a>
         </li>
@@ -61,7 +61,7 @@
                       <li>
                         <a class="dropdown-item"
                            href="{% if view_name != 'homepage' %}
-                           {{ url_for('home.index') }}#dev{{ dev.id }}
+                           {{ url_for('home') }}#dev{{ dev.id }}
                            {% else %} #dev{{ dev.id }}
                            {% endif %}">{{ dev }}
                         </a>
@@ -89,7 +89,7 @@
                   <li>
                     <a class="dropdown-item"
                        href="{% if view_name != 'homepage' %}
-                       {{ url_for('home.index') }}#com{{ com.id }}
+                       {{ url_for('home') }}#com{{ com.id }}
                        {% else %}
                        #com{{ com.id }}
                        {% endif %}">
@@ -109,7 +109,7 @@
     {% if user and not user.is_authenticated %}
       <a type="button"
          href="{% if view_name not in ['registration', 'login'] %}
-         {{ url_for('login.login') }}
+         {{ url_for('login') }}
          {% else %} #
          {% endif %}"
          class="btn btn-outline-dark ml-5"
@@ -118,7 +118,7 @@
       </a>
     {% elif user %}
       <a class="nav-link mx-3"
-         href="{{ url_for('profile.user_profile') }}"
+         href="{{ url_for('profile') }}"
          style="float: right;">
         {{ user.login }}
       </a>

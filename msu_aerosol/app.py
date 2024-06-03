@@ -1,30 +1,35 @@
 import logging
 
 from flask import Flask
+from flask_restful import Api
 
+from api.about import About
+from api.archive import Archive, DeviceArchive
+from api.contacts import Contacts
+from api.homepage import Home
+from api.users import Login, Logout, Profile, Register
+from api.device import DeviceDownload, DevicePage, DeviceUpload
 from msu_aerosol import config
 from msu_aerosol.admin import init_admin, init_schedule
 from msu_aerosol.commands import create_superuser
 from msu_aerosol.models import db
-from views.about import about_bp
-from views.archive import archive_bp
-from views.contacts import contacts_bp
-from views.device import device_bp
-from views.homepage import home_bp
-from views.users import login_bp, register_bp
-from views.users import profile_bp
 
 __all__: list = []
 
 app: Flask = config.initialize_flask_app(__name__)
-app.register_blueprint(home_bp, name='home')
-app.register_blueprint(device_bp, name='device_details')
-app.register_blueprint(register_bp, name='registration')
-app.register_blueprint(login_bp, name='login')
-app.register_blueprint(profile_bp, name='profile')
-app.register_blueprint(about_bp, name='about')
-app.register_blueprint(archive_bp, name='archive')
-app.register_blueprint(contacts_bp, name='contacts')
+api: Api = Api(app)
+api.add_resource(Home, '/')
+api.add_resource(About, '/about')
+api.add_resource(Archive, '/archive')
+api.add_resource(DeviceArchive, '/archive/<int:device_id>')
+api.add_resource(Contacts, '/contacts')
+api.add_resource(Profile, '/profile')
+api.add_resource(Login, '/login')
+api.add_resource(Register, '/register')
+api.add_resource(Logout, '/logout')
+api.add_resource(DevicePage, '/devices/<int:device_id>')
+api.add_resource(DeviceDownload, '/devices/<int:device_id>/download')
+api.add_resource(DeviceUpload, '/devices/<int:device_id>/upload')
 
 app.cli.add_command(create_superuser)
 app.logger.setLevel(logging.INFO)
