@@ -16,8 +16,26 @@ from msu_aerosol.models import db
 
 __all__: list = []
 
+# Важнейшие переменные для управления приложением
 app: Flask = config.initialize_flask_app(__name__)
 api: Api = Api(app)
+log = logging.getLogger('werkzeug')
+
+# Настройка приложения
+app.cli.add_command(create_superuser)
+app.logger.setLevel(logging.INFO)
+
+# Настройка логирования
+log.disabled = True
+logging.getLogger('apscheduler.executors.default').propagate = False
+logging.basicConfig(
+    level=logging.INFO,
+    filename='download_log.log',
+    filemode='w',
+)
+
+
+# Добавление ресурсов Flask-Restful
 api.add_resource(Home, '/')
 api.add_resource(About, '/about')
 api.add_resource(Archive, '/archive')
@@ -31,17 +49,7 @@ api.add_resource(DevicePage, '/devices/<int:device_id>')
 api.add_resource(DeviceDownload, '/devices/<int:device_id>/download')
 api.add_resource(DeviceUpload, '/devices/<int:device_id>/upload')
 
-app.cli.add_command(create_superuser)
-app.logger.setLevel(logging.INFO)
-log = logging.getLogger('werkzeug')
-log.disabled = True
-logging.getLogger('apscheduler.executors.default').propagate = False
-logging.basicConfig(
-    level=logging.INFO,
-    filename='download_log.log',
-    filemode='w',
-)
-
+# Создание БД
 with app.app_context():
     db.init_app(app)
     db.create_all()

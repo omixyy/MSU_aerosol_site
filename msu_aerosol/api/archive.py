@@ -4,19 +4,19 @@ import os
 from pathlib import Path
 from zipfile import ZipFile
 
-from flask import make_response, render_template, send_file
+from flask import make_response, render_template, Response, send_file
 from flask_login import current_user
 from flask_restful import Resource
 
 from msu_aerosol.admin import get_complexes_dict
-from msu_aerosol.models import Complex, Device
+from msu_aerosol.models import Device
 
 __all__: list = []
 
 
 class Archive(Resource):
-    def get(self):
-        complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
+    def get(self) -> Response:
+        complex_to_device = get_complexes_dict()
         return make_response(
             render_template(
                 'archive/archive.html',
@@ -30,9 +30,9 @@ class Archive(Resource):
 
 
 class DeviceArchive(Resource):
-    def get(self, device_id):
-        complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
-        device: Device = Device.query.get_or_404(device_id)
+    def get(self, device_id: int) -> Response:
+        complex_to_device = get_complexes_dict()
+        device = Device.query.get_or_404(device_id)
         path = f'data/{device.full_name}'
         files = os.listdir(path)
         return make_response(
@@ -48,9 +48,9 @@ class DeviceArchive(Resource):
             200,
         )
 
-    def post(self, device_id):
+    def post(self, device_id: int) -> Response:
         memory_file = BytesIO()
-        device: Device = Device.query.get_or_404(device_id)
+        device = Device.query.get_or_404(device_id)
         path = f'data/{device.full_name}'
         with ZipFile(memory_file, 'w') as zf:
             for root, dirs, files in os.walk(path):

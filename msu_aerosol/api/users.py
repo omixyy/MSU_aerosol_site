@@ -55,7 +55,7 @@ def get_registration_template(error: str | None) -> Response:
     )
 
 
-def get_profile_template(message: str | None, form: ProfileForm) -> Response:
+def get_profile_template(message: (str, None), form: ProfileForm) -> Response:
     complex_to_device = get_complexes_dict()
     return make_response(
         render_template(
@@ -71,7 +71,7 @@ def get_profile_template(message: str | None, form: ProfileForm) -> Response:
     )
 
 
-def get_login_template(error: str | None) -> Response:
+def get_login_template(error: (str, None)) -> Response:
     complex_to_device = get_complexes_dict()
     form = LoginForm()
     return make_response(
@@ -95,12 +95,12 @@ def load_user(user_id):
 
 class Profile(Resource):
     @login_required
-    def get(self):
+    def get(self) -> Response:
         form = ProfileForm(obj=current_user)
         return get_profile_template(None, form)
 
     @login_required
-    def post(self):
+    def post(self) -> Response:
         form = ProfileForm(obj=current_user)
         if form.validate_on_submit():
             current_user.login = request.form.get('login')
@@ -108,6 +108,7 @@ class Profile(Resource):
             current_user.surname = request.form.get('surname')
             current_user.email = request.form.get('email')
             db.session.commit()
+
         return get_profile_template('Данные успешно сохранены', form)
 
 
@@ -136,16 +137,16 @@ class Login(Resource):
 
 class Logout(Resource):
     @login_required
-    def get(self):
+    def get(self) -> Response:
         logout_user()
         return redirect(url_for('home'))
 
 
 class Register(Resource):
-    def get(self):
+    def get(self) -> Response:
         return get_registration_template(None)
 
-    def post(self):
+    def post(self) -> Response:
         user_login = request.form.get('login')
         password = request.form.get('password')
         password_again = request.form.get('password_again')

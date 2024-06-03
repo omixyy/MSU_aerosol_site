@@ -54,13 +54,8 @@ def get_admin_template(obj: AdminIndexView, message: str | None) -> str:
 
 
 class AdminHomeView(AdminIndexView):
-    def __init__(
-        self,
-        name=None,
-        url=None,
-        template='admin/index.html',
-    ) -> None:
-        super().__init__(name=name, url=url, template=template)
+    def __init__(self, name=None, url=None) -> None:
+        super().__init__(name=name, url=url, template='admin/index.html')
 
     @expose('/', methods=['GET', 'POST'])
     def admin_index(self) -> str:
@@ -75,7 +70,7 @@ class AdminHomeView(AdminIndexView):
         all_devices = Device.query.all()
 
         if request.method == 'POST':
-            changed: list = []
+            changed = []
             for dev in all_devices:
                 full_name = disk.get_public_meta(dev.link)['name']
                 usable_cols = [i.name for i in dev.columns if i.use]
@@ -177,9 +172,9 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
 @listens_for(Device, 'after_insert')
 def after_insert(mapper, connection, target) -> None:
     download_device_data(target.link)
-    full_name: str = disk.get_public_meta(target.link)['name']
+    full_name = disk.get_public_meta(target.link)['name']
     target.full_name = full_name
-    file: str = os.listdir(f'data/{full_name}')[0]
+    file = os.listdir(f'data/{full_name}')[0]
     dialect = get_dialect(f'data/{full_name}/{file}')
     target.full_name = full_name
     with Path(f'data/{full_name}/{file}').open('r') as csv_file:
@@ -231,13 +226,10 @@ admin: Admin = Admin(
     template_mode='bootstrap4',
     index_view=AdminHomeView(
         name='Home',
-        template='admin/index.html',
         url='/admin',
     ),
 )
-
 login_manager: LoginManager = LoginManager()
-
 scheduler: BackgroundScheduler = BackgroundScheduler()
 atexit.register(lambda: scheduler.shutdown())
 

@@ -6,6 +6,7 @@ from flask import (
     make_response,
     render_template,
     request,
+    Response,
     send_file,
 )
 from flask_login import current_user
@@ -21,15 +22,13 @@ from msu_aerosol.models import Complex, Device
 __all__: list = []
 
 
-def get_device_template(device_id: int, **kwargs):
+def get_device_template(device_id: int, **kwargs) -> Response:
     message = kwargs.get('message')
     error = kwargs.get('error')
-    device_orm_obj: Device = Device.query.get_or_404(device_id)
-    complex_orm_obj: Complex = Complex.query.get(device_orm_obj.complex_id)
-    complex_to_device: dict[Complex, list[Device]] = get_complexes_dict()
-    device_to_name: dict[str, str] = {
-        dev.name: dev.full_name for dev in Device.query.all()
-    }
+    device_orm_obj = Device.query.get_or_404(device_id)
+    complex_orm_obj = Complex.query.get(device_orm_obj.complex_id)
+    complex_to_device = get_complexes_dict()
+    device_to_name = {dev.name: dev.full_name for dev in Device.query.all()}
     min_date, max_date = choose_range(device_to_name[device_orm_obj.name])
     return make_response(
         render_template(
@@ -51,12 +50,12 @@ def get_device_template(device_id: int, **kwargs):
 
 
 class DevicePage(Resource):
-    def get(self, device_id: int):
+    def get(self, device_id: int) -> Response:
         return get_device_template(device_id)
 
 
 class DeviceDownload(Resource):
-    def post(self, device_id: int):
+    def post(self, device_id: int) -> Response:
         data_range = (
             request.form.get('datetime_picker_start'),
             request.form.get('datetime_picker_end'),
@@ -85,7 +84,7 @@ class DeviceDownload(Resource):
 
 
 class DeviceUpload(Resource):
-    def post(self, device_id: int):
+    def post(self, device_id: int) -> Response:
         file = request.files['file']
         filename = secure_filename(file.filename)
 

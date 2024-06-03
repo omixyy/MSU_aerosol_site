@@ -7,39 +7,39 @@ from flask import Flask
 __all__: list = []
 
 load_dotenv()
-basedir: Path = Path(os.path.dirname(__file__)).resolve().parent
-yadisk_token: str = os.getenv('YADISK_TOKEN', default='FAKE_TOKEN')
+basedir = Path(os.path.dirname(__file__)).resolve().parent
+yadisk_token = os.getenv('YADISK_TOKEN', default='FAKE_TOKEN')
 upload_folder = 'received_data'
 allowed_extensions = {'csv', 'xlsx'}
 
 
 class Config:
-    SECRET_KEY: str = os.getenv(
+    SECRET_KEY = os.getenv(
         'SECRET_KEY',
         default='FAKE_SECRET_KEY',
     )
-    SQLALCHEMY_DATABASE_URI: str = 'sqlite:///database.db'
-    SESSION_COOKIE_NAME: str = os.getenv(
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
+    SESSION_COOKIE_NAME = os.getenv(
         'SESSION_COOKIE_NAME',
         default='FAKE_SESSION_COOKIE_NAME',
     )
-    STATIC_FOLDER: Path = basedir / 'static'
-    SQLALCHEMY_TRACK_MODIFICATIONS: bool = True
-    TEMPLATES_AUTO_RELOAD: bool = True
+    STATIC_FOLDER = basedir / 'static'
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    TEMPLATES_AUTO_RELOAD = True
 
 
 class ProdConfig(Config):
-    FLASK_ENV: str = 'production'
-    DEBUG: bool = False
+    FLASK_ENV = 'production'
+    DEBUG = False
 
 
 class DevConfig(Config):
-    FLASK_ENV: str = 'development'
-    DEBUG: bool = True
+    FLASK_ENV = 'development'
+    DEBUG = True
 
 
 def initialize_flask_app(filename: str) -> Flask:
-    app: Flask = Flask(
+    app = Flask(
         filename,
         instance_relative_config=False,
         static_folder=Config.STATIC_FOLDER,

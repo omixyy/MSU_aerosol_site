@@ -18,7 +18,7 @@ create_superuser: Blueprint = Blueprint('activate', __name__)
     hide_input=True,
     confirmation_prompt=True,
 )
-def create_superuser(login, email, password):
+def create_superuser(login: str, email: str, password: str) -> None:
     admin_role = Role.query.filter_by(name='Admin').first()
     if not admin_role:
         admin_role = Role(
