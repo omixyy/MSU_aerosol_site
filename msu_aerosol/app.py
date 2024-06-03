@@ -6,9 +6,9 @@ from flask_restful import Api
 from api.about import About
 from api.archive import Archive, DeviceArchive
 from api.contacts import Contacts
+from api.device import DeviceDownload, DevicePage, DeviceUpload
 from api.homepage import Home
 from api.users import Login, Logout, Profile, Register
-from api.device import DeviceDownload, DevicePage, DeviceUpload
 from msu_aerosol import config
 from msu_aerosol.admin import init_admin, init_schedule
 from msu_aerosol.commands import create_superuser
