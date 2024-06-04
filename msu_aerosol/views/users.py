@@ -29,6 +29,12 @@ __all__: list = []
 
 
 def is_safe(password: str) -> bool:
+    """
+    Проверка пароля на безопасность.
+
+    :param password: Сам пароль
+    :return: Да/нет
+    """
     return not (
         len(password) < 10
         or len(re.findall(r'\d', password)) < 4
@@ -38,6 +44,13 @@ def is_safe(password: str) -> bool:
 
 
 def get_registration_template(error: str | None) -> str:
+    """
+    Функция, возвращающая шаблон страницы регистрации.
+
+    :param error: Ошибка, если есть. Иначе - None.
+    :return: Шаблон страницы регистрации
+    """
+
     complex_to_device = get_complexes_dict()
     form = RegisterForm()
     return render_template(
@@ -51,7 +64,15 @@ def get_registration_template(error: str | None) -> str:
     )
 
 
-def get_profile_template(message: (str, None), form: ProfileForm) -> str:
+def get_profile_template(message: str | None, form: ProfileForm) -> str:
+    """
+    Функция, возвращающая шаблон страницы профиля.
+
+    :param message: Сообщение об успешном сохранении данных
+    :param form: Форма профиля
+    :return: Шаблон страницы профиля
+    """
+
     complex_to_device = get_complexes_dict()
     return render_template(
         'users/profile.html',
@@ -64,7 +85,14 @@ def get_profile_template(message: (str, None), form: ProfileForm) -> str:
     )
 
 
-def get_login_template(error: (str, None)) -> str:
+def get_login_template(error: str | None) -> str:
+    """
+    Функция, возвращающая шаблон страницы входа.
+
+    :param error: Сообщение об ошибке, если есть. Иначе - None.
+    :return: Шаблон страницы входа
+    """
+
     complex_to_device = get_complexes_dict()
     form = LoginForm()
     return render_template(
@@ -80,17 +108,40 @@ def get_login_template(error: (str, None)) -> str:
 
 @login_manager.user_loader
 def load_user(user_id):
+    """
+    Необходимая функция загрузки пользователя.
+
+    :param user_id: Идентификатор пользователя
+    :return: Объект пользователя
+    """
+
     return User.query.get(int(user_id))
 
 
 class Profile(MethodView):
+    """
+    Представление страницы профиля.
+    """
+
     @login_required
     def get(self) -> str:
+        """
+        Метод GET для страницы профиля.
+
+        :return: Шаблон страницы профиля с формой
+        """
         form = ProfileForm(obj=current_user)
         return get_profile_template(None, form)
 
     @login_required
     def post(self) -> str:
+        """
+        Метод POST страницы профиля.
+        Сохраняет введённые пользователем данные о себе.
+
+        :return: Шаблон страницы профиля.
+        """
+
         form = ProfileForm(obj=current_user)
         if form.validate_on_submit():
             current_user.login = request.form.get('login')
@@ -103,10 +154,27 @@ class Profile(MethodView):
 
 
 class Login(MethodView):
+    """
+    Представление страницы входа.
+    """
+
     def get(self) -> str:
+        """
+        Метод GET для страницы входа.
+
+        :return: Шаблон страницы входа
+        """
+
         return get_login_template(None)
 
-    def post(self) -> str:
+    def post(self) -> str | Response:
+        """
+        Метод POST для страницы входа.
+        Проверяет корректность введённых данных и оформляет вход в систему.
+
+        :return: Редирект на главную, если всё прошло успешно, иначе шаблон страницы входа с ошибкой
+        """
+
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(login=form.login.data).first()
@@ -126,17 +194,43 @@ class Login(MethodView):
 
 
 class Logout(MethodView):
+    """
+    Представление выхода из аккаунта.
+    """
+
     @login_required
     def get(self) -> Response:
+        """
+        Метод GET для выхода из аккаунта, только он доступен.
+
+        :return: Редирект на домашнюю страницу
+        """
         logout_user()
         return redirect(url_for('home'))
 
 
 class Register(MethodView):
+    """
+    Представление страницы регистрации.
+    """
+
     def get(self) -> str:
+        """
+        Метод GET для страницы регистрации.
+
+        :return: Шаблон страницы регистрации
+        """
         return get_registration_template(None)
 
     def post(self) -> str | Response:
+        """
+        Метод POST для страницы регистрации.
+        Проверяет корректность всех введённых данных и создаёт нового пользователя, если всё хорошо.
+        Иначе - сообщение об ошибке.
+
+        :return:
+        """
+
         user_login = request.form.get('login')
         password = request.form.get('password')
         password_again = request.form.get('password_again')

@@ -5,29 +5,39 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import declared_attr
 
-__all__ = [
-    'Complex',
-    'Device',
-    'db',
-]
+__all__ = []
 
 db: SQLAlchemy = SQLAlchemy()
 
 
 class BaseModel(db.Model):
+    """
+    Базовая модель.
+    """
+
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, unique=True)
 
 
 class BaseColumnModel(db.Model):
+    """
+    Базовая модель для столбца.
+    """
+
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, unique=False)
     use = db.Column(db.Boolean, nullable=False, default=False)
 
     @declared_attr
-    def device_id(self):
+    def device_id(self) -> db.Column:
+        """
+        Поле, связанное с id прибора.
+
+        :return: Идентификатор прибора
+        """
+
         return db.Column(
             db.Integer,
             db.ForeignKey('devices.id'),
@@ -36,6 +46,10 @@ class BaseColumnModel(db.Model):
 
 
 class Complex(BaseModel):
+    """
+    Таблица комплексов приборов.
+    """
+
     __tablename__ = 'complexes'
     devices = db.relationship(
         'Device',
@@ -52,6 +66,10 @@ class Complex(BaseModel):
 
 
 class Device(BaseModel):
+    """
+    Таблица приборов.
+    """
+
     __tablename__ = 'devices'
     name = db.Column(db.String, unique=True, nullable=False)
     full_name = db.Column(db.String)
@@ -86,6 +104,10 @@ class Device(BaseModel):
 
 
 class User(BaseModel, UserMixin):
+    """
+    Таблица пользователей.
+    """
+
     __tablename__ = 'users'
     name = db.Column(db.String, unique=False)
     surname = db.Column(db.String, nullable=True)
@@ -104,6 +126,10 @@ class User(BaseModel, UserMixin):
 
 
 class Role(BaseModel):
+    """
+    Таблица ролей пользователей.
+    """
+
     __tablename__ = 'roles'
     can_access_admin = db.Column(db.Boolean, default=False)
     can_upload_data = db.Column(db.Boolean, default=False)
@@ -120,15 +146,27 @@ class Role(BaseModel):
 
 
 class DeviceDataColumn(BaseColumnModel):
+    """
+    Таблица столбцов.
+    """
+
     __tablename__ = 'column'
     color = db.Column(db.String)
 
 
 class DeviceTimeColumn(BaseColumnModel):
+    """
+    Таблица столбцов премени.
+    """
+
     __tablename__ = 'time_column'
 
 
 class UserFieldView(ModelView):
+    """
+    Эти поля бут отображаться в админке в таблице пользователей.
+    """
+
     column_list = (
         'id',
         'login',
@@ -140,6 +178,10 @@ class UserFieldView(ModelView):
 
 
 class DeviceView(ModelView):
+    """
+    Эти поля бут отображаться в админке в таблице приборов.
+    """
+
     column_list = (
         'id',
         'name',

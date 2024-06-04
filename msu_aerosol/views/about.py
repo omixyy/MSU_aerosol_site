@@ -10,7 +10,17 @@ __all__: list = []
 
 
 class About(MethodView):
+    """
+    Представление страницы "О сайте".
+    """
+
     def get(self) -> str:
+        """
+        Метод GET для страницы, только он доступен.
+
+        :return: Шаблон страницы "О сайте"
+        """
+
         complex_to_device = get_complexes_dict()
         return render_template(
             'about/about.html',

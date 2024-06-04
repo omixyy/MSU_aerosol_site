@@ -15,7 +15,17 @@ __all__: list = []
 
 
 class Archive(MethodView):
+    """
+    Представление страницы "Архив".
+    """
+
     def get(self) -> str:
+        """
+        Метод GET для страницы архива, только он доступен.
+
+        :return: Шаблон страницы "Архив"
+        """
+
         complex_to_device = get_complexes_dict()
         return render_template(
             'archive/archive.html',
@@ -27,7 +37,20 @@ class Archive(MethodView):
 
 
 class DeviceArchive(MethodView):
+    """
+    Представление Страницы архива прибора.
+    """
+
     def get(self, device_id: int) -> str:
+        """
+        Метод GET для страницы архива прибора.
+        Получаем все доступные на сервере файлы прибора,
+        передаём их в шаблон.
+
+        :param device_id: Идентификатор прибора
+        :return: Шаблон страницы архива прибора
+        """
+
         complex_to_device = get_complexes_dict()
         device = Device.query.get_or_404(device_id)
         path = f'data/{device.full_name}'
@@ -43,6 +66,15 @@ class DeviceArchive(MethodView):
         )
 
     def post(self, device_id: int) -> Response:
+        """
+        Метод POST для страницы архива прибора.
+        Находим все доступные файлы прибора на сервере,
+        отправляем их пользователю в виде zip-архива.
+
+        :param device_id: Идентификатор прибора
+        :return: zip-архив файлов прибора.
+        """
+
         memory_file = BytesIO()
         device = Device.query.get_or_404(device_id)
         path = f'data/{device.full_name}'

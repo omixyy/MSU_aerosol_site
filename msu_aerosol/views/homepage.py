@@ -10,7 +10,16 @@ __all__: list = []
 
 
 class Home(MethodView):
+    """
+    Представление главной страницы.
+    """
+
     def get(self) -> str:
+        """
+        Метод GET для страницы, только он доступен.
+
+        :return: Шаблон главной страницы
+        """
         complex_to_device = get_complexes_dict()
         return render_template(
             'home/homepage.html',

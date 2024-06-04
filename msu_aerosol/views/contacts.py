@@ -10,7 +10,17 @@ __all__: list = []
 
 
 class Contacts(MethodView):
+    """
+    Представление страницы "Контакты".
+    """
+
     def get(self) -> str:
+        """
+        Метод GET для страницы, только он доступен.
+
+        :return: Шаблон страницы "Контакты"
+        """
+
         complex_to_device = get_complexes_dict()
         return render_template(
             'contacts/contacts.html',

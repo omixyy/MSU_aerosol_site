@@ -9,6 +9,10 @@ __all__: list = []
 
 
 class ProfileForm(FlaskForm):
+    """
+    Форма профиля
+    """
+
     login = StringField(
         'Логин',
         validators=[DataRequired()],

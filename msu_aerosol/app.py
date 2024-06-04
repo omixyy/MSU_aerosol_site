@@ -19,7 +19,7 @@ __all__: list = []
 # Важнейшие переменные для управления приложением
 app: Flask = config.initialize_flask_app(__name__)
 api: Api = Api(app)
-log = logging.getLogger('werkzeug')
+log: logging.Logger = logging.getLogger('werkzeug')
 
 # Настройка приложения
 app.cli.add_command(create_superuser)

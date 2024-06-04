@@ -43,6 +43,14 @@ application = None
 
 
 def get_admin_template(obj: AdminIndexView, message: str | None) -> str:
+    """
+    Функция, возвращающая шаблон домашней страницы админки.
+
+    :param obj: Объект представления админки
+    :param message: Сообщение на странице (ошибка)
+    :return: Шаблон админки
+    """
+
     return obj.render(
         'admin/admin_home.html',
         name_to_device={
@@ -54,11 +62,21 @@ def get_admin_template(obj: AdminIndexView, message: str | None) -> str:
 
 
 class AdminHomeView(AdminIndexView):
+    """
+    Класс, выступающий в роли представления админки.
+    """
+
     def __init__(self, name=None, url=None) -> None:
         super().__init__(name=name, url=url, template='admin/admin_home.html')
 
     @expose('/', methods=['GET', 'POST'])
     def admin_index(self) -> str:
+        """
+        Функция, срабатывающая при нажатии на кнопку "подтвердить" в админке.
+
+        :return: Шаблон домашней страницы админки
+        """
+
         if (
             not current_user.is_authenticated
             or not current_user.role
@@ -156,6 +174,13 @@ class AdminHomeView(AdminIndexView):
 
 
 def get_complexes_dict() -> dict[Complex, list[Device]]:
+    """
+    Функция, возвращающая словарь,
+    в котором каждому комплексу сопоставлен список приборов в нём.
+
+    :return: Словарь вида {Комплекс: [*Приборы]}
+    """
+
     return {
         com: Device.query.filter(
             Device.complex_id == com.id,
@@ -165,15 +190,33 @@ def get_complexes_dict() -> dict[Complex, list[Device]]:
 
 
 def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
+    """
+    Функция, возвращающая разделитель в csv файле.
+
+    :param path: Путь к csv файлу
+    :return: Разделитель в таблице
+    """
     with Path(path).open('r') as f:
         return csv.Sniffer().sniff(f.readline())
 
 
 @listens_for(Device, 'after_insert')
 def after_insert(mapper, connection, target) -> None:
+    """
+    Функция, срабатывающая после того,
+    как в таблицу devices в БД была добавлена запись.
+
+    Определяет полное название прибора через Яндекс диск,
+    добавляет столбцам прибора цвета (нужно для Телеграм-бота).
+
+    :param mapper: Необходимый аргумент для декоратора listens_for, не используется в функции
+    :param connection: Необходимый аргумент для декоратора listens_for, не используется в функции
+    :param target: Необходимый аргумент для декоратора listens_for, представляет собой объект типа Device
+    :return: None
+    """
+
     download_device_data(target.link)
     full_name = disk.get_public_meta(target.link)['name']
-    target.full_name = full_name
     file = os.listdir(f'data/{full_name}')[0]
     dialect = get_dialect(f'data/{full_name}/{file}')
     target.full_name = full_name
@@ -182,7 +225,15 @@ def after_insert(mapper, connection, target) -> None:
         colors = get_spaced_colors(len(header))
 
     @listens_for(db.session, 'after_flush', once=True)
-    def receive_after_flush(session, context):
+    def receive_after_flush(session, context) -> None:
+        """
+        Вспомогательная функция, присваивает столбцам цвета.
+
+        :param session: Необходимый аргумент для декоратора listens_for, не используется в функции
+        :param context: Необходимый аргумент для декоратора listens_for, не используется в функции
+        :return: None
+        """
+
         for column, color in zip(header, colors):
             if 'time' in column.lower() or 'date' in column.lower():
                 col = DeviceTimeColumn(
@@ -204,6 +255,16 @@ def after_insert(mapper, connection, target) -> None:
 
 @listens_for(Device, 'after_delete')
 def after_delete(mapper, connection, target) -> None:
+    """
+    Функция, срабатывающая после удаления записи из таблицы devices.
+    Удаляет все файлы удаленного прибора.
+
+    :param mapper:
+    :param connection:
+    :param target:
+    :return:
+    """
+
     full_name = disk.get_public_meta(target.link)['name']
     graph_full = f'templates/includes/devices/full/graph_{full_name}.html'
     graph_rec = f'templates/includes/devices/recent/graph_{full_name}.html'
@@ -237,6 +298,17 @@ atexit.register(lambda: scheduler.shutdown())
 @listens_for(Device, 'after_insert')
 @listens_for(Device, 'after_delete')
 def init_schedule(mapper, connection, target, app=None) -> None:
+    """
+    Функция, срабатывающая при удалении или добавлении записи в таблицу devices.
+    Перезапускает scheduler для избежания ошибок, связанных с обновлением несуществующих приборов.
+
+    :param mapper: Необходимый аргумент для декоратора listens_for, не используется в функции
+    :param connection: Необходимый аргумент для декоратора listens_for, не используется в функции
+    :param target: Необходимый аргумент для декоратора listens_for, представляет собой объект типа Device
+    :param app: Объект приложения, нужный для обращения к БД через scheduler
+    :return: None
+    """
+
     global scheduler
     global application
     if app:
@@ -259,6 +331,13 @@ def init_schedule(mapper, connection, target, app=None) -> None:
 
 
 def init_admin(app: Flask) -> None:
+    """
+    Функция инициализации админки.
+
+    :param app: Объект приложения
+    :return: None
+    """
+
     login_manager.init_app(app)
     admin.init_app(app)
     admin.add_view(ModelView(Complex, db.session))

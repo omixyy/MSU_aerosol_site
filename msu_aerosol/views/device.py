@@ -22,6 +22,16 @@ __all__: list = []
 
 
 def get_device_template(device_id: int, **kwargs) -> str:
+    """
+    Функция, возвращающая шаблон страницы прибора.
+    Получает все необходимые переменные из kwargs и БД,
+    передаём их в шаблон.
+
+    :param device_id: Идентификатор прибора
+    :param kwargs: Словарь с ключами 'message' и 'error'
+    :return: Шаблон страницы прибора
+    """
+
     message = kwargs.get('message')
     error = kwargs.get('error')
     device_orm_obj = Device.query.get_or_404(device_id)
@@ -46,12 +56,34 @@ def get_device_template(device_id: int, **kwargs) -> str:
 
 
 class DevicePage(MethodView):
+    """
+    Представление страницы прибора.
+    """
+
     def get(self, device_id: int) -> str:
+        """
+        Метод GET для страницы, только он доступен.
+
+        :return: Шаблон страницы прибора
+        """
         return get_device_template(device_id)
 
 
 class DeviceDownload(MethodView):
+    """
+    Представление страницы скачивания файла прибора по выбранному диапазону.
+    """
+
     def post(self, device_id: int) -> Response:
+        """
+        Метод POST для страницы, только он доступен.
+        Получат все данные, введённые пользователет,
+        отправляет ему файл с данными по выбранному диапазону.
+
+        :param device_id: Идентификатор прибора
+        :return: Файл с данными
+        """
+
         data_range = (
             request.form.get('datetime_picker_start'),
             request.form.get('datetime_picker_end'),
@@ -80,7 +112,19 @@ class DeviceDownload(MethodView):
 
 
 class DeviceUpload(MethodView):
+    """
+    Представление страницы отправки файла пользователем на сервер.
+    """
+
     def post(self, device_id: int) -> str:
+        """
+        Метод POST для страницы, только он доступен.
+        Пробует построить график для прибора с новым файлом, если не получается - сообщает об ошибке.
+
+        :param device_id: Идентификатор прибора
+        :return: Шаблон страницы прибора
+        """
+
         file = request.files['file']
         filename = secure_filename(file.filename)
 

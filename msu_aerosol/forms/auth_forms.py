@@ -11,6 +11,10 @@ __all__: list = []
 
 
 class RegisterForm(FlaskForm):
+    """
+    Форма регистрации
+    """
+
     login = StringField('Логин', validators=[DataRequired()])
     email = EmailField(
         'Почта',
@@ -28,6 +32,10 @@ class RegisterForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
+    """
+    Форма входа в аккаунт
+    """
+
     login = StringField(
         'Логин',
         validators=[DataRequired()],
