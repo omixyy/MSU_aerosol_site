@@ -4,9 +4,9 @@ import os
 from pathlib import Path
 from zipfile import ZipFile
 
-from flask import make_response, render_template, Response, send_file
+from flask import render_template, Response, send_file
+from flask.views import MethodView
 from flask_login import current_user
-from flask_restful import Resource
 
 from msu_aerosol.admin import get_complexes_dict
 from msu_aerosol.models import Device
@@ -14,38 +14,32 @@ from msu_aerosol.models import Device
 __all__: list = []
 
 
-class Archive(Resource):
-    def get(self) -> Response:
+class Archive(MethodView):
+    def get(self) -> str:
         complex_to_device = get_complexes_dict()
-        return make_response(
-            render_template(
-                'archive/archive.html',
-                now=datetime.now(),
-                view_name='archive',
-                complex_to_device=complex_to_device,
-                user=current_user,
-            ),
-            200,
+        return render_template(
+            'archive/archive.html',
+            now=datetime.now(),
+            view_name='archive',
+            complex_to_device=complex_to_device,
+            user=current_user,
         )
 
 
-class DeviceArchive(Resource):
-    def get(self, device_id: int) -> Response:
+class DeviceArchive(MethodView):
+    def get(self, device_id: int) -> str:
         complex_to_device = get_complexes_dict()
         device = Device.query.get_or_404(device_id)
         path = f'data/{device.full_name}'
         files = os.listdir(path)
-        return make_response(
-            render_template(
-                'archive/device_archive.html',
-                now=datetime.now(),
-                view_name='device_archive',
-                device=device,
-                user=current_user,
-                complex_to_device=complex_to_device,
-                files=files,
-            ),
-            200,
+        return render_template(
+            'archive/device_archive.html',
+            now=datetime.now(),
+            view_name='device_archive',
+            device=device,
+            user=current_user,
+            complex_to_device=complex_to_device,
+            files=files,
         )
 
     def post(self, device_id: int) -> Response:

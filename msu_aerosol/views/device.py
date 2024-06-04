@@ -3,14 +3,13 @@ import logging
 from pathlib import Path
 
 from flask import (
-    make_response,
     render_template,
     request,
     Response,
     send_file,
 )
+from flask.views import MethodView
 from flask_login import current_user
-from flask_restful import Resource
 from werkzeug.utils import secure_filename
 
 from msu_aerosol.admin import get_complexes_dict
@@ -22,7 +21,7 @@ from msu_aerosol.models import Complex, Device
 __all__: list = []
 
 
-def get_device_template(device_id: int, **kwargs) -> Response:
+def get_device_template(device_id: int, **kwargs) -> str:
     message = kwargs.get('message')
     error = kwargs.get('error')
     device_orm_obj = Device.query.get_or_404(device_id)
@@ -30,31 +29,28 @@ def get_device_template(device_id: int, **kwargs) -> Response:
     complex_to_device = get_complexes_dict()
     device_to_name = {dev.name: dev.full_name for dev in Device.query.all()}
     min_date, max_date = choose_range(device_to_name[device_orm_obj.name])
-    return make_response(
-        render_template(
-            'device/device.html',
-            now=datetime.now(),
-            view_name='device',
-            device=device_orm_obj,
-            complex=complex_orm_obj,
-            complex_to_device=complex_to_device,
-            user=current_user,
-            device_to_name=device_to_name,
-            min_date=str(min_date).replace(' ', 'T'),
-            max_date=str(max_date).replace(' ', 'T'),
-            message=message,
-            error=error,
-        ),
-        200,
+    return render_template(
+        'device/device.html',
+        now=datetime.now(),
+        view_name='device',
+        device=device_orm_obj,
+        complex=complex_orm_obj,
+        complex_to_device=complex_to_device,
+        user=current_user,
+        device_to_name=device_to_name,
+        min_date=str(min_date).replace(' ', 'T'),
+        max_date=str(max_date).replace(' ', 'T'),
+        message=message,
+        error=error,
     )
 
 
-class DevicePage(Resource):
-    def get(self, device_id: int) -> Response:
+class DevicePage(MethodView):
+    def get(self, device_id: int) -> str:
         return get_device_template(device_id)
 
 
-class DeviceDownload(Resource):
+class DeviceDownload(MethodView):
     def post(self, device_id: int) -> Response:
         data_range = (
             request.form.get('datetime_picker_start'),
@@ -83,8 +79,8 @@ class DeviceDownload(Resource):
         )
 
 
-class DeviceUpload(Resource):
-    def post(self, device_id: int) -> Response:
+class DeviceUpload(MethodView):
+    def post(self, device_id: int) -> str:
         file = request.files['file']
         filename = secure_filename(file.filename)
 

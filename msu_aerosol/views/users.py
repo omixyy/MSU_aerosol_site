@@ -2,20 +2,19 @@ from datetime import datetime
 import re
 
 from flask import (
-    make_response,
     redirect,
     render_template,
     request,
     Response,
     url_for,
 )
+from flask.views import MethodView
 from flask_login import (
     current_user,
     login_required,
     login_user,
     logout_user,
 )
-from flask_restful import Resource
 from werkzeug.security import (
     check_password_hash,
     generate_password_hash,
@@ -38,53 +37,44 @@ def is_safe(password: str) -> bool:
     )
 
 
-def get_registration_template(error: str | None) -> Response:
+def get_registration_template(error: str | None) -> str:
     complex_to_device = get_complexes_dict()
     form = RegisterForm()
-    return make_response(
-        render_template(
-            'users/register.html',
-            form=form,
-            message_error=error,
-            complex_to_device=complex_to_device,
-            user=current_user,
-            now=datetime.now(),
-            view_name='registration',
-        ),
-        200,
+    return render_template(
+        'users/register.html',
+        form=form,
+        message_error=error,
+        complex_to_device=complex_to_device,
+        user=current_user,
+        now=datetime.now(),
+        view_name='registration',
     )
 
 
-def get_profile_template(message: (str, None), form: ProfileForm) -> Response:
+def get_profile_template(message: (str, None), form: ProfileForm) -> str:
     complex_to_device = get_complexes_dict()
-    return make_response(
-        render_template(
-            'users/profile.html',
-            now=datetime.now(),
-            complex_to_device=complex_to_device,
-            view_name='profile',
-            user=current_user,
-            form=form,
-            message_success=message,
-        ),
-        200,
+    return render_template(
+        'users/profile.html',
+        now=datetime.now(),
+        complex_to_device=complex_to_device,
+        view_name='profile',
+        user=current_user,
+        form=form,
+        message_success=message,
     )
 
 
-def get_login_template(error: (str, None)) -> Response:
+def get_login_template(error: (str, None)) -> str:
     complex_to_device = get_complexes_dict()
     form = LoginForm()
-    return make_response(
-        render_template(
-            'users/login.html',
-            form=form,
-            message_error=error,
-            complex_to_device=complex_to_device,
-            now=datetime.now(),
-            view_name='login',
-            user=current_user,
-        ),
-        200,
+    return render_template(
+        'users/login.html',
+        form=form,
+        message_error=error,
+        complex_to_device=complex_to_device,
+        now=datetime.now(),
+        view_name='login',
+        user=current_user,
     )
 
 
@@ -93,14 +83,14 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class Profile(Resource):
+class Profile(MethodView):
     @login_required
-    def get(self) -> Response:
+    def get(self) -> str:
         form = ProfileForm(obj=current_user)
         return get_profile_template(None, form)
 
     @login_required
-    def post(self) -> Response:
+    def post(self) -> str:
         form = ProfileForm(obj=current_user)
         if form.validate_on_submit():
             current_user.login = request.form.get('login')
@@ -112,11 +102,11 @@ class Profile(Resource):
         return get_profile_template('Данные успешно сохранены', form)
 
 
-class Login(Resource):
-    def get(self) -> Response:
+class Login(MethodView):
+    def get(self) -> str:
         return get_login_template(None)
 
-    def post(self) -> Response:
+    def post(self) -> str:
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(login=form.login.data).first()
@@ -135,18 +125,18 @@ class Login(Resource):
         return self.get()
 
 
-class Logout(Resource):
+class Logout(MethodView):
     @login_required
     def get(self) -> Response:
         logout_user()
         return redirect(url_for('home'))
 
 
-class Register(Resource):
-    def get(self) -> Response:
+class Register(MethodView):
+    def get(self) -> str:
         return get_registration_template(None)
 
-    def post(self) -> Response:
+    def post(self) -> str | Response:
         user_login = request.form.get('login')
         password = request.form.get('password')
         password_again = request.form.get('password_again')

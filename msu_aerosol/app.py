@@ -3,16 +3,16 @@ import logging
 from flask import Flask
 from flask_restful import Api
 
-from api.about import About
-from api.archive import Archive, DeviceArchive
-from api.contacts import Contacts
-from api.device import DeviceDownload, DevicePage, DeviceUpload
-from api.homepage import Home
-from api.users import Login, Logout, Profile, Register
 from msu_aerosol import config
 from msu_aerosol.admin import init_admin, init_schedule
 from msu_aerosol.commands import create_superuser
 from msu_aerosol.models import db
+from views.about import About
+from views.archive import Archive, DeviceArchive
+from views.contacts import Contacts
+from views.device import DeviceDownload, DevicePage, DeviceUpload
+from views.homepage import Home
+from views.users import Login, Logout, Profile, Register
 
 __all__: list = []
 
@@ -34,20 +34,55 @@ logging.basicConfig(
     filemode='w',
 )
 
-
-# Добавление ресурсов Flask-Restful
-api.add_resource(Home, '/')
-api.add_resource(About, '/about')
-api.add_resource(Archive, '/archive')
-api.add_resource(DeviceArchive, '/archive/<int:device_id>')
-api.add_resource(Contacts, '/contacts')
-api.add_resource(Profile, '/profile')
-api.add_resource(Login, '/login')
-api.add_resource(Register, '/register')
-api.add_resource(Logout, '/logout')
-api.add_resource(DevicePage, '/devices/<int:device_id>')
-api.add_resource(DeviceDownload, '/devices/<int:device_id>/download')
-api.add_resource(DeviceUpload, '/devices/<int:device_id>/upload')
+# Связь URL адресов с классами их представления
+app.add_url_rule(
+    '/',
+    view_func=Home.as_view('home'),
+)
+app.add_url_rule(
+    '/about',
+    view_func=About.as_view('about'),
+)
+app.add_url_rule(
+    '/archive',
+    view_func=Archive.as_view('archive'),
+)
+app.add_url_rule(
+    '/archive/<int:device_id>',
+    view_func=DeviceArchive.as_view('device_archive'),
+)
+app.add_url_rule(
+    '/contacts',
+    view_func=Contacts.as_view('contacts'),
+)
+app.add_url_rule(
+    '/devices/<int:device_id>',
+    view_func=DevicePage.as_view('device'),
+)
+app.add_url_rule(
+    '/devices/<int:device_id>/download',
+    view_func=DeviceDownload.as_view('device_download'),
+)
+app.add_url_rule(
+    '/devices/<int:device_id>/upload',
+    view_func=DeviceUpload.as_view('device_upload'),
+)
+app.add_url_rule(
+    '/profile',
+    view_func=Profile.as_view('profile'),
+)
+app.add_url_rule(
+    '/login',
+    view_func=Login.as_view('login'),
+)
+app.add_url_rule(
+    '/logout',
+    view_func=Logout.as_view('logout'),
+)
+app.add_url_rule(
+    '/register',
+    view_func=Register.as_view('register'),
+)
 
 # Создание БД
 with app.app_context():
