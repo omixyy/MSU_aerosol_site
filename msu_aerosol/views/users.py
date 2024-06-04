@@ -207,6 +207,7 @@ class Logout(MethodView):
 
         :return: Редирект на домашнюю страницу
         """
+
         logout_user()
         return redirect(url_for('home'))
 
@@ -222,6 +223,7 @@ class Register(MethodView):
 
         :return: Шаблон страницы регистрации
         """
+
         return get_registration_template(None)
 
     def post(self) -> str | Response:

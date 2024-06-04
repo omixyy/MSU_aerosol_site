@@ -66,6 +66,7 @@ class DevicePage(MethodView):
 
         :return: Шаблон страницы прибора
         """
+
         return get_device_template(device_id)
 
 

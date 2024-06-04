@@ -20,6 +20,7 @@ class Home(MethodView):
 
         :return: Шаблон главной страницы
         """
+
         complex_to_device = get_complexes_dict()
         return render_template(
             'home/homepage.html',
