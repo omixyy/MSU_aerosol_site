@@ -35,6 +35,7 @@ def is_safe(password: str) -> bool:
     :param password: Сам пароль
     :return: Да/нет
     """
+
     return not (
         len(password) < 10
         or len(re.findall(r'\d', password)) < 4
