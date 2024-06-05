@@ -116,20 +116,26 @@ class AdminHomeView(AdminIndexView):
                     device_id=dev.id,
                 ):
                     col.use = False
-                time = DeviceTimeColumn.query.filter_by(
+                time_cols = DeviceTimeColumn.query.filter_by(
                     use=True,
                     device_id=dev.id,
-                ).first()
-                if time:
-                    time.use = False
+                ).all()
+                for i in time_cols:
+                    i.use = False
                 full_name = disk.get_public_meta(dev.link)['name']
                 checkboxes = request.form.getlist(f'{full_name}_cb')
                 radio = request.form.get(f'{full_name}_rb')
                 time_format = request.form.get(f'datetime_format_{full_name}')
                 for i in checkboxes:
-                    for k in DeviceDataColumn.query.filter_by(name=i):
+                    for k in DeviceDataColumn.query.filter_by(
+                        name=i,
+                        device_id=dev.id,
+                    ):
                         k.use = True
-                for j in DeviceTimeColumn.query.filter_by(name=radio):
+                for j in DeviceTimeColumn.query.filter_by(
+                    name=radio,
+                    device_id=dev.id,
+                ):
                     j.use = True
                 dev.time_format = time_format
                 dev.full_name = full_name
