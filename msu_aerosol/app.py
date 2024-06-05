@@ -1,7 +1,6 @@
 import logging
 
 from flask import Flask
-from flask_restful import Api
 
 from msu_aerosol import config
 from msu_aerosol.admin import init_admin, init_schedule
@@ -18,7 +17,6 @@ __all__: list = []
 
 # Важнейшие переменные для управления приложением
 app: Flask = config.initialize_flask_app(__name__)
-api: Api = Api(app)
 log: logging.Logger = logging.getLogger('werkzeug')
 
 # Настройка приложения
