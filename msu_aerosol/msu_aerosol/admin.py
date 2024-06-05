@@ -196,6 +196,7 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
     :param path: Путь к csv файлу
     :return: Разделитель в таблице
     """
+
     with Path(path).open('r') as f:
         return csv.Sniffer().sniff(f.readline())
 
@@ -264,10 +265,13 @@ def after_delete(mapper, connection, target) -> None:
     Функция, срабатывающая после удаления записи из таблицы devices.
     Удаляет все файлы удаленного прибора.
 
-    :param mapper:
-    :param connection:
-    :param target:
-    :return:
+    :param mapper: Необходимый аргумент для декоратора listens_for,
+                   не используется в функции
+    :param connection: Необходимый аргумент для декоратора listens_for,
+                       не используется в функции
+    :param target: Необходимый аргумент для декоратора listens_for,
+                   представляет собой объект типа Device
+    :return: None
     """
 
     full_name = disk.get_public_meta(target.link)['name']

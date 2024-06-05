@@ -55,9 +55,8 @@ def download_last_modified_file(links, app=None) -> None:
         download_response = requests.get(last_modified_file['file'])
         file_path = f'data/{full_name}/{last_modified_file["name"]}'
         list_data_path.append([full_name, file_path])
-        if not Path(file_path).exists():
-            with Path(file_path).open('wb') as f:
-                f.write(download_response.content)
+        with Path(file_path).open('wb') as f:
+            f.write(download_response.content)
     for i in list_data_path:
         try:
             preprocessing_one_file(i[0], i[1], app=app)
@@ -232,8 +231,8 @@ def make_graph(
             current_date += timedelta(days=29)
     combined_data[time_col] = pd.to_datetime(combined_data[time_col])
     m = max(combined_data[time_col])
-    last_48_hours = [m.replace(day=(m.day - 2)), m]
-    last_2_weeks = [m.replace(day=(m.day - 14)), m]
+    last_48_hours = [m - timedelta(days=2), m]
+    last_2_weeks = [m - timedelta(days=14), m]
     if spec_act == 'recent':
         combined_data = combined_data.loc[
             (last_48_hours[0] <= pd.to_datetime(combined_data[time_col]))
