@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import uuid
 
 from dotenv import load_dotenv
 from flask import Flask
@@ -14,10 +15,8 @@ allowed_extensions = {'csv', 'xlsx'}
 
 
 class Config:
-    SECRET_KEY = os.getenv(
-        'SECRET_KEY',
-        default='FAKE_SECRET_KEY',
-    )
+    SECRET_KEY = str(uuid.uuid4())
+    print(SECRET_KEY)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
     SESSION_COOKIE_NAME = os.getenv(
         'SESSION_COOKIE_NAME',
