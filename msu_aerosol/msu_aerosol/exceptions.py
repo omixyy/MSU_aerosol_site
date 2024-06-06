@@ -14,3 +14,8 @@ class ColumnsMatchError(Exception):
 class CouldNotPreprocessDataError(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+
+class FileExtensionError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
