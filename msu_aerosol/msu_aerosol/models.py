@@ -170,8 +170,8 @@ class UserFieldView(ModelView):
     column_list = (
         'id',
         'login',
-        'first_name',
-        'last_name',
+        'name',
+        'surname',
         'email',
         'created_date',
     )
