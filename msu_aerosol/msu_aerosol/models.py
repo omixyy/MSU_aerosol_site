@@ -176,6 +176,8 @@ class UserFieldView(ModelView):
         'created_date',
     )
 
+    form_excluded_columns = ('password',)
+
 
 class DeviceView(ModelView):
     """
