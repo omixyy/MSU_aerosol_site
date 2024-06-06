@@ -13,7 +13,8 @@ from flask_login import current_user
 from werkzeug.utils import secure_filename
 
 from msu_aerosol.admin import get_complexes_dict
-from msu_aerosol.config import upload_folder
+from msu_aerosol.config import allowed_extensions, upload_folder
+from msu_aerosol.exceptions import FileExtensionError
 from msu_aerosol.graph_funcs import choose_range, preprocessing_one_file
 from msu_aerosol.graph_funcs import make_graph
 from msu_aerosol.models import Complex, Device
@@ -131,6 +132,9 @@ class DeviceUpload(MethodView):
         filename = secure_filename(file.filename)
 
         try:
+            extension = filename.split('.')[-1]
+            if extension not in allowed_extensions:
+                raise FileExtensionError
             full_name = Device.query.get(device_id).full_name
             directory = Path(
                 f'{upload_folder}/{full_name}',
@@ -152,7 +156,7 @@ class DeviceUpload(MethodView):
                 message='Файл успешно получен',
             )
 
-        except Exception:
+        except (Exception, FileExtensionError):
             return get_device_template(
                 device_id,
                 error='Ошибка при загрузке файла',
