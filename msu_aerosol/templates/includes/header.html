@@ -103,8 +103,12 @@
         </div>
       </ul>
     </div>
-    {% if user and user.is_authenticated and user.role.can_access_admin %}
-      <span class="badge bg-warning text-dark">Admin</span>
+    {% if user and user.is_authenticated and user.role %}
+      {% if user.role.can_access_admin %}
+        <span class="badge rounded-pill bg-warning text-dark">{{ user.role.name }}</span>
+      {% elif user.role.can_upload_data %}
+        <span class="badge rounded-pill bg-dark">{{ user.role.name }}</span>
+      {% endif %}
     {% endif %}
     {% if user and not user.is_authenticated %}
       <a type="button"
