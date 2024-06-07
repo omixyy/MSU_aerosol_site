@@ -1,8 +1,8 @@
-import shutil
 from datetime import timedelta
 from io import BytesIO
 import os
 from pathlib import Path
+import shutil
 from urllib.parse import urlencode
 from zipfile import ZipFile
 
@@ -105,7 +105,11 @@ def preprocessing_one_file(
     app=None,
 ) -> None:
     df = pd.read_csv(
-        path, sep=None, engine='python', decimal=',', on_bad_lines="skip"
+        path,
+        sep=None,
+        engine='python',
+        decimal=',',
+        on_bad_lines='skip',
     )
     device_obj = get_device_by_name(device, app=app)
     time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
