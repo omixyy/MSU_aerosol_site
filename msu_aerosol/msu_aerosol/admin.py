@@ -6,7 +6,7 @@ import shutil
 from typing import Type
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import abort, Flask, request
+from flask import Flask, request
 from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
@@ -33,6 +33,7 @@ from msu_aerosol.models import (
     DeviceTimeColumn,
     DeviceView,
     Role,
+    RoleView,
     User,
     UserFieldView,
 )
@@ -69,6 +70,12 @@ class AdminHomeView(AdminIndexView):
     def __init__(self, name=None, url=None) -> None:
         super().__init__(name=name, url=url, template='admin/admin_home.html')
 
+    def is_accessible(self) -> bool:
+        return (
+            current_user.is_authenticated
+            and current_user.role.can_access_admin
+        )
+
     @expose('/', methods=['GET', 'POST'])
     def admin_index(self) -> str:
         """
@@ -77,12 +84,6 @@ class AdminHomeView(AdminIndexView):
         :return: Шаблон домашней страницы админки
         """
 
-        if (
-            not current_user.is_authenticated
-            or not current_user.role
-            or not current_user.role.can_access_admin
-        ):
-            abort(403)
         downloaded = os.listdir('data')
         downloaded.remove('.gitignore')
         all_devices = Device.query.all()
@@ -363,4 +364,4 @@ def init_admin(app: Flask) -> None:
     admin.add_view(ModelView(Complex, db.session))
     admin.add_view(DeviceView(Device, db.session))
     admin.add_view(UserFieldView(User, db.session))
-    admin.add_view(ModelView(Role, db.session))
+    admin.add_view(RoleView(Role, db.session))

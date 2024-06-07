@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_admin.contrib.sqla import ModelView
-from flask_login import UserMixin
+from flask_login import current_user, UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import declared_attr
 
@@ -178,6 +178,12 @@ class UserFieldView(ModelView):
 
     form_excluded_columns = ('password',)
 
+    def is_accessible(self):
+        return (
+            current_user.is_authenticated
+            and current_user.role.can_access_admin
+        )
+
 
 class DeviceView(ModelView):
     """
@@ -198,3 +204,17 @@ class DeviceView(ModelView):
         'time_columns',
         'full_name',
     )
+
+    def is_accessible(self):
+        return (
+            current_user.is_authenticated
+            and current_user.role.can_access_admin
+        )
+
+
+class RoleView(ModelView):
+    def is_accessible(self):
+        return (
+            current_user.is_authenticated
+            and current_user.role.can_access_admin
+        )
