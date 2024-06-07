@@ -21,7 +21,7 @@ class BaseModel(db.Model):
 
 
 class ProtectedView(ModelView):
-    def is_accessible(self):
+    def is_accessible(self) -> bool:
         return (
             current_user.is_authenticated
             and current_user.role.can_access_admin
