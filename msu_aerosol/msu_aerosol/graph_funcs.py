@@ -1,3 +1,4 @@
+import datetime
 from datetime import timedelta
 from io import BytesIO
 import os
@@ -49,7 +50,7 @@ def download_last_modified_file(links, app=None) -> None:
         last_modified_file = sorted(
             filter(
                 lambda y: y['name'].endswith('.csv'),
-                disk.get_public_meta(link)['embedded']['items'],
+                disk.get_public_meta(link, limit=1000)['embedded']['items'],
             ),
             key=lambda x: x['modified'],
         )[-1]
