@@ -32,8 +32,8 @@ from msu_aerosol.models import (
     DeviceDataColumn,
     DeviceTimeColumn,
     DeviceView,
+    ProtectedView,
     Role,
-    RoleView,
     User,
     UserFieldView,
 )
@@ -364,4 +364,4 @@ def init_admin(app: Flask) -> None:
     admin.add_view(ModelView(Complex, db.session))
     admin.add_view(DeviceView(Device, db.session))
     admin.add_view(UserFieldView(User, db.session))
-    admin.add_view(RoleView(Role, db.session))
+    admin.add_view(ProtectedView(Role, db.session))

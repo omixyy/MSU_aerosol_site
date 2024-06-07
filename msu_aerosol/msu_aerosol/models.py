@@ -20,6 +20,14 @@ class BaseModel(db.Model):
     name = db.Column(db.String, unique=True)
 
 
+class ProtectedView(ModelView):
+    def is_accessible(self):
+        return (
+            current_user.is_authenticated
+            and current_user.role.can_access_admin
+        )
+
+
 class BaseColumnModel(db.Model):
     """
     Базовая модель для столбца.
@@ -162,7 +170,7 @@ class DeviceTimeColumn(BaseColumnModel):
     __tablename__ = 'time_column'
 
 
-class UserFieldView(ModelView):
+class UserFieldView(ProtectedView):
     """
     Эти поля бут отображаться в админке в таблице пользователей.
     """
@@ -178,14 +186,8 @@ class UserFieldView(ModelView):
 
     form_excluded_columns = ('password',)
 
-    def is_accessible(self):
-        return (
-            current_user.is_authenticated
-            and current_user.role.can_access_admin
-        )
 
-
-class DeviceView(ModelView):
+class DeviceView(ProtectedView):
     """
     Эти поля бут отображаться в админке в таблице приборов.
     """
@@ -204,17 +206,3 @@ class DeviceView(ModelView):
         'time_columns',
         'full_name',
     )
-
-    def is_accessible(self):
-        return (
-            current_user.is_authenticated
-            and current_user.role.can_access_admin
-        )
-
-
-class RoleView(ModelView):
-    def is_accessible(self):
-        return (
-            current_user.is_authenticated
-            and current_user.role.can_access_admin
-        )
