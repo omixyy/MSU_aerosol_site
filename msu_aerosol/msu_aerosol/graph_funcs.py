@@ -1,3 +1,4 @@
+import shutil
 from datetime import timedelta
 from io import BytesIO
 import os
@@ -76,6 +77,13 @@ def download_device_data(url: str) -> str:
         file.write(download_response.content)
     with ZipFile('yandex_disk_folder.zip', 'r') as zf:
         zf.extractall(f'{main_path}')
+        full_name = disk.get_public_meta(url)['name']
+        for i in os.listdir(f'{main_path}/{full_name}'):
+            if not i.endswith('.csv'):
+                if Path(f'{main_path}/{full_name}/{i}').is_file():
+                    Path(f'{main_path}/{full_name}/{i}').unlink()
+                else:
+                    shutil.rmtree(f'{main_path}/{full_name}/{i}')
         return zf.namelist()[-1][0:-1:]
 
 
@@ -96,7 +104,9 @@ def preprocessing_one_file(
     user_upload=False,
     app=None,
 ) -> None:
-    df = pd.read_csv(path, sep=None, engine='python', decimal=',')
+    df = pd.read_csv(
+        path, sep=None, engine='python', decimal=',', on_bad_lines="skip"
+    )
     device_obj = get_device_by_name(device, app=app)
     time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
     columns = [j.name for j in device_obj.columns if j.use]

@@ -142,6 +142,10 @@ class AdminHomeView(AdminIndexView):
                 dev.full_name = full_name
                 db.session.commit()
 
+                preprocess_device_data(full_name)
+                make_graph(full_name, 'full')
+                make_graph(full_name, 'recent')
+
                 try:
                     preprocess_device_data(full_name)
                     make_graph(full_name, 'full')
@@ -228,7 +232,9 @@ def after_insert(mapper, connection, target) -> None:
 
     download_device_data(target.link)
     full_name = disk.get_public_meta(target.link)['name']
-    file = os.listdir(f'data/{full_name}')[0]
+    file = [x for x in os.listdir(f'data/{full_name}') if x.endswith('.csv')][
+        0
+    ]
     dialect = get_dialect(f'data/{full_name}/{file}')
     target.full_name = full_name
     with Path(f'data/{full_name}/{file}').open('r') as csv_file:
