@@ -313,7 +313,7 @@ def make_graph(
         linewidth=1,
         linecolor='black',
         mirror=True,
-        tickformat='%d.%m.%Y\n%H:%M',
+        tickformat='%H:%M\n%d.%m.%Y',
     )
     fig.update_yaxes(
         gridcolor='grey',
