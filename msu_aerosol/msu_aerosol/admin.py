@@ -142,10 +142,6 @@ class AdminHomeView(AdminIndexView):
                 dev.full_name = full_name
                 db.session.commit()
 
-                preprocess_device_data(full_name)
-                make_graph(full_name, 'full')
-                make_graph(full_name, 'recent')
-
                 try:
                     preprocess_device_data(full_name)
                     make_graph(full_name, 'full')
