@@ -1,6 +1,7 @@
 import logging
 
 from flask import Flask
+from waitress import serve
 
 from msu_aerosol import config
 from msu_aerosol.admin import init_admin, init_schedule
@@ -91,7 +92,7 @@ with app.app_context():
 
 
 def main() -> None:
-    app.run(use_reloader=False)
+    serve(app, host='0.0.0.0', port=5000)
 
 
 if __name__ == '__main__':
