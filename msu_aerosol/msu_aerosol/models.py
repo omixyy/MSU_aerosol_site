@@ -164,7 +164,7 @@ class DeviceDataColumn(BaseColumnModel):
 
 class DeviceTimeColumn(BaseColumnModel):
     """
-    Таблица столбцов премени.
+    Таблица столбцов времени.
     """
 
     __tablename__ = 'time_column'
