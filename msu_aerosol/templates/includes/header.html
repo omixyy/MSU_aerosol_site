@@ -1,6 +1,6 @@
 {% block header %}
 <header>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand navbar-light bg-light">
     <a class="navbar-brand"
        href="{% if view_name != 'homepage' %} {{ url_for('home') }} {% else %} # {% endif %}">
       <img src="{{ url_for('static', filename='img/MSU_logo.png') }}" width="30" height="30" alt=""
