@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from zipfile import ZipFile
 
-from flask import render_template, Response, request, send_file
+from flask import render_template, request, Response, send_file
 from flask.views import MethodView
 from flask_login import current_user
 
@@ -93,11 +93,10 @@ class DeviceArchive(MethodView):
                 download_name='data.zip',
             )
 
-        else:
-            filename = request.form["button"]
-            return send_file(
-                f'data/{device.full_name}/{filename}',
-                mimetype='text/csv',
-                as_attachment=True,
-                download_name=filename,
-            )
+        filename = request.form['button']
+        return send_file(
+            f'data/{device.full_name}/{filename}',
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name=filename,
+        )
