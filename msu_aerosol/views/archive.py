@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from zipfile import ZipFile
 
-from flask import render_template, Response, send_file
+from flask import render_template, Response, request, send_file
 from flask.views import MethodView
 from flask_login import current_user
 
@@ -41,11 +41,12 @@ class DeviceArchive(MethodView):
     Представление Страницы архива прибора.
     """
 
+
     def get(self, device_id: int) -> str:
         """
         Метод GET для страницы архива прибора.
-        Получаем все доступные на сервере файлы прибора,
-        передаём их в шаблон.
+        Получение все доступные на сервере файлы прибора,
+        передача их в шаблон.
 
         :param device_id: Идентификатор прибора
         :return: Шаблон страницы архива прибора
@@ -68,26 +69,36 @@ class DeviceArchive(MethodView):
     def post(self, device_id: int) -> Response:
         """
         Метод POST для страницы архива прибора.
-        Находим все доступные файлы прибора на сервере,
-        отправляем их пользователю в виде zip-архива.
+        Находит все доступные файлы прибора на сервере,
+        отправляет их пользователю в виде zip-архива.
 
         :param device_id: Идентификатор прибора
         :return: zip-архив файлов прибора.
         """
 
-        memory_file = BytesIO()
         device = Device.query.get_or_404(device_id)
-        path = f'data/{device.full_name}'
-        with ZipFile(memory_file, 'w') as zf:
-            for root, dirs, files in os.walk(path):
-                for file in files:
-                    file_path = Path(root) / file
-                    zf.write(file_path, os.path.relpath(file_path, path))
+        if request.form['button'] == 'download_all':
+            memory_file = BytesIO()
+            path = f'data/{device.full_name}'
+            with ZipFile(memory_file, 'w') as zf:
+                for root, dirs, files in os.walk(path):
+                    for file in files:
+                        file_path = Path(root) / file
+                        zf.write(file_path, os.path.relpath(file_path, path))
 
-        memory_file.seek(0)
-        return send_file(
-            memory_file,
-            mimetype='application/zip',
-            as_attachment=True,
-            download_name='data.zip',
-        )
+            memory_file.seek(0)
+            return send_file(
+                memory_file,
+                mimetype='application/zip',
+                as_attachment=True,
+                download_name='data.zip',
+            )
+
+        else:
+            filename = request.form["button"]
+            return send_file(
+                f'data/{device}/{filename}',
+                mimetype='text/csv',
+                as_attachment=True,
+                download_name=filename,
+            )

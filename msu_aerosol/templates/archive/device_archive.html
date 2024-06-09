@@ -9,18 +9,20 @@
     Доступные данные
   </h4>
   <form method="POST">
-    <button type="submit" value="download" name="button" class="download btn btn-dark my-4">Скачать все</button>
+    <button type="submit" value="download_all" name="button" class="download btn btn-dark my-4">Скачать все</button>
   </form>
   <div class="list-group">
     {% for i in files %}
-      <a
-              target="_blank"
-              href="data/{{ device }}/{{ i }}"
-              class="list-group-item list-group-item-action"
-              download="{{ i }}"
-      >
-        {{ i }}
-      </a>
+      <form method="POST">
+        <button
+                type="submit"
+                class="list-group-item list-group-item-action"
+                value="{{ i }}"
+                name="button"
+        >
+          {{ i }}
+        </button>
+      </form>
     {% endfor %}
   </div>
 {% endblock %}
