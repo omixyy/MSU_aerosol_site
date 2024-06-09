@@ -96,7 +96,7 @@ class DeviceArchive(MethodView):
         else:
             filename = request.form["button"]
             return send_file(
-                f'data/{device}/{filename}',
+                f'data/{device.full_name}/{filename}',
                 mimetype='text/csv',
                 as_attachment=True,
                 download_name=filename,
