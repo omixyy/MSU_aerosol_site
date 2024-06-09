@@ -41,7 +41,6 @@ class DeviceArchive(MethodView):
     Представление Страницы архива прибора.
     """
 
-
     def get(self, device_id: int) -> str:
         """
         Метод GET для страницы архива прибора.
