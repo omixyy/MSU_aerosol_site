@@ -59,13 +59,19 @@ def download_last_modified_file(links, app=None) -> None:
         with Path(file_path).open('wb') as f:
             f.write(download_response.content)
     for i in list_data_path:
-        try:
-            preprocessing_one_file(i[0], i[1], app=app)
-            make_graph(i[0], spec_act='full', app=app)
-            make_graph(i[0], spec_act='recent', app=app)
+        if app:
+            with app.app_context():
+                dev = Device.query.filter_by(full_name=i[0]).first()
+        else:
+            dev = Device.query.filter_by(full_name=i[0]).first()
+        if not dev.archived:
+            try:
+                preprocessing_one_file(i[0], i[1], app=app)
+                make_graph(i[0], spec_act='full', app=app)
+                make_graph(i[0], spec_act='recent', app=app)
 
-        except (KeyError, Exception):
-            pass
+            except (KeyError, Exception):
+                pass
 
 
 def download_device_data(url: str) -> str:
@@ -98,6 +104,21 @@ def preprocess_device_data(name_folder: str) -> None:
         )
 
 
+def get_time_col(device_obj):
+    return (
+        DeviceTimeColumn.query.filter_by(
+            use=True,
+            device_id=device_obj.id,
+        )
+        .first()
+        .name
+    )
+
+
+def get_columns(device_obj):
+    return Device.query.filter_by(id=device_obj.id).first().columns
+
+
 def preprocessing_one_file(
     device: str,
     path: str,
@@ -114,14 +135,11 @@ def preprocessing_one_file(
     if df.shape[0] == 0:
         return
     device_obj = get_device_by_name(device, app=app)
-    time_col = (
-        DeviceTimeColumn.query.filter_by(
-            use=True,
-            device_id=device_obj.id,
-        )
-        .first()
-        .name
-    )
+    if app:
+        with app.app_context():
+            time_col = get_time_col(device_obj)
+    else:
+        time_col = get_time_col(device_obj)
     columns = [j.name for j in device_obj.columns if j.use]
     if any(
         (i not in list(df.columns) for i in [time_col] + columns),
@@ -306,13 +324,19 @@ def make_graph(
         mask_shifted = mask.shift(-1, fill_value=False)
         combined_data = combined_data[~mask_shifted]
     combined_data.reset_index(inplace=True)
+    combined_data = combined_data.sort_values(by=time_col)
     fig = px.line(
         combined_data,
         x=time_col,
         y=[i.name for i in device_obj.columns if i.use],
     )
+    if app:
+        with app.app_context():
+            cols = get_columns(device_obj)
+    else:
+        cols = get_columns(device_obj)
     for trace in fig.data:
-        for i in Device.query.filter_by(id=device_obj.id).first().columns:
+        for i in cols:
             if i.name == trace['name']:
                 trace.visible = True if i.default else 'legendonly'
                 break
@@ -324,7 +348,9 @@ def make_graph(
         paper_bgcolor='white',
         showlegend=True,
     )
-    fig.update_traces(line={'width': 2})
+    fig.update_traces(
+        line={'width': 2}
+    )
     fig.update_xaxes(
         gridcolor='grey',
         showline=True,
