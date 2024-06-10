@@ -348,9 +348,7 @@ def make_graph(
         paper_bgcolor='white',
         showlegend=True,
     )
-    fig.update_traces(
-        line={'width': 2}
-    )
+    fig.update_traces(line={'width': 2})
     fig.update_xaxes(
         gridcolor='grey',
         showline=True,
