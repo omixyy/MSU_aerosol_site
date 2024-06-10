@@ -10,7 +10,7 @@ from flask_login import current_user
 
 from msu_aerosol.admin import get_complexes_dict
 from msu_aerosol.graph_funcs import disk
-from msu_aerosol.models import Device
+from msu_aerosol.models import Device, db
 
 __all__: list = []
 
@@ -57,6 +57,7 @@ class DeviceArchive(MethodView):
         device = Device.query.get_or_404(device_id)
         if not device.full_name:
             device.full_name = disk.get_public_meta(device.link)['name']
+            db.session.commit()
         path = f'data/{device.full_name}'
         files = os.listdir(path)
         return render_template(
