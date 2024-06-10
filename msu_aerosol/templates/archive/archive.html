@@ -17,4 +17,14 @@
       {% endfor %}
     {% endfor %}
   </div>
+  <h5>
+    Архивированные приборы:
+  </h5>
+  <div class="list-group" style="float: center;">
+    {% for i in archived %}
+      <a href="{{ url_for('device_archive', device_id=i.id) }}" class="list-group-item list-group-item-action">
+        {{ i }}
+      </a>
+  </div>
+  {% endfor %}
 {% endblock %}

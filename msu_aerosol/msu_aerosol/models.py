@@ -85,6 +85,7 @@ class Device(BaseModel):
     show = db.Column(db.Boolean, nullable=True, default=False)
     link = db.Column(db.String, nullable=False)
     time_format = db.Column(db.String, nullable=True)
+    archived = db.Column(db.Boolean, default=False)
 
     columns = db.relationship(
         'DeviceDataColumn',

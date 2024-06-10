@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from io import BytesIO
 import os
 from pathlib import Path
@@ -302,6 +302,12 @@ def make_graph(
         x=time_col,
         y=[i.name for i in device_obj.columns if i.use],
     )
+    for trace in fig.data:
+        for i in Device.query.filter_by(id=device_obj.id).first().columns:
+            if i.name == trace['name']:
+                trace.visible = True if i.default else 'legendonly'
+                break
+
     fig.update_layout(
         title=str(device),
         xaxis={'title': [i.name for i in device_obj.time_columns if i.use][0]},

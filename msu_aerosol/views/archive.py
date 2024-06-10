@@ -9,6 +9,7 @@ from flask.views import MethodView
 from flask_login import current_user
 
 from msu_aerosol.admin import get_complexes_dict
+from msu_aerosol.graph_funcs import disk
 from msu_aerosol.models import Device
 
 __all__: list = []
@@ -32,6 +33,7 @@ class Archive(MethodView):
             now=datetime.now(),
             view_name='archive',
             complex_to_device=complex_to_device,
+            archived=Device.query.filter_by(archived=True),
             user=current_user,
         )
 
@@ -53,6 +55,8 @@ class DeviceArchive(MethodView):
 
         complex_to_device = get_complexes_dict()
         device = Device.query.get_or_404(device_id)
+        if not device.full_name:
+            device.full_name = disk.get_public_meta(device.link)['name']
         path = f'data/{device.full_name}'
         files = os.listdir(path)
         return render_template(

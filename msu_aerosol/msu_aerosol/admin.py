@@ -56,7 +56,7 @@ def get_admin_template(obj: AdminIndexView, message: str | None) -> str:
         'admin/admin_home.html',
         name_to_device={
             disk.get_public_meta(dev.link)['name']: dev
-            for dev in Device.query.all()
+            for dev in Device.query.filter_by(archived=False).all()
         },
         message_error=message,
     )
@@ -86,12 +86,12 @@ class AdminHomeView(AdminIndexView):
 
         downloaded = os.listdir('data')
         downloaded.remove('.gitignore')
-        all_devices = Device.query.all()
+        all_devices = Device.query.filter_by(archived=False).all()
 
         if request.method == 'POST':
             changed = []
             for dev in all_devices:
-                full_name = disk.get_public_meta(dev.link)['name']
+                full_name = dev.full_name
                 usable_cols = [i.name for i in dev.columns if i.use]
                 time_col = [i.name for i in dev.time_columns if i.use]
                 default_cols = DeviceDataColumn.query.filter_by(default=True)
@@ -201,8 +201,9 @@ def get_complexes_dict() -> dict[Complex, list[Device]]:
     """
 
     return {
-        com: Device.query.filter(
-            Device.complex_id == com.id,
+        com: Device.query.filter_by(
+            complex_id=com.id,
+            archived=False,
         ).all()
         for com in Complex.query.all()
     }
@@ -240,11 +241,14 @@ def after_insert(mapper, connection, target) -> None:
 
     download_device_data(target.link)
     full_name = disk.get_public_meta(target.link)['name']
-    file = [x for x in os.listdir(f'data/{full_name}') if x.endswith('.csv')][
-        0
-    ]
+    file = [
+        x
+        for x in os.listdir(
+            f'data/{full_name}',
+        )
+        if x.endswith('.csv')
+    ][0]
     dialect = get_dialect(f'data/{full_name}/{file}')
-    target.full_name = full_name
     with Path(f'data/{full_name}/{file}').open('r') as csv_file:
         header = list(csv.reader(csv_file, dialect=dialect))[0]
         colors = get_spaced_colors(len(header))
