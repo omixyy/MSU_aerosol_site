@@ -16,7 +16,7 @@ from yadisk import YaDisk
 
 from msu_aerosol.config import yadisk_token
 from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
-from msu_aerosol.models import Device
+from msu_aerosol.models import Device, DeviceTimeColumn
 
 __all__ = []
 
@@ -111,8 +111,17 @@ def preprocessing_one_file(
         decimal=',',
         on_bad_lines='skip',
     )
+    if df.shape[0] == 0:
+        return
     device_obj = get_device_by_name(device, app=app)
-    time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
+    time_col = (
+        DeviceTimeColumn.query.filter_by(
+            use=True,
+            device_id=device_obj.id,
+        )
+        .first()
+        .name
+    )
     columns = [j.name for j in device_obj.columns if j.use]
     if any(
         (i not in list(df.columns) for i in [time_col] + columns),

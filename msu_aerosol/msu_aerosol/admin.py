@@ -94,13 +94,20 @@ class AdminHomeView(AdminIndexView):
                 full_name = dev.full_name
                 usable_cols = [i.name for i in dev.columns if i.use]
                 time_col = [i.name for i in dev.time_columns if i.use]
-                default_cols = DeviceDataColumn.query.filter_by(default=True)
+                default_cols = [
+                    i.name
+                    for i in DeviceDataColumn.query.filter_by(
+                        default=True,
+                        device_id=dev.id,
+                    ).all()
+                ]
                 if (
                     request.form.getlist(f'{full_name}_cb') != usable_cols
                     or not usable_cols
                     or not time_col
                     or request.form.get(f'{full_name}_rb') != time_col[0]
-                    or request.form.get(f'{full_name}_cb_def') != default_cols
+                    or request.form.getlist(f'{full_name}_cb_def')
+                    != default_cols
                     or request.form.get(f'datetime_format_{full_name}')
                     != dev.time_format
                     or not Path(
@@ -148,12 +155,11 @@ class AdminHomeView(AdminIndexView):
                     dev.time_format = time_format
                     dev.full_name = full_name
                     db.session.commit()
+                    preprocess_device_data(full_name)
 
                     try:
-                        preprocess_device_data(full_name)
                         make_graph(full_name, 'full')
                         make_graph(full_name, 'recent')
-
                     except TimeFormatError:
                         return get_admin_template(
                             self,
