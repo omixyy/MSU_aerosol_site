@@ -38,8 +38,6 @@ from msu_aerosol.models import (
     UserFieldView,
 )
 
-from numpy import intersect1d
-
 __all__ = []
 
 application = None
@@ -184,7 +182,7 @@ class AdminHomeView(AdminIndexView):
                 else:
                     return get_admin_template(
                         self,
-                        f'Не совпадают списки столбцов.',
+                        'Не совпадают списки столбцов.',
                     )
 
             for dev in all_devices:
