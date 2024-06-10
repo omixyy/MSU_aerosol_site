@@ -160,6 +160,7 @@ class DeviceDataColumn(BaseColumnModel):
 
     __tablename__ = 'column'
     color = db.Column(db.String)
+    default = db.Column(db.Boolean, default=False)
 
 
 class DeviceTimeColumn(BaseColumnModel):

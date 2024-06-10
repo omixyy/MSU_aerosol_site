@@ -38,6 +38,8 @@ from msu_aerosol.models import (
     UserFieldView,
 )
 
+from numpy import intersect1d
+
 __all__ = []
 
 application = None
@@ -94,11 +96,13 @@ class AdminHomeView(AdminIndexView):
                 full_name = disk.get_public_meta(dev.link)['name']
                 usable_cols = [i.name for i in dev.columns if i.use]
                 time_col = [i.name for i in dev.time_columns if i.use]
+                default_cols = DeviceDataColumn.query.filter_by(default=True)
                 if (
                     request.form.getlist(f'{full_name}_cb') != usable_cols
                     or not usable_cols
                     or not time_col
                     or request.form.get(f'{full_name}_rb') != time_col[0]
+                    or request.form.get(f'{full_name}_cb_def') != default_cols
                     or request.form.get(f'datetime_format_{full_name}')
                     != dev.time_format
                     or not Path(
@@ -112,65 +116,75 @@ class AdminHomeView(AdminIndexView):
                     changed.append(dev)
 
             for dev in changed:
-                for col in DeviceDataColumn.query.filter_by(
-                    use=True,
-                    device_id=dev.id,
-                ):
-                    col.use = False
-                time_cols = DeviceTimeColumn.query.filter_by(
-                    use=True,
-                    device_id=dev.id,
-                ).all()
-                for i in time_cols:
-                    i.use = False
                 full_name = disk.get_public_meta(dev.link)['name']
                 checkboxes = request.form.getlist(f'{full_name}_cb')
                 radio = request.form.get(f'{full_name}_rb')
+                defaults = request.form.getlist(f'{full_name}_cb_def')
                 time_format = request.form.get(f'datetime_format_{full_name}')
-                for i in checkboxes:
-                    for k in DeviceDataColumn.query.filter_by(
-                        name=i,
+                if set(defaults).issubset(set(checkboxes)):
+                    for col in DeviceDataColumn.query.filter_by(
+                        use=True,
                         device_id=dev.id,
                     ):
-                        k.use = True
-                for j in DeviceTimeColumn.query.filter_by(
-                    name=radio,
-                    device_id=dev.id,
-                ):
-                    j.use = True
-                dev.time_format = time_format
-                dev.full_name = full_name
-                db.session.commit()
+                        col.use = False
+                        col.default = False
+                    time_cols = DeviceTimeColumn.query.filter_by(
+                        use=True,
+                        device_id=dev.id,
+                    ).all()
+                    for i in time_cols:
+                        i.use = False
+                    for i in checkboxes:
+                        for k in DeviceDataColumn.query.filter_by(
+                            name=i,
+                            device_id=dev.id,
+                        ):
+                            k.use = True
+                            if i in defaults:
+                                k.default = True
+                    for j in DeviceTimeColumn.query.filter_by(
+                        name=radio,
+                        device_id=dev.id,
+                    ):
+                        j.use = True
+                    dev.time_format = time_format
+                    dev.full_name = full_name
+                    db.session.commit()
 
-                try:
-                    preprocess_device_data(full_name)
-                    make_graph(full_name, 'full')
-                    make_graph(full_name, 'recent')
+                    try:
+                        preprocess_device_data(full_name)
+                        make_graph(full_name, 'full')
+                        make_graph(full_name, 'recent')
 
-                except TimeFormatError:
+                    except TimeFormatError:
+                        return get_admin_template(
+                            self,
+                            'Формат времени не подходит под столбец',
+                        )
+
+                    except ColumnsMatchError:
+                        return get_admin_template(
+                            self,
+                            'Обнаружено несовпадение столбцов',
+                        )
+
+                    except ValueError:
+                        return get_admin_template(
+                            self,
+                            'Невозможно предобработать данные '
+                            'по выбранным столбцам',
+                        )
+
+                    except Exception as e:
+                        error = e.__class__.__name__
+                        return get_admin_template(
+                            self,
+                            f'Непредвиденная ошибка: {error}',
+                        )
+                else:
                     return get_admin_template(
                         self,
-                        'Формат времени не подходит под столбец',
-                    )
-
-                except ColumnsMatchError:
-                    return get_admin_template(
-                        self,
-                        'Обнаружено несовпадение столбцов',
-                    )
-
-                except ValueError:
-                    return get_admin_template(
-                        self,
-                        'Невозможно предобработать данные '
-                        'по выбранным столбцам',
-                    )
-
-                except Exception as e:
-                    error = e.__class__.__name__
-                    return get_admin_template(
-                        self,
-                        f'Непредвиденная ошибка: {error}',
+                        f'Не совпадают списки столбцов.',
                     )
 
             for dev in all_devices:
