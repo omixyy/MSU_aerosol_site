@@ -161,6 +161,7 @@ class AdminHomeView(AdminIndexView):
                         preprocess_device_data(full_name)
                         make_graph(full_name, 'full')
                         make_graph(full_name, 'recent')
+
                     except TimeFormatError:
                         return get_admin_template(
                             self,
