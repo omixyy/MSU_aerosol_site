@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from io import BytesIO
 import os
 from pathlib import Path
@@ -123,10 +123,13 @@ def preprocessing_one_file(
     if not Path(f'proc_data/{device}').exists():
         Path(f'proc_data/{device}').mkdir(parents=True)
     try:
-        df[time_col] = pd.to_datetime(
-            df[time_col],
-            format=make_format_date(device_obj.time_format),
-        )
+        if time_col == 'timestamp':
+            df[time_col] = pd.to_datetime(df[time_col], unit='s')
+        else:
+            df[time_col] = pd.to_datetime(
+                df[time_col],
+                format=make_format_date(device_obj.time_format),
+            )
     except (TypeError, ValueError):
         if not app:
             raise TimeFormatError('Проблемы с форматом времени')
@@ -314,6 +317,7 @@ def make_graph(
         linecolor='black',
         mirror=True,
         tickformat='%H:%M\n%d.%m.%Y',
+        minor_griddash="dot"
     )
     fig.update_yaxes(
         gridcolor='grey',

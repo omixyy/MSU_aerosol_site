@@ -9,7 +9,7 @@ from msu_aerosol.commands import create_superuser
 from msu_aerosol.models import db
 from views.about import About
 from views.archive import Archive, DeviceArchive
-from views.contacts import Contacts
+from views.contacts import DevelopersContacts, ACContacts
 from views.device import DeviceDownload, DevicePage, DeviceUpload
 from views.homepage import Home
 from views.users import Login, Logout, Profile, Register
@@ -51,8 +51,12 @@ app.add_url_rule(
     view_func=DeviceArchive.as_view('device_archive'),
 )
 app.add_url_rule(
+    '/developers_contacts',
+    view_func=DevelopersContacts.as_view('developers_contacts'),
+)
+app.add_url_rule(
     '/contacts',
-    view_func=Contacts.as_view('contacts'),
+    view_func=ACContacts.as_view('ac_contacts'),
 )
 app.add_url_rule(
     '/devices/<int:device_id>',
