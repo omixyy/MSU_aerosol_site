@@ -17,3 +17,43 @@ h4 {
   height: 600px;
   text-align: center;
 }
+
+.row_new {
+  margin-top: 0.1%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+img {
+  border-radius: 15px;
+}
+
+img.wide {
+  width: 100%;
+}
+
+img.wide:hover {
+  opacity: 0.75;
+}
+
+.header_img_default {
+  width: 15%;
+  height: 7.5%;
+}
+
+.header_img_wide {
+  width: 9%;
+  height: 9%;
+}
+
+.header_img_mega_wide {
+  width: 32%;
+  height: 15%;
+}
+
+.header_img_medium {
+  width: 16.5%;
+  height: 9%;
+}
