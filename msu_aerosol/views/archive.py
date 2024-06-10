@@ -10,7 +10,7 @@ from flask_login import current_user
 
 from msu_aerosol.admin import get_complexes_dict
 from msu_aerosol.graph_funcs import disk
-from msu_aerosol.models import Device, db
+from msu_aerosol.models import db, Device
 
 __all__: list = []
 
