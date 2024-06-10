@@ -9,7 +9,7 @@ from msu_aerosol.commands import create_superuser
 from msu_aerosol.models import db
 from views.about import About
 from views.archive import Archive, DeviceArchive
-from views.contacts import DevelopersContacts, ACContacts
+from views.contacts import ACContacts, DevelopersContacts
 from views.device import DeviceDownload, DevicePage, DeviceUpload
 from views.homepage import Home
 from views.users import Login, Logout, Profile, Register

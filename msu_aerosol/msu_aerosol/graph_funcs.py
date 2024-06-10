@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from io import BytesIO
 import os
 from pathlib import Path
@@ -317,7 +317,7 @@ def make_graph(
         linecolor='black',
         mirror=True,
         tickformat='%H:%M\n%d.%m.%Y',
-        minor_griddash="dot"
+        minor_griddash='dot',
     )
     fig.update_yaxes(
         gridcolor='grey',
