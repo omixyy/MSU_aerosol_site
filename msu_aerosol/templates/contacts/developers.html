@@ -7,52 +7,45 @@
   <div class="mx-auto head">
     <h1>Наша команда</h1>
   </div>
-  <div class="member_holder my-5 ms-5">
-    <img
-            class="round"
-            src="{{ url_for('static', filename='img/devs/webdev.jpg') }}"
-            width="222"
-            align="left"
-            hspace="2%"
-            style="margin-bottom: 2.55%;"
-            alt=""
-    />
-    <img
-            src="{{ url_for('static', filename='img/qrs/webdev_qr.png') }}"
-            width="222"
-            align="left"
-            hspace="2%"
-    >
-    <br><br>
-    <p style="width: 768px;">
-      Backend и frontend разработчик, тестировщик<br>
-      <a href="https://t.me/omixyy" target="_blank"><i class="fa fa-telegram"></i></a>
-      <a href="https://github.com/omixyy" target="_blank"><i class="fa fa-github"></i></a>
-    </p>
-  </div>
-  <br><br>
-  <div class="member_holder my-5 ms-5">
-    <img
-            class="round"
-            src="{{ url_for('static', filename='img/devs/datascientist.jpg') }}"
-            width="222"
-            align="left"
-            hspace="2%"
-            style="margin-bottom: 2.55%;"
-            alt=""
-    />
-    <img
-            src="{{ url_for('static', filename='img/qrs/datascientist_qr.png') }}"
-            width="222"
-            align="left"
-            hspace="2%"
-    >
-    <br><br>
-    <p style="width: 768px;">
-      Аналитик данных, разработчик Телеграм-бота.<br>
-      <a href="https://t.me/lotossoks" target="_blank"><i class="fa fa-telegram"></i></a>
-      <a href="https://github.com/lotoossoks" target="_blank"><i class="fa fa-github"></i></a>
-    </p>
-  </div>
+    <div class="col member_holder my-5 ms-5">
+      <img
+              class="round"
+              src="{{ url_for('static', filename='img/devs/webdev.jpg') }}"
+              width="222"
+              align="left"
+              alt=""
+      />
+      <img
+              src="{{ url_for('static', filename='img/qrs/webdev_qr.png') }}"
+              width="222"
+              hspace="2%"
+      >
+      <br><br>
+      <p style="width: 768px; font-size: 21px;">
+        Backend и frontend разработчик, тестировщик
+        <a href="https://t.me/omixyy" target="_blank"><i class="fa fa-telegram"></i></a>
+        <a href="https://github.com/omixyy" target="_blank"><i class="fa fa-github"></i></a>
+      </p>
+    </div>
+
+    <div class="col member_holder my-5 ms-5">
+      <img
+              class="round"
+              src="{{ url_for('static', filename='img/devs/datascientist.jpg') }}"
+              width="222"
+              alt=""
+      />
+      <img
+              src="{{ url_for('static', filename='img/qrs/datascientist_qr.png') }}"
+              width="222"
+              hspace="2%"
+      >
+      <br><br>
+      <p style="width: 768px; font-size: 21px;">
+        Аналитик данных, разработчик Телеграм-бота.
+        <a href="https://t.me/lotossoks" target="_blank"><i class="fa fa-telegram"></i></a>
+        <a href="https://github.com/lotoossoks" target="_blank"><i class="fa fa-github"></i></a>
+      </p>
+    </div>
 
 {% endblock %}
