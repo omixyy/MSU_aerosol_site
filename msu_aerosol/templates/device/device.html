@@ -53,36 +53,20 @@
                   step="any"
           >
         </div>
-        <div class="col download">
-          {% if user and user.is_authenticated %}
-            <button type="submit" id="download" class="btn btn-outline-dark my-4">Скачать</button>
-          {% endif %}
-        </div>
       </div>
-    </form>
-    <div class="fluid-container button_row_container">
-      <div class="row">
-        <div class="col-2">
-          <button onclick="updateGraph()" class="btn btn-dark">Подтвердить</button>
-        </div>
+      <div style="width: 40%;">
+        {% if user and user.is_authenticated %}
+          <button type="submit" id="download" class="btn btn-outline-dark mb-4" >Скачать</button>
+        {% endif %}
+        <button onclick="updateGraph()" class="btn btn-dark mb-4">Подтвердить</button>
+      </div>
+      <button type="submit" class="btn btn-dark commit_button mb-4">Отправить</button>
         {% if user.is_authenticated and user.role.can_upload_data %}
-            <div class="col-3">
-            <form method="POST" name="file_sender" enctype="multipart/form-data" action="{{ url_for('device_upload', device_id=device.id) }}">
-              <div class="fluid-container">
-                <div class="row">
-                  <div class="col-7 send_button">
-                    <button type="submit" class="btn btn-dark commit_button">Отправить</button>
-                  </div>
-                  <div class="form-file col-4 mt-1">
-                    <input type="file" class="form-file-input" id="customFile" name="file">
-                  </div>
-                </div>
-              </div>
-            </form>
+          <div class="mb-3" style="width: 320px;">
+            <input class="form-control" type="file" id="formFile">
           </div>
         {% endif %}
-      </div>
-    </div>
+    </form>
   </div>
   <div class="graph_container" id="graphDiv">
     {% include "includes/devices/full/graph_" ~ device.full_name ~ ".html"  %}
