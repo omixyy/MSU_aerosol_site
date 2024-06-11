@@ -155,7 +155,6 @@ class AdminHomeView(AdminIndexView):
                     dev.time_format = time_format
                     dev.full_name = full_name
                     db.session.commit()
-                    preprocess_device_data(full_name)
 
                     try:
                         preprocess_device_data(full_name)
