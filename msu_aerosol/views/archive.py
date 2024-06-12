@@ -61,7 +61,7 @@ class DeviceArchive(MethodView):
         path = f'data/{device.full_name}'
         files = sorted(
             os.listdir(path),
-            key=lambda x: datetime.strptime(x[0:6], '%Y-%m'),
+            key=lambda x: datetime.strptime(x[0:7], '%Y-%m'),
         )
         return render_template(
             'archive/device_archive.html',
