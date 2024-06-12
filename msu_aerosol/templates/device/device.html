@@ -70,7 +70,7 @@
         {% endif %}
     </form>
   </div>
-  <div class="graph_container" id="graphDiv">
+  <div class="graph_container" id="#{{ device }}">
     {% include "includes/devices/full/graph_" ~ device.full_name ~ ".html"  %}
   </div>
 {% endblock %}
