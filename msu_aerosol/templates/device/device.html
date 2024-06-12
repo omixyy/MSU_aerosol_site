@@ -54,13 +54,13 @@
           >
         </div>
       </div>
-      <div style="width: 40%;">
+      <div style="width: 50%;">
         {% if user and user.is_authenticated %}
           <button type="submit" id="download" class="btn btn-outline-dark mb-4" >Скачать</button>
         {% endif %}
         <button onclick="updateGraph()" class="btn btn-dark mb-4">Подтвердить</button>
+        <button type="submit" class="btn btn-dark commit_button mb-4">Отправить</button>
       </div>
-      <button type="submit" class="btn btn-dark commit_button mb-4">Отправить</button>
         {% if user.is_authenticated and user.role.can_upload_data %}
           <div class="mb-3" style="width: 320px;">
             <input class="form-control" type="file" id="formFile">
