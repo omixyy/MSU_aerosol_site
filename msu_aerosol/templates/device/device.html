@@ -23,8 +23,8 @@
       </div>
     {% endif %}
     <form method="POST" name="datetime_picker" action="{{ url_for('device_download', device_id=device.id) }}">
-      <div class="row calendar_row">
-        <div class="col calendars">
+      <div class="row">
+        <div class="col">
           <label for="datetime_picker_start" class="control-label">Начало</label>
           <input
                   id="datetime_picker_start"
@@ -35,12 +35,13 @@
                   max={{ max_date }}
                   value={{ min_date }}
                   step="any"
+                  style="width: 65%;"
           >
         </div>
         <div class="arrow">
           &rarr;
         </div>
-        <div class="col calendars">
+        <div class="col">
           <label for="datetime_picker_end" class="control-label">Конец</label>
           <input
                   id="datetime_picker_end"
@@ -51,18 +52,19 @@
                   max={{ max_date }}
                   value={{ max_date }}
                   step="any"
+                  style="width: 65%;"
           >
         </div>
       </div>
-      <div style="width: 50%;">
+      <div class="row_buttons">
         {% if user and user.is_authenticated %}
-          <button type="submit" id="download" class="btn btn-outline-dark mb-4" >Скачать</button>
+          <button type="submit" id="download" class="col_button btn btn-outline-dark mb-4" >Скачать</button>
         {% endif %}
-        <button onclick="updateGraph()" class="btn btn-dark mb-4">Подтвердить</button>
-        <button type="submit" class="btn btn-dark commit_button mb-4">Отправить</button>
+        <button onclick="updateGraph()" class="col_button btn btn-dark mb-4">Подтвердить</button>
+        <button type="submit" class="col_button btn btn-dark commit_button mb-4">Отправить</button>
       </div>
         {% if user.is_authenticated and user.role.can_upload_data %}
-          <div class="mb-3" style="width: 320px;">
+          <div class="mb-3" style="width: 23%;">
             <input class="form-control" type="file" id="formFile">
           </div>
         {% endif %}

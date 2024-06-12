@@ -11,12 +11,24 @@
   margin-top: 1%;
 }
 
-.message, calendars, download {
+.message, download {
   width: 20%;
 }
 
+.row {
+  width: 30%;
+}
+
+.row_buttons {
+  width: 30%;
+}
+
+.col_button {
+  width: 25%;
+}
+
 .calendar_row {
-  width: 40%;
+  width: 20%;
   margin-top: 1%;
 }
 
@@ -25,9 +37,10 @@
 }
 
 .arrow {
-  width: 10%;
+  width: 5%;
   text-align: center;
   line-height: 90px;
+  margin-left: -20%;
 }
 
 commit_button {
