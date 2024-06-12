@@ -4,3 +4,25 @@
   margin-bottom: 2%;
   border-radius: 10px;
 }
+
+h5 {
+  margin-top: 15%;
+}
+
+.rounded {
+  margin-top: -8%;
+  border-radius: 111px;
+}
+
+iframe {
+  border-radius: 10px;
+}
+
+.framer {
+  float: right;
+  margin-right: 5%;
+  margin-bottom: 5%;
+  margin-top: -2%;
+  text-align: center;
+  overflow: hidden;
+}

@@ -6,23 +6,47 @@
     <h1>Контакты</h1>
   </div>
   <div class="main">
-    <script
-            type="text/javascript"
-            charset="utf-8"
-            async
-            src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Aa4691f2eda0d9e069afd6459c2400d89f80fdcd943567bfa97014712890fcd0c&amp;width=500&amp;height=400&amp;lang=ru_RU&amp;scroll=true"
-    >
-    </script>
-    <p style="font-style: italic; margin-top: 2%;">
-      <a href="https://www.youtube.com/watch?v=loC8aWlrxwY&t=2s" target="_blank">
-        Видео о проекте Аэрозольного комплекса
-      </a>
-    </p>
-    <p style="font-style: italic; margin-top: 2%;">
-      Ведущий научный сотрудник Географического факультета МГУ Поповичева Ольга Борисовна:
-      <a href="mailto:olga.popovicheva@gmail.com">
-        olga.popovicheva@gmail.com
-      </a>
-    </p>
+    <div class="framer">
+      <h4>Расположение АК МГУ</h4>
+      <iframe
+              src="https://yandex.ru/map-widget/v1/?um=constructor%3Aa4691f2eda0d9e069afd6459c2400d89f80fdcd943567bfa97014712890fcd0c&amp;source=constructor"
+              width="800"
+              height="600"
+              frameborder="0"
+      ></iframe>
+    </div>
+    <div style="width: 35%;">
+      <h5>
+        <img
+                class="rounded"
+                src="{{ url_for('static', filename='img/users/holder.png') }}"
+                width="222"
+                alt=""
+                align="left"
+                vspace="5"
+                hspace="5"
+        />
+        Поповичева Ольга Борисовна, ведущий научный сотрудник Географического факультета МГУ, НИИЯФ МГУ, к.ф.-м.н.
+        <a href="mailto:olga.popovicheva@gmail.com">
+          olga.popovicheva@gmail.com
+        </a>
+      </h5>
+    </div>
+    <br><br><br><br>
+    <div style="text-align: center; float: left;">
+      <h4>
+        Об Аэрозольном комплексе
+      </h4>
+      <iframe
+              width="640"
+              height="360"
+              src="https://www.youtube.com/embed/loC8aWlrxwY"
+              title="Об  инструментальном  аэрозольном комплексе рассказывают Н.С. Касимов и О.Б. Поповичева"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+      ></iframe>
+    </div>
   </div>
 {% endblock %}
