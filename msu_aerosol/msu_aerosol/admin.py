@@ -9,7 +9,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, request
 from flask_admin import Admin
 from flask_admin import AdminIndexView, expose
-from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, LoginManager
 from sqlalchemy.event import listens_for
 
@@ -386,7 +385,7 @@ def init_admin(app: Flask) -> None:
 
     login_manager.init_app(app)
     admin.init_app(app)
-    admin.add_view(ModelView(Complex, db.session))
+    admin.add_view(ProtectedView(Complex, db.session))
     admin.add_view(DeviceView(Device, db.session))
     admin.add_view(UserFieldView(User, db.session))
     admin.add_view(ProtectedView(Role, db.session))
