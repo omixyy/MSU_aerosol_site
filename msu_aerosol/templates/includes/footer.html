@@ -2,56 +2,57 @@
 <footer>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts/font-awesome.min.css') }}">
   <div class="footer">
-    <img src="{{ url_for('static', filename='img/MSU_logo.png') }}" width="150" height="150" alt=""
-           style="float: right; margin-right: 3%; margin-top: 4%">
+    <img src="{{ url_for('static', filename='img/MSU_logo.png') }}" width="120" height="120" alt=""
+           style="float: right; margin-right: 3%; margin-top: 1%">
     <div class="container-fluid">
       <div class="row">
-        <ul>
-          <li>
-            <a href="https://t.me/omixyy" target="_blank">
-              <i class="fa fa-telegram"></i>
-            </a>
-          </li>
-          <li>
-            <a href="https://vk.com/omixyy" target="_blank">
-              <i class="fa fa-vk">
-              </i>
-            </a>
-          </li>
-          <li>
-            <a href="https://github.com/omixyy/MSU_aerosol_site" target="_blank">
-              <i class="fa fa-github"></i>
-            </a>
-          </li>
-        </ul>
+        <div class="col">
+          <h5 style="color: white;">О проекте</h5>
+          <div style="margin-left: -20%;">
+            <ul>
+              <li style="width: 100%">
+                <a href="https://www.geogr.msu.ru/science/projects/IAC/" target="_blank">Об Аэрозольном комплексе</a>
+              </li>
+              <li style="width: 100%">
+                <a href="{{ url_for('static', filename='pdf/description.pdf') }}" target="_blank">Описание сайта</a>
+              </li>
+              <li style="width: 100%">
+                <a href="{{ url_for('developers_contacts') }}">О разработчиках</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col">
+          <h5 style="color: white;">Ресурсы МГУ</h5>
+          <div style="margin-left: -20%;">
+            <ul>
+              <li>
+                <a href="http://www.geogr.msu.ru/" target="_blank">Географический факультет МГУ</a>
+              </li>
+              <li style="width: 100%">
+                <a href="http://www.momsu.ru/" target="_blank">Метеостанция МГУ</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col">
+          <h5 style="color: white;">
+            Сторонние ресурсы
+          </h5>
+          <div style="margin-left: -20%;">
+            <ul>
+              <li style="width: 100%">
+                <a href="https://mosecom.mos.ru" target="_blank">Мосэкомониторинг</a>
+              </li>
+              <li style="width: 100%">
+                <a href="https://www.minobrnauki.gov.ru" target="_blank">Минобрнауки</a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <div class="row">
-        <ul>
-          <li style="width: 100%">
-            <a href="https://www.geogr.msu.ru/science/projects/IAC/" target="_blank">Об Аэрозольном комплексе</a>
-          </li>
-          <li>
-            <a href="http://www.geogr.msu.ru/" target="_blank">Географический факультет МГУ</a>
-          </li>
-          <li style="width: 100%">
-            <a href="http://www.momsu.ru/" target="_blank">Метеостанция МГУ</a>
-          </li>
-          <li style="width: 100%">
-            <a href="https://mosecom.mos.ru" target="_blank">Мосэкомониторинг</a>
-          </li>
-          <li style="width: 100%">
-            <a href="https://www.minobrnauki.gov.ru" target="_blank">Минобрнауки</a>
-          </li>
-          <li style="width: 100%">
-            <a href="{{ url_for('static', filename='pdf/description.pdf') }}" target="_blank">Описание сайта</a>
-          </li>
-          <li style="width: 100%">
-            <a href="{{ url_for('developers_contacts') }}">О разработчиках</a>
-          </li>
-        </ul>
-      </div>
-      <div class="row" style="margin-left: 2%">
-        MSU Copyright © {{ now.year }} MSU - All rights reserved
+      <div class="container-fluid">
+        <p style="color: grey;">MSU Copyright © {{ now.year }} MSU - All rights reserved</p>
       </div>
     </div>
   </div>
