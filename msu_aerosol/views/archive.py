@@ -59,7 +59,7 @@ class DeviceArchive(MethodView):
             device.full_name = disk.get_public_meta(device.link)['name']
             db.session.commit()
         path = f'data/{device.full_name}'
-        files = sorted(os.listdir(path), key=lambda x: datetime.strptime(x, '%Y-%m'))
+        files = sorted(os.listdir(path), key=lambda x: datetime.strptime(x[0:6], '%Y-%m'))
         return render_template(
             'archive/device_archive.html',
             now=datetime.now(),
