@@ -42,12 +42,17 @@ __all__ = []
 application = None
 
 
-def get_admin_template(obj: AdminIndexView, message: str | None) -> str:
+def get_admin_template(
+    obj: AdminIndexView,
+    error: str | None = None,
+    success: str | None = None,
+) -> str:
     """
     Функция, возвращающая шаблон домашней страницы админки.
 
     :param obj: Объект представления админки
-    :param message: Сообщение на странице (ошибка)
+    :param error: Сообщение на странице (ошибка)
+    :param success: Сообщение на странице (успех)
     :return: Шаблон админки
     """
 
@@ -57,7 +62,8 @@ def get_admin_template(obj: AdminIndexView, message: str | None) -> str:
             disk.get_public_meta(dev.link)['name']: dev
             for dev in Device.query.filter_by(archived=False).all()
         },
-        message_error=message,
+        message_error=error,
+        message_success=success,
     )
 
 
@@ -88,6 +94,45 @@ class AdminHomeView(AdminIndexView):
         all_devices = Device.query.filter_by(archived=False).all()
 
         if request.method == 'POST':
+            reload = request.form.get('device')
+            if reload:
+                device_record = Device.query.filter_by(full_name=reload)
+                device = device_record.first()
+                remove_device_data(reload)
+
+                dev_id = device.id
+                name = device.name
+                full_name = device.full_name
+                link = device.link
+                show = device.show
+                serial_number = device.serial_number
+                archived = device.archived
+                complex_id = device.complex_id
+                device_record.delete()
+
+                cols = DeviceDataColumn.query.filter_by(device_id=dev_id)
+                time_cols = DeviceTimeColumn.query.filter_by(device_id=dev_id)
+                cols.delete()
+                time_cols.delete()
+
+                new_device = Device(
+                    id=dev_id,
+                    name=name,
+                    full_name=full_name,
+                    link=link,
+                    show=show,
+                    serial_number=serial_number,
+                    archived=archived,
+                    complex_id=complex_id,
+                )
+                db.session.add(new_device)
+                db.session.commit()
+                download_device_data(new_device.link)
+                return get_admin_template(
+                    self,
+                    success='Данные успешно обновлены',
+                )
+
             changed = []
             for dev in all_devices:
                 full_name = dev.full_name
@@ -163,19 +208,19 @@ class AdminHomeView(AdminIndexView):
                     except TimeFormatError:
                         return get_admin_template(
                             self,
-                            'Формат времени не подходит под столбец',
+                            error='Формат времени не подходит под столбец',
                         )
 
                     except ColumnsMatchError:
                         return get_admin_template(
                             self,
-                            'Обнаружено несовпадение столбцов',
+                            error='Обнаружено несовпадение столбцов',
                         )
 
                     except ValueError:
                         return get_admin_template(
                             self,
-                            'Невозможно предобработать данные '
+                            error='Невозможно предобработать данные '
                             'по выбранным столбцам',
                         )
 
@@ -183,19 +228,19 @@ class AdminHomeView(AdminIndexView):
                         error = e.__class__.__name__
                         return get_admin_template(
                             self,
-                            f'Непредвиденная ошибка: {error}',
+                            error=f'Непредвиденная ошибка: {error}',
                         )
                 else:
                     return get_admin_template(
                         self,
-                        'Не совпадают списки столбцов.',
+                        error='Не совпадают списки столбцов.',
                     )
 
             for dev in all_devices:
                 dev.show = True
                 db.session.commit()
 
-        return get_admin_template(self, None)
+        return get_admin_template(self)
 
 
 def get_complexes_dict() -> dict[Complex, list[Device]]:
@@ -290,6 +335,31 @@ def after_insert(mapper, connection, target) -> None:
                 db.session.add(time_col)
 
 
+def remove_device_data(full_name: str) -> None:
+    """
+    Удаляет все файлы прибора.
+
+    :param full_name: Полное название прибора
+    :return: None
+    """
+
+    graph_full = f'templates/includes/devices/full/graph_{full_name}.html'
+    graph_rec = f'templates/includes/devices/recent/graph_{full_name}.html'
+    proc_data = f'proc_data/{full_name}'
+    data = f'data/{full_name}'
+    if Path(graph_full).exists():
+        Path(graph_full).unlink()
+
+    if Path(graph_rec).exists():
+        Path(graph_rec).unlink()
+
+    if Path(proc_data).exists():
+        shutil.rmtree(proc_data)
+
+    if Path(data).exists():
+        shutil.rmtree(data)
+
+
 @listens_for(Device, 'after_delete')
 def after_delete(mapper, connection, target) -> None:
     """
@@ -306,21 +376,7 @@ def after_delete(mapper, connection, target) -> None:
     """
 
     full_name = disk.get_public_meta(target.link)['name']
-    graph_full = f'templates/includes/devices/full/graph_{full_name}.html'
-    graph_rec = f'templates/includes/devices/recent/graph_{full_name}.html'
-    proc_data = f'proc_data/{full_name}'
-    data = f'data/{full_name}'
-    if Path(graph_full).exists():
-        Path(graph_full).unlink()
-
-    if Path(graph_rec).exists():
-        Path(graph_rec).unlink()
-
-    if Path(proc_data).exists():
-        shutil.rmtree(proc_data)
-
-    if Path(data).exists():
-        shutil.rmtree(data)
+    remove_device_data(full_name)
 
 
 admin: Admin = Admin(
