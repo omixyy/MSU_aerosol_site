@@ -80,7 +80,9 @@ def download_device_data(url: str) -> None:
     for i in items['embedded']['items']:
         if not Path(f'{main_path}/{full_name}').exists():
             Path(f'{main_path}/{full_name}').mkdir(parents=True)
-        if i['name'].endswith('.csv') or i['name'].endswith('.txt'):
+        if i['name'].endswith('.csv') or (
+            i['name'].endswith('.txt') and full_name == '_Today'
+        ):
             disk.download_by_link(
                 i['file'],
                 f'{main_path}/{full_name}/{i["name"]}',
