@@ -304,7 +304,10 @@ def after_insert(mapper, connection, target) -> None:
         if x.endswith('.csv') or x.endswith('.txt')
     ][0]
     dialect = get_dialect(f'data/{full_name}/{file}')
-    with Path(f'data/{full_name}/{file}').open('r') as csv_file:
+    with Path(f'data/{full_name}/{file}').open(
+        'r',
+        encoding='latin' if file.endswith('.txt') else 'utf8',
+    ) as csv_file:
         header = list(csv.reader(csv_file, dialect=dialect))[0]
         colors = get_spaced_colors(len(header))
 
