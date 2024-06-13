@@ -41,7 +41,7 @@ def make_visible_date_format(date: str) -> str:
 def download_last_modified_file(links, app=None) -> None:
     list_data_path = []
     for link in links:
-        meta = disk.get_public_meta(link)
+        meta = disk.get_public_meta(link, limit=1000)
         full_name = meta['name']
         last_modified_file = sorted(
             filter(
@@ -71,7 +71,7 @@ def download_last_modified_file(links, app=None) -> None:
 
 
 def download_device_data(url: str) -> None:
-    items = disk.get_public_meta(url)
+    items = disk.get_public_meta(url, limit=1000)
     full_name = items['name']
     for i in items['embedded']['items']:
         if not Path(f'{main_path}/{full_name}').exists():
@@ -85,7 +85,7 @@ def download_device_data(url: str) -> None:
 
 def preprocess_device_data(name_folder: str) -> None:
     for name_file in os.listdir(f'{main_path}/{name_folder}'):
-        if not name_file.endswith('.csv'):
+        if not name_file.endswith('.csv') and not name_file.endswith('.txt'):
             Path(f'{main_path}/{name_folder}/{name_file}').unlink()
     for name_file in os.listdir(f'{main_path}/{name_folder}'):
         preprocessing_one_file(
@@ -115,13 +115,22 @@ def preprocessing_one_file(
     user_upload=False,
     app=None,
 ) -> None:
-    df = pd.read_csv(
-        path,
-        sep=None,
-        engine='python',
-        decimal=',',
-        on_bad_lines='skip',
-    )
+    if path.endswith('.csv'):
+        df = pd.read_csv(
+            path,
+            sep=None,
+            engine='python',
+            decimal=',',
+            on_bad_lines='skip',
+        )
+    else:
+        df = pd.read_csv(
+            path,
+            sep='\t',
+            encoding='latin',
+            decimal=',',
+            on_bad_lines='skip',
+        )
     if df.shape[0] == 0:
         return
     device_obj = get_device_by_name(device, app=app)

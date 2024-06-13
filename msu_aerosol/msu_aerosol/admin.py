@@ -301,7 +301,7 @@ def after_insert(mapper, connection, target) -> None:
         for x in os.listdir(
             f'data/{full_name}',
         )
-        if x.endswith('.csv')
+        if x.endswith('.csv') or x.endswith('.txt')
     ][0]
     dialect = get_dialect(f'data/{full_name}/{file}')
     with Path(f'data/{full_name}/{file}').open('r') as csv_file:
