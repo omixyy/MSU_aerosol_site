@@ -42,7 +42,8 @@ def make_visible_date_format(date: str) -> str:
 def download_last_modified_file(links, app=None) -> None:
     list_data_path = []
     for link in links:
-        full_name = disk.get_public_meta(link)['name']
+        meta = disk.get_public_meta(link)
+        full_name = meta['name']
         last_modified_file = sorted(
             filter(
                 lambda y: y['name'].endswith('.csv'),
@@ -50,11 +51,10 @@ def download_last_modified_file(links, app=None) -> None:
             ),
             key=lambda x: x['modified'],
         )[-1]
-        download_response = requests.get(last_modified_file['file'])
-        file_path = f'data/{full_name}/{last_modified_file["name"]}'
-        list_data_path.append([full_name, file_path])
-        with Path(file_path).open('wb') as f:
-            f.write(download_response.content)
+        disk.download_by_link(
+            last_modified_file['file'],
+            f'{main_path}/{full_name}/{last_modified_file["name"]}',
+        )
     for i in list_data_path:
         if app:
             with app.app_context():
