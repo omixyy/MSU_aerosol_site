@@ -50,10 +50,12 @@ def download_last_modified_file(links, app=None) -> None:
             ),
             key=lambda x: x['modified'],
         )[-1]
+        file_path = f'data/{full_name}/{last_modified_file["name"]}'
         disk.download_by_link(
             last_modified_file['file'],
             f'{main_path}/{full_name}/{last_modified_file["name"]}',
         )
+        list_data_path.append([full_name, file_path])
     for i in list_data_path:
         if app:
             with app.app_context():
