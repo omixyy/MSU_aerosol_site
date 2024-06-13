@@ -62,7 +62,7 @@ class DeviceArchive(MethodView):
         files = sorted(
             os.listdir(path),
             key=lambda x: datetime.strptime(
-                x[0:7],
+            x[0:10] if '_Today' == device.full_name else x[0:7],
                 '%Y-%m-%d' if '_Today' == device.full_name else '%Y_%m',
             ),
         )
