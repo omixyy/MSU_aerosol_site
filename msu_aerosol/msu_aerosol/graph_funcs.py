@@ -115,6 +115,21 @@ def get_columns(device_obj):
     return Device.query.filter_by(id=device_obj.id).first().columns
 
 
+def proc_spaces(df, time_col):
+    df = df.sort_values(by=time_col)
+    diff_mode = df[time_col].diff().mode().values[0] * 1.1
+    new_rows = []
+    for i in range(len(df) - 1):
+        diff = df.loc[i + 1, time_col] - df.loc[i, time_col]
+        if diff > diff_mode:
+            new_date1 = df.loc[i, time_col] + pd.Timedelta(seconds=1)
+            new_date2 = df.loc[i + 1, time_col] - pd.Timedelta(seconds=1)
+            new_row1 = {time_col: new_date1}
+            new_row2 = {time_col: new_date2}
+            new_rows.extend([new_row1, new_row2])
+    return pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True)
+
+
 def preprocessing_one_file(
     device: str,
     path: str,
@@ -166,18 +181,7 @@ def preprocessing_one_file(
         if not app:
             raise TimeFormatError('Проблемы с форматом времени')
         return
-    df = df.sort_values(by=time_col)
-    diff_mode = df[time_col].diff().mode().values[0] * 1.1
-    new_rows = []
-    for i in range(len(df) - 1):
-        diff = df.loc[i + 1, time_col] - df.loc[i, time_col]
-        if diff > diff_mode:
-            new_date1 = df.loc[i, time_col] + pd.Timedelta(seconds=1)
-            new_date2 = df.loc[i + 1, time_col] - pd.Timedelta(seconds=1)
-            new_row1 = {time_col: new_date1}
-            new_row2 = {time_col: new_date2}
-            new_rows.extend([new_row1, new_row2])
-    df = pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True)
+    df = proc_spaces(df, time_col)
     for year in df[time_col].dt.year.unique():
         for month in df[time_col].dt.month.unique():
             df_month = df.loc[
@@ -279,6 +283,7 @@ def make_graph(
         except FileNotFoundError:
             current_date += timedelta(days=29)
     combined_data[time_col] = pd.to_datetime(combined_data[time_col])
+    combined_data = proc_spaces(combined_data, time_col)
     m = max(combined_data[time_col])
     last_48_hours = [m - timedelta(days=2), m]
     last_2_weeks = [m - timedelta(days=14), m]
