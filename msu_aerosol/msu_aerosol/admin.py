@@ -59,7 +59,11 @@ def get_admin_template(
     return obj.render(
         'admin/admin_home.html',
         name_to_device={
-            dev.full_name if dev.full_name else disk.get_public_meta(dev.link)['name']: dev
+            (
+                dev.full_name
+                if dev.full_name
+                else disk.get_public_meta(dev.link)['name']
+            ): dev
             for dev in Device.query.filter_by(archived=False).all()
         },
         message_error=error,
