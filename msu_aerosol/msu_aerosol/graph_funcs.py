@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
-import requests
 from yadisk import YaDisk
 
 from msu_aerosol.config import yadisk_token
