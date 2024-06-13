@@ -272,7 +272,10 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
     :return: Разделитель в таблице
     """
 
-    with Path(path).open('r') as f:
+    with Path(path).open(
+        'r',
+        encoding='latin' if path.endswith('.txt') else 'utf8',
+    ) as f:
         return csv.Sniffer().sniff(f.readline())
 
 
