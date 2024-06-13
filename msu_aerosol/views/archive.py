@@ -59,11 +59,21 @@ class DeviceArchive(MethodView):
             device.full_name = disk.get_public_meta(device.link)['name']
             db.session.commit()
         path = f'data/{device.full_name}'
+        listdir = os.listdir(path)
+        delimiter = listdir[0][4]
+        file = listdir[0]
+        try:
+            time_format = f'%Y{delimiter}%m{delimiter}%d'
+            time_slice = slice(0, 10)
+            datetime.strptime(file[time_slice], time_format)
+        except ValueError:
+            time_slice = slice(0, 7)
+            time_format = f'%Y{delimiter}%m'
         files = sorted(
-            os.listdir(path),
+            listdir,
             key=lambda x: datetime.strptime(
-                x[0:10] if '_Today' == device.full_name else x[0:7],
-                '%Y-%m-%d' if '_Today' == device.full_name else '%Y_%m',
+                x[time_slice],
+                time_format,
             ),
         )
         return render_template(
