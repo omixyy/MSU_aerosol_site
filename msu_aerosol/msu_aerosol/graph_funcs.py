@@ -45,7 +45,9 @@ def download_last_modified_file(links, app=None) -> None:
         full_name = meta['name']
         last_modified_file = sorted(
             filter(
-                lambda y: y['name'].endswith('.csv'),
+                lambda y: y['name'].endswith(
+                    '.txt' if '_Today' == full_name else '.csv',
+                ),
                 disk.get_public_meta(link, limit=1000)['embedded']['items'],
             ),
             key=lambda x: x['modified'],
