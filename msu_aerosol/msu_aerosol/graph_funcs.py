@@ -2,9 +2,6 @@ from datetime import timedelta
 from io import BytesIO
 import os
 from pathlib import Path
-import shutil
-from urllib.parse import urlencode
-from zipfile import ZipFile
 
 from hsluv import hsluv_to_rgb
 import numpy as np
@@ -74,23 +71,17 @@ def download_last_modified_file(links, app=None) -> None:
                 pass
 
 
-def download_device_data(url: str) -> str:
-    final_url = base_url + urlencode({'public_key': url})
-    response = requests.get(final_url)
-    download_url = response.json()['href']
-    download_response = requests.get(download_url)
-    with Path('yandex_disk_folder.zip').open('wb') as file:
-        file.write(download_response.content)
-    with ZipFile('yandex_disk_folder.zip', 'r') as zf:
-        zf.extractall(f'{main_path}')
-        full_name = disk.get_public_meta(url)['name']
-        for i in os.listdir(f'{main_path}/{full_name}'):
-            if not i.endswith('.csv'):
-                if Path(f'{main_path}/{full_name}/{i}').is_file():
-                    Path(f'{main_path}/{full_name}/{i}').unlink()
-                else:
-                    shutil.rmtree(f'{main_path}/{full_name}/{i}')
-        return zf.namelist()[-1][0:-1:]
+def download_device_data(url: str) -> None:
+    items = disk.get_public_meta(url)
+    full_name = items['name']
+    for i in items['embedded']['items']:
+        if not Path(f'{main_path}/{full_name}').exists():
+            Path(f'{main_path}/{full_name}').mkdir(parents=True)
+        if i['name'].endswith('.csv') or i['name'].endswith('.txt'):
+            disk.download_by_link(
+                i['file'],
+                f'{main_path}/{full_name}/{i["name"]}',
+            )
 
 
 def preprocess_device_data(name_folder: str) -> None:
