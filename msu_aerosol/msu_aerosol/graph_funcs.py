@@ -41,7 +41,7 @@ def make_visible_date_format(date: str) -> str:
 def download_last_modified_file(links: list[str], app=None) -> None:
     list_data_path = []
     for link in links:
-        full_name = Device.query.filter_by(link=link)
+        full_name = Device.query.filter_by(link=link).full_name
         last_modified_file = sorted(
             filter(
                 lambda y: y['name'].endswith(
