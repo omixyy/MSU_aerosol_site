@@ -43,9 +43,9 @@ def download_last_modified_file(links: list[str], app=None) -> None:
     for link in links:
         if app:
             with app.app_context():
-                full_name = Device.query.filter_by(link=link).full_name
+                full_name = Device.query.filter_by(link=link).first().full_name
         else:
-            full_name = Device.query.filter_by(link=link).full_name
+            full_name = Device.query.filter_by(link=link).first().full_name
         last_modified_file = sorted(
             filter(
                 lambda y: y['name'].endswith(
