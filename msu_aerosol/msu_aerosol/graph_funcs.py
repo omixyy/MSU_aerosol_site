@@ -209,7 +209,9 @@ def preprocessing_one_file(
                 df_month.drop_duplicates()
             if len(df_month) == 0:
                 continue
-            df_month = df_month.sort_values(by=time_col).drop_duplicates()
+            df_month = df_month.sort_values(by=time_col).drop_duplicates(
+                subset=[time_col]
+            )
             df_month.to_csv(file_path, index=False)
 
 
