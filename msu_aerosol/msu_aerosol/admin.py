@@ -271,7 +271,7 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
 
     with Path(path).open(
         'r',
-        encoding='latin' if csv_exists(str(Path(path).parent)) else 'utf8',
+        encoding='utf8' if csv_exists(str(Path(path).parent)) else 'latin',
     ) as f:
         return csv.Sniffer().sniff(f.readline())
 
@@ -306,7 +306,7 @@ def after_insert(mapper, connection, target) -> None:
     dialect = get_dialect(f'data/{full_name}/{file}')
     with Path(f'data/{full_name}/{file}').open(
         'r',
-        encoding='latin' if csv_exists(f'data/{full_name}') else 'utf8',
+        encoding='utf8' if csv_exists(f'data/{full_name}') else 'latin',
     ) as csv_file:
         header = list(csv.reader(csv_file, dialect=dialect))[0]
         colors = get_spaced_colors(len(header))
