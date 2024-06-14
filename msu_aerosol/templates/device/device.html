@@ -57,7 +57,7 @@
         </div>
       </div>
       <div class="row_buttons">
-        <button onclick="updateGraph()" class="col_button btn btn-dark mb-4">Подтвердить</button>
+        <button type="button" onclick="updateGraph()" class="col_button btn btn-dark mb-4">Подтвердить</button>
         {% if user and user.is_authenticated %}
           <button type="submit" id="download" class="col_button btn btn-outline-dark mb-4" >Скачать</button>
         {% endif %}
