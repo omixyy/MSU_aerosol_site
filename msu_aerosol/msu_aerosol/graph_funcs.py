@@ -94,9 +94,6 @@ def download_device_data(link: str) -> None:
 
 def preprocess_device_data(name_folder: str) -> None:
     for name_file in os.listdir(f'{main_path}/{name_folder}'):
-        if not name_file.endswith('.csv') and not name_file.endswith('.txt'):
-            Path(f'{main_path}/{name_folder}/{name_file}').unlink()
-    for name_file in os.listdir(f'{main_path}/{name_folder}'):
         preprocessing_one_file(
             name_folder,
             f'{main_path}/{name_folder}/{name_file}',
