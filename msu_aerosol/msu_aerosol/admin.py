@@ -271,7 +271,7 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
 
     with Path(path).open(
         'r',
-        encoding='latin' if csv_exists() else 'utf8',
+        encoding='latin' if csv_exists(path) else 'utf8',
     ) as f:
         return csv.Sniffer().sniff(f.readline())
 
