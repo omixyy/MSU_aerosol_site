@@ -22,7 +22,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right"></button>
       </div>
     {% endif %}
-    <form method="POST" name="datetime_picker" action="{{ url_for('device_download', device_id=device.id) }}">
+    <form method="POST" id="form_download" action="{{ url_for('device_download', device_id=device.id) }}">
       <div class="row">
         <div class="col">
           <label for="datetime_picker_start" class="control-label">Начало</label>
@@ -57,20 +57,24 @@
         </div>
       </div>
       <div class="row_buttons">
+        <button onclick="updateGraph()" class="col_button btn btn-dark mb-4">Подтвердить</button>
         {% if user and user.is_authenticated %}
           <button type="submit" id="download" class="col_button btn btn-outline-dark mb-4" >Скачать</button>
         {% endif %}
-        <button onclick="updateGraph()" class="col_button btn btn-dark mb-4">Подтвердить</button>
-        <button type="submit" class="col_button btn btn-dark commit_button mb-4">Отправить</button>
       </div>
-        {% if user.is_authenticated and user.role.can_upload_data %}
-          <div class="mb-3" style="width: 23%;">
-            <input class="form-control" type="file" id="formFile">
-          </div>
-        {% endif %}
     </form>
+    {% if user and user.is_authenticated and user.role.can_upload_data %}
+      <form method="POST" id="form_upload" action="{{ url_for('device_upload', device_id=device.id) }}" enctype="multipart/form-data">
+        <div class="row" style="width: 24%;">
+          <div class="mb-3 form-file col">
+            <input class="form-control" type="file" id="formFile" name="file">
+          </div>
+          <button type="submit" id="upload" class="col-4 btn btn-dark commit_button mb-4">Отправить</button>
+        </div>
+      </form>
+    {% endif %}
   </div>
   <div class="graph_container" id="#{{ device }}">
-    {% include "includes/devices/full/graph_" ~ device.full_name ~ ".html"  %}
+    {% include "includes/devices/full/graph_" ~ device.device_full_name ~ ".html"  %}
   </div>
 {% endblock %}

@@ -38,7 +38,9 @@ def get_device_template(device_id: int, **kwargs) -> str:
     device_orm_obj = Device.query.get_or_404(device_id)
     complex_orm_obj = Complex.query.get(device_orm_obj.complex_id)
     complex_to_device = get_complexes_dict()
-    device_to_name = {dev.name: dev.full_name for dev in Device.query.all()}
+    device_to_name = {
+        dev.name: dev.device_full_name for dev in Device.query.all()
+    }
     min_date, max_date = choose_range(device_to_name[device_orm_obj.name])
     return render_template(
         'device/device.html',
@@ -86,11 +88,12 @@ class DeviceDownload(MethodView):
         :return: Файл с данными
         """
 
+        print("NOT HERE")
         data_range = (
             request.form.get('datetime_picker_start'),
             request.form.get('datetime_picker_end'),
         )
-        full_name = Device.query.get(device_id).full_name
+        full_name = Device.query.get(device_id).device_full_name
         buffer = make_graph(
             full_name,
             'download',
@@ -135,18 +138,16 @@ class DeviceUpload(MethodView):
             extension = filename.split('.')[-1]
             if extension not in allowed_extensions:
                 raise FileExtensionError
-            full_name = Device.query.get(device_id).full_name
-            directory = Path(
-                f'{upload_folder}/{full_name}',
-            )
-            if not directory.exists():
+            full_name = Device.query.get(device_id).device_full_name
+            directory = f'{upload_folder}/{full_name}'
+            if not Path(directory).exists():
                 Path(directory).mkdir(parents=True)
             file.save(
                 Path(directory, filename),
             )
             preprocessing_one_file(
                 full_name,
-                Path(directory, filename),
+                str(Path(directory) / filename),
                 user_upload=True,
             )
             make_graph(full_name, 'full')

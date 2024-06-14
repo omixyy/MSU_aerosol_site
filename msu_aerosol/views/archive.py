@@ -9,8 +9,7 @@ from flask.views import MethodView
 from flask_login import current_user
 
 from msu_aerosol.admin import get_complexes_dict
-from msu_aerosol.graph_funcs import disk
-from msu_aerosol.models import db, Device
+from msu_aerosol.models import Device
 
 __all__: list = []
 
@@ -55,10 +54,7 @@ class DeviceArchive(MethodView):
 
         complex_to_device = get_complexes_dict()
         device = Device.query.get_or_404(device_id)
-        if not device.full_name:
-            device.full_name = disk.get_public_meta(device.link)['name']
-            db.session.commit()
-        path = f'data/{device.full_name}'
+        path = f'data/{device.device_full_name}'
         listdir = os.listdir(path)
         delimiter = listdir[0][4]
         file = listdir[0]
@@ -99,7 +95,7 @@ class DeviceArchive(MethodView):
         device = Device.query.get_or_404(device_id)
         if request.form['button'] == 'download_all':
             memory_file = BytesIO()
-            path = f'data/{device.full_name}'
+            path = f'data/{device.device_full_name}'
             with ZipFile(memory_file, 'w') as zf:
                 for root, dirs, files in os.walk(path):
                     for file in files:
@@ -116,7 +112,7 @@ class DeviceArchive(MethodView):
 
         filename = request.form['button']
         return send_file(
-            f'data/{device.full_name}/{filename}',
+            f'data/{device.device_full_name}/{filename}',
             mimetype='text/csv',
             as_attachment=True,
             download_name=filename,
