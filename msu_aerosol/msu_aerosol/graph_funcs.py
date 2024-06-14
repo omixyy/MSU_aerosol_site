@@ -82,7 +82,7 @@ def download_device_data(device: Device) -> None:
         if not Path(f'{main_path}/{full_name}').exists():
             Path(f'{main_path}/{full_name}').mkdir(parents=True)
         if i['name'].endswith('.csv') or (
-            i['name'].endswith('.txt') and full_name == '_Today'
+            i['name'].endswith('.txt') and full_name == 'GRIMM'
         ):
             disk.download_by_link(
                 i['file'],

@@ -80,15 +80,19 @@ class Device(BaseModel):
 
     __tablename__ = 'devices'
     name = db.Column(db.String, unique=True, nullable=False)
-    serial_number = db.Column(db.String)
+    serial_number = db.Column(db.String, default='')
     show = db.Column(db.Boolean, nullable=True, default=False)
     link = db.Column(db.String, nullable=False)
     time_format = db.Column(db.String, nullable=True)
     archived = db.Column(db.Boolean, default=False)
     device_full_name = db.Column(
         db.String,
-        default=lambda context: f'{context.get_current_parameters()["name"]} '
-        f'{context.get_current_parameters()["serial_number"]}',
+        default=lambda context: (
+            f'{context.get_current_parameters()["name"]}'
+            f' {context.get_current_parameters()["serial_number"]}'
+            if context.get_current_parameters()["serial_number"]
+            else ''
+        ),
     )
 
     columns = db.relationship(
