@@ -38,9 +38,7 @@ def get_device_template(device_id: int, **kwargs) -> str:
     device_orm_obj = Device.query.get_or_404(device_id)
     complex_orm_obj = Complex.query.get(device_orm_obj.complex_id)
     complex_to_device = get_complexes_dict()
-    device_to_name = {
-        dev.name: dev.full_name for dev in Device.query.all()
-    }
+    device_to_name = {dev.name: dev.full_name for dev in Device.query.all()}
     min_date, max_date = choose_range(device_to_name[device_orm_obj.name])
     return render_template(
         'device/device.html',

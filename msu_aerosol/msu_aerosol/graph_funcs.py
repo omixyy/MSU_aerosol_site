@@ -47,9 +47,7 @@ def download_last_modified_file(links: list[str], app=None) -> None:
                 lambda y: y['name'].endswith(
                     '.txt' if 'GRIMM' == full_name else '.csv',
                 ),
-                disk.get_public_meta(link, limit=1000)['embedded'][
-                    'items'
-                ],
+                disk.get_public_meta(link, limit=1000)['embedded']['items'],
             ),
             key=lambda x: x['modified'],
         )[-1]

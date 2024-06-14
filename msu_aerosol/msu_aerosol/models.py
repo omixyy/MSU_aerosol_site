@@ -90,7 +90,7 @@ class Device(BaseModel):
         default=lambda context: (
             f'{context.get_current_parameters()["name"]}'
             f' {context.get_current_parameters()["serial_number"]}'
-            if context.get_current_parameters()["serial_number"]
+            if context.get_current_parameters()['serial_number']
             else ''
         ),
     )
