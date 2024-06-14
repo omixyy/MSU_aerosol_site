@@ -20,9 +20,9 @@ __all__ = []
 def get_device_by_name(name: str, app=None) -> Device | None:
     if app:
         with app.app_context():
-            return Device.query.filter_by(device_full_name=name).first()
+            return Device.query.filter_by(full_name=name).first()
 
-    return Device.query.filter_by(device_full_name=name).first()
+    return Device.query.filter_by(full_name=name).first()
 
 
 main_path = 'data'
@@ -38,16 +38,16 @@ def make_visible_date_format(date: str) -> str:
     return date.replace('%', '')
 
 
-def download_last_modified_file(all_devices, app=None) -> None:
+def download_last_modified_file(links: list[str], app=None) -> None:
     list_data_path = []
-    for device in all_devices:
-        full_name = device.device_full_name
+    for link in links:
+        full_name = Device.query.filter_by(link=link)
         last_modified_file = sorted(
             filter(
                 lambda y: y['name'].endswith(
                     '.txt' if 'GRIMM' == full_name else '.csv',
                 ),
-                disk.get_public_meta(device.link, limit=1000)['embedded'][
+                disk.get_public_meta(link, limit=1000)['embedded'][
                     'items'
                 ],
             ),
@@ -62,9 +62,9 @@ def download_last_modified_file(all_devices, app=None) -> None:
     for i in list_data_path:
         if app:
             with app.app_context():
-                dev = Device.query.filter_by(device_full_name=i[0]).first()
+                dev = Device.query.filter_by(full_name=i[0]).first()
         else:
-            dev = Device.query.filter_by(device_full_name=i[0]).first()
+            dev = Device.query.filter_by(full_name=i[0]).first()
         if not dev.archived:
             try:
                 preprocessing_one_file(i[0], i[1], app=app)
@@ -75,9 +75,9 @@ def download_last_modified_file(all_devices, app=None) -> None:
                 pass
 
 
-def download_device_data(device: Device) -> None:
-    items = disk.get_public_meta(device.link, limit=1000)
-    full_name = device.device_full_name
+def download_device_data(link: str) -> None:
+    items = disk.get_public_meta(link, limit=1000)
+    full_name = Device.query.filter_by(link=link).first().full_name
     for i in items['embedded']['items']:
         if not Path(f'{main_path}/{full_name}').exists():
             Path(f'{main_path}/{full_name}').mkdir(parents=True)

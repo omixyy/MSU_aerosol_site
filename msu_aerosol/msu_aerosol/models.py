@@ -85,7 +85,7 @@ class Device(BaseModel):
     link = db.Column(db.String, nullable=False)
     time_format = db.Column(db.String, nullable=True)
     archived = db.Column(db.Boolean, default=False)
-    device_full_name = db.Column(
+    full_name = db.Column(
         db.String,
         default=lambda context: (
             f'{context.get_current_parameters()["name"]}'
@@ -205,7 +205,7 @@ class DeviceView(ProtectedView):
     column_list = (
         'id',
         'name',
-        'device_full_name',
+        'full_name',
         'serial_number',
         'complex_id',
     )
@@ -214,5 +214,5 @@ class DeviceView(ProtectedView):
         'columns',
         'time_format',
         'time_columns',
-        'device_full_name',
+        'full_name',
     )

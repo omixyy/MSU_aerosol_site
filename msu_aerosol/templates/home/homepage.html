@@ -17,7 +17,7 @@
               <div id="dev{{ device.id }}" class="device_content">
                 <h4>{{ device.name }}</h4>
                 <hr>
-                {% include "includes/devices/recent/graph_" ~ device.device_full_name ~ ".html" %}
+                {% include "includes/devices/recent/graph_" ~ device.full_name ~ ".html" %}
                 <a class="btn btn-dark device_link"
                    href="{{ url_for('device', device_id=device.id) }}">
                   Подробнее

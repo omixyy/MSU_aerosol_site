@@ -58,7 +58,7 @@ def get_admin_template(
     return obj.render(
         'admin/admin_home.html',
         name_to_device={
-            dev.device_full_name: dev
+            dev.full_name: dev
             for dev in Device.query.filter_by(archived=False).all()
         },
         message_error=error,
@@ -95,13 +95,13 @@ class AdminHomeView(AdminIndexView):
         if request.method == 'POST':
             reload = request.form.get('device')
             if reload:
-                device_record = Device.query.filter_by(device_full_name=reload)
+                device_record = Device.query.filter_by(full_name=reload)
                 device = device_record.first()
                 remove_device_data(reload)
 
                 dev_id = device.id
                 name = device.name
-                full_name = device.device_full_name
+                full_name = device.full_name
                 link = device.link
                 show = device.show
                 serial_number = device.serial_number
@@ -117,7 +117,7 @@ class AdminHomeView(AdminIndexView):
                 new_device = Device(
                     id=dev_id,
                     name=name,
-                    device_full_name=full_name,
+                    full_name=full_name,
                     link=link,
                     show=show,
                     serial_number=serial_number,
@@ -126,7 +126,7 @@ class AdminHomeView(AdminIndexView):
                 )
                 db.session.add(new_device)
                 db.session.commit()
-                download_device_data(new_device)
+                download_device_data(new_device.link)
                 return get_admin_template(
                     self,
                     success='Данные успешно обновлены',
@@ -134,7 +134,7 @@ class AdminHomeView(AdminIndexView):
 
             changed = []
             for dev in all_devices:
-                full_name = dev.device_full_name
+                full_name = dev.full_name
                 usable_cols = [i.name for i in dev.columns if i.use]
                 time_col = [i.name for i in dev.time_columns if i.use]
                 default_cols = [
@@ -164,7 +164,7 @@ class AdminHomeView(AdminIndexView):
                     changed.append(dev)
 
             for dev in changed:
-                full_name = dev.device_full_name
+                full_name = dev.full_name
                 checkboxes = request.form.getlist(f'{full_name}_cb')
                 radio = request.form.get(f'{full_name}_rb')
                 defaults = request.form.getlist(f'{full_name}_cb_def')
@@ -290,8 +290,8 @@ def after_insert(mapper, connection, target) -> None:
     :return: None
     """
 
-    download_device_data(target)
-    full_name = target.device_full_name
+    download_device_data(target.link)
+    full_name = target.full_name
     file = [
         x
         for x in os.listdir(
@@ -378,7 +378,7 @@ def after_delete(mapper, connection, target) -> None:
     :return: None
     """
 
-    full_name = target.device_full_name
+    full_name = target.full_name
     remove_device_data(full_name)
 
 
@@ -417,7 +417,7 @@ def init_schedule(mapper, connection, target, app=None) -> None:
     global application
     if app:
         application = app
-    devices = Device.query.all()
+    links = [i.link for i in Device.query.all()]
     if scheduler.running or not (mapper and connection and target):
         scheduler.remove_all_jobs()
 
@@ -426,7 +426,7 @@ def init_schedule(mapper, connection, target, app=None) -> None:
             trigger='interval',
             seconds=300,
             id='downloader',
-            args=[devices],
+            args=[links],
             kwargs={'app': application},
         )
 
