@@ -88,7 +88,6 @@ class DeviceDownload(MethodView):
         :return: Файл с данными
         """
 
-        print("NOT HERE")
         data_range = (
             request.form.get('datetime_picker_start'),
             request.form.get('datetime_picker_end'),
