@@ -38,6 +38,13 @@ def make_visible_date_format(date: str) -> str:
     return date.replace('%', '')
 
 
+def no_csv(link: str) -> bool:
+    return all(
+        not i['name'].endswith('.csv')
+        for i in disk.get_public_meta(link, limit=1000)['embedded']['items']
+    )
+
+
 def download_last_modified_file(links: list[str], app=None) -> None:
     list_data_path = []
     for link in links:
@@ -49,7 +56,7 @@ def download_last_modified_file(links: list[str], app=None) -> None:
         last_modified_file = sorted(
             filter(
                 lambda y: y['name'].endswith(
-                    '.txt' if 'GRIMM' == full_name else '.csv',
+                    '.txt' if no_csv(link) else '.csv',
                 ),
                 disk.get_public_meta(link, limit=1000)['embedded']['items'],
             ),
@@ -84,7 +91,7 @@ def download_device_data(link: str) -> None:
         if not Path(f'{main_path}/{full_name}').exists():
             Path(f'{main_path}/{full_name}').mkdir(parents=True)
         if i['name'].endswith('.csv') or (
-            i['name'].endswith('.txt') and full_name == 'GRIMM'
+            i['name'].endswith('.txt') and no_csv(link)
         ):
             disk.download_by_link(
                 i['file'],
@@ -192,7 +199,7 @@ def preprocessing_one_file(
             ]
             month = '0' + str(month) if month < 10 else str(month)
             file_path = f'proc_data/{device}/{year}_{month}.csv'
-            if Path(file_path).exists() and user_upload:
+            if Path(file_path).exists() or user_upload:
                 df_help = pd.read_csv(file_path)
                 df_help[time_col] = pd.to_datetime(df_help[time_col])
                 df_month = pd.concat(
