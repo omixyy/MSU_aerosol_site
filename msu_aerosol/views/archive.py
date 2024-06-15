@@ -26,7 +26,14 @@ class Archive(MethodView):
         :return: Шаблон страницы "Архив"
         """
 
-        complex_to_device = get_complexes_dict()
+        complex_to_device: dict = {}
+        for key, value in get_complexes_dict().items():
+            new_value: list = []
+            for i in value:
+                if i.link not in list(map(lambda x: x.link, new_value)):
+                    new_value.append(i)
+            complex_to_device[key] = new_value.copy()
+            new_value.clear()
         return render_template(
             'archive/archive.html',
             now=datetime.now(),
