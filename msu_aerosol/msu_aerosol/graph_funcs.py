@@ -45,14 +45,9 @@ def no_csv(link: str) -> bool:
     )
 
 
-def download_last_modified_file(links: list[str], app=None) -> None:
+def download_last_modified_file(name_to_link: dict[str: str], app=None) -> None:
     list_data_path = []
-    for link in links:
-        if app:
-            with app.app_context():
-                full_name = Device.query.filter_by(link=link).first().full_name
-        else:
-            full_name = Device.query.filter_by(link=link).first().full_name
+    for full_name, link in name_to_link.items():
         last_modified_file = sorted(
             filter(
                 lambda y: y['name'].endswith(
@@ -84,9 +79,8 @@ def download_last_modified_file(links: list[str], app=None) -> None:
                 pass
 
 
-def download_device_data(link: str) -> None:
+def download_device_data(full_name: str, link: str) -> None:
     items = disk.get_public_meta(link, limit=1000)
-    full_name = Device.query.filter_by(link=link).first().full_name
     for i in items['embedded']['items']:
         if not Path(f'{main_path}/{full_name}').exists():
             Path(f'{main_path}/{full_name}').mkdir(parents=True)

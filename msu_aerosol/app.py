@@ -27,6 +27,7 @@ app.logger.setLevel(logging.INFO)
 # Настройка логирования
 log.disabled = True
 logging.getLogger('apscheduler.executors.default').propagate = False
+logging.getLogger('waitress').setLevel(logging.ERROR)
 logging.basicConfig(
     level=logging.INFO,
     filename='download_log.log',

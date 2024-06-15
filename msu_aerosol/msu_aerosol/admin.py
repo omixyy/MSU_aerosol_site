@@ -126,7 +126,7 @@ class AdminHomeView(AdminIndexView):
                 )
                 db.session.add(new_device)
                 db.session.commit()
-                download_device_data(new_device.link)
+                download_device_data(new_device.full_name, new_device.link)
                 return get_admin_template(
                     self,
                     success='Данные успешно обновлены',
@@ -294,7 +294,7 @@ def after_insert(mapper, connection, target) -> None:
     :return: None
     """
 
-    download_device_data(target.link)
+    download_device_data(target.full_name, target.link)
     full_name = target.full_name
     file = [
         x
@@ -421,7 +421,11 @@ def init_schedule(mapper, connection, target, app=None) -> None:
     global application
     if app:
         application = app
-    links = [i.link for i in Device.query.all() if i.show or i.archived]
+    name_to_link = {
+        i.name: i.link
+        for i in Device.query.all()
+        if i.show or i.archived
+    }
     if scheduler.running or not (mapper and connection and target):
         scheduler.remove_all_jobs()
 
@@ -430,7 +434,7 @@ def init_schedule(mapper, connection, target, app=None) -> None:
             trigger='interval',
             seconds=300,
             id='downloader',
-            args=[links],
+            args=[name_to_link],
             kwargs={'app': application},
         )
 
