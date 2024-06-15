@@ -60,10 +60,7 @@
                     {% if dev.show %}
                       <li>
                         <a class="dropdown-item"
-                           href="{% if view_name != 'device' %}
-                           {{ url_for('device', device_id=dev.id) }}
-                           {% else %} #
-                           {% endif %}">{{ dev }}
+                           href="{{ url_for('device', device_id=dev.id) }}">{{ dev }}
                         </a>
                       </li>
                     {% endif %}
