@@ -276,7 +276,7 @@ def make_graph(
     if not begin_record_date or not end_record_date:
         begin_record_date, end_record_date = choose_range(device, app=app)
     if spec_act == 'full':
-        begin_record_date = end_record_date - timedelta(days=14)
+        begin_record_date = end_record_date - timedelta(days=15)
     if spec_act == 'recent':
         begin_record_date = end_record_date - timedelta(days=3)
     current_date, combined_data = begin_record_date, pd.DataFrame()
@@ -292,7 +292,6 @@ def make_graph(
         except FileNotFoundError:
             current_date += timedelta(days=29)
     combined_data[time_col] = pd.to_datetime(combined_data[time_col])
-    combined_data = proc_spaces(combined_data, time_col)
     m = max(combined_data[time_col])
     last_48_hours = [m - timedelta(days=2), m]
     last_2_weeks = [m - timedelta(days=14), m]
@@ -343,6 +342,7 @@ def make_graph(
         mask_shifted = mask.shift(-1, fill_value=False)
         combined_data = combined_data[~mask_shifted]
     combined_data.reset_index(inplace=True)
+    combined_data = combined_data.drop_duplicates(subset=[time_col])
     combined_data = combined_data.sort_values(by=time_col)
     fig = px.line(
         combined_data,
