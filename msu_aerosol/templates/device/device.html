@@ -65,7 +65,7 @@
     </form>
     {% if user and user.is_authenticated and user.role.can_upload_data %}
       <form method="POST" id="form_upload" action="{{ url_for('device_upload', device_id=device.id) }}" enctype="multipart/form-data">
-        <div class="row" style="width: 24%;">
+        <div class="row" style="width: 475px;">
           <div class="mb-3 form-file col">
             <input class="form-control" type="file" id="formFile" name="file">
           </div>
