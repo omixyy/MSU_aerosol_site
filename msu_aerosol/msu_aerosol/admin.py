@@ -421,7 +421,7 @@ def init_schedule(mapper, connection, target, app=None) -> None:
     global application
     if app:
         application = app
-    links = [i.link for i in Device.query.all()]
+    links = [i.link for i in Device.query.all() if i.show]
     if scheduler.running or not (mapper and connection and target):
         scheduler.remove_all_jobs()
 
