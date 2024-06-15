@@ -88,16 +88,16 @@ class AdminHomeView(AdminIndexView):
         :return: Шаблон домашней страницы админки
         """
 
-        downloaded = os.listdir('data')
+        downloaded: list[str] = os.listdir('data')
+        all_devices: list[Device] = Device.query.filter_by(archived=False).all()
         downloaded.remove('.gitignore')
-        all_devices = Device.query.filter_by(archived=False).all()
 
         if request.method == 'POST':
-            reload = request.form.get('device')
-            if reload:
-                device_record = Device.query.filter_by(full_name=reload)
+            full_name_reloaded: str = request.form.get('device')
+            if full_name_reloaded:
+                device_record = Device.query.filter_by(full_name=full_name_reloaded)
                 device = device_record.first()
-                remove_device_data(reload)
+                remove_device_data(full_name_reloaded)
 
                 dev_id = device.id
                 name = device.name
@@ -114,7 +114,7 @@ class AdminHomeView(AdminIndexView):
                 cols.delete()
                 time_cols.delete()
 
-                new_device = Device(
+                new_device: Device = Device(
                     id=dev_id,
                     name=name,
                     full_name=full_name,
@@ -132,7 +132,7 @@ class AdminHomeView(AdminIndexView):
                     success='Данные успешно обновлены',
                 )
 
-            changed = []
+            changed: list[Device] = []
             for dev in all_devices:
                 full_name = dev.full_name
                 usable_cols = [i.name for i in dev.columns if i.use]
