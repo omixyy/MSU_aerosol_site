@@ -89,13 +89,17 @@ class AdminHomeView(AdminIndexView):
         """
 
         downloaded: list[str] = os.listdir('data')
-        all_devices: list[Device] = Device.query.filter_by(archived=False).all()
+        all_devices: list[Device] = Device.query.filter_by(
+            archived=False,
+        ).all()
         downloaded.remove('.gitignore')
 
         if request.method == 'POST':
             full_name_reloaded: str = request.form.get('device')
             if full_name_reloaded:
-                device_record = Device.query.filter_by(full_name=full_name_reloaded)
+                device_record = Device.query.filter_by(
+                    full_name=full_name_reloaded,
+                )
                 device = device_record.first()
                 remove_device_data(full_name_reloaded)
 

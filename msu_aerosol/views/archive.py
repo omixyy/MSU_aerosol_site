@@ -30,7 +30,7 @@ class Archive(MethodView):
         for key, value in get_complexes_dict().items():
             new_value: list = []
             for i in value:
-                if i.link not in list(map(lambda x: x.link, new_value)):
+                if i.link not in [x.link for x in new_value]:
                     new_value.append(i)
             complex_to_device[key] = new_value.copy()
             new_value.clear()
