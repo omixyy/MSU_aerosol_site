@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import sqlalchemy
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, UserMixin
 from flask_sqlalchemy import SQLAlchemy
@@ -39,7 +40,7 @@ class BaseColumnModel(db.Model):
     use = db.Column(db.Boolean, nullable=False, default=False)
 
     @declared_attr
-    def device_id(self) -> db.Column:
+    def device_id(self) -> sqlalchemy.Column:
         """
         Поле, связанное с id прибора.
 
