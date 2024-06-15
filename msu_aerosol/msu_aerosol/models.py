@@ -1,9 +1,9 @@
 from datetime import datetime
 
-import sqlalchemy
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, UserMixin
 from flask_sqlalchemy import SQLAlchemy
+import sqlalchemy
 from sqlalchemy.orm import declared_attr
 
 __all__ = []

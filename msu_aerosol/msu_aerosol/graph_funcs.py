@@ -45,7 +45,7 @@ def no_csv(link: str) -> bool:
     )
 
 
-def download_last_modified_file(name_to_link: dict[str: str], app=None) -> None:
+def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
     list_data_path = []
     for full_name, link in name_to_link.items():
         last_modified_file = sorted(
