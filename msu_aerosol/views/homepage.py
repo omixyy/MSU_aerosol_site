@@ -53,21 +53,24 @@ class Home(MethodView):
         order = order_handler.load_order()
         complex_to_device_unsorted = get_complexes_dict()
         complex_to_device: dict = {}
-        for key, value in complex_to_device_unsorted.items():
-            order_list: list = order[: len(value)]
-            devices_list: list = []
-            for i in order_list:
-                device = list(
-                    filter(
-                        lambda x: x.id == int(i),
-                        complex_to_device_unsorted[key],
-                    ),
-                )[0]
-                devices_list.append(device)
+        if order:
+            for key, value in complex_to_device_unsorted.items():
+                order_list: list = order[: len(value)]
+                devices_list: list = []
+                for i in order_list:
+                    device = list(
+                        filter(
+                            lambda x: x.id == int(i),
+                            complex_to_device_unsorted[key],
+                        ),
+                    )[0]
+                    devices_list.append(device)
 
-            complex_to_device[key] = devices_list
-            for _ in range(len(value)):
-                del order[0]
+                complex_to_device[key] = devices_list
+                for _ in range(len(value)):
+                    del order[0]
+        else:
+            complex_to_device = get_complexes_dict()
         return render_template(
             'home/homepage.html',
             now=datetime.now(),
