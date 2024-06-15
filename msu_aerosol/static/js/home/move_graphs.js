@@ -31,12 +31,14 @@ function activateEdit() {
     }
   }
 
-  var editButton = document.getElementsByClassName("btn btn-outline-success accept")[0];
-  if (editButton.style.display === 'none' || editButton.style.display === "") {
-      editButton.style.display = 'inline-flex';
+  var editButtons = document.getElementsByClassName("btn btn-outline-success accept");
+  for (let i = 0; i < editButtons.length; i++) {
+    if (editButtons[i].style.display === 'none' || editButtons[i].style.display === "") {
+      editButtons[i].style.display = 'inline-flex';
     } else {
-      editButton.style.display = 'none';
+      editButtons[i].style.display = 'none';
     }
+  }
 }
 
 function sendOrderToServer() {
