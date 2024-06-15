@@ -11,7 +11,7 @@ from views.about import About
 from views.archive import Archive, DeviceArchive
 from views.contacts import ACContacts, DevelopersContacts
 from views.device import DeviceDownload, DevicePage, DeviceUpload
-from views.homepage import Home
+from views.homepage import Home, UpdateIndex
 from views.users import Login, Logout, Profile, Register
 
 __all__: list = []
@@ -74,6 +74,10 @@ app.add_url_rule(
 app.add_url_rule(
     '/profile',
     view_func=Profile.as_view('profile'),
+)
+app.add_url_rule(
+    '/update_index',
+    view_func=UpdateIndex.as_view('update_index'),
 )
 app.add_url_rule(
     '/login',

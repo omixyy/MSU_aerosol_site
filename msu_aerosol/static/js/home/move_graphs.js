@@ -3,7 +3,7 @@ function getBlockIndex(block) {
     return blocks.indexOf(block);
 }
 
-function moveLeft(button, complex_id) {
+function moveLeft(button) {
   const block = button.parentElement;
   const previousBlock = block.previousElementSibling;
   if (previousBlock && previousBlock.classList.contains('device_content')) {
@@ -12,7 +12,7 @@ function moveLeft(button, complex_id) {
   }
 }
 
-function moveRight(button, complex_id) {
+function moveRight(button) {
   const block = button.parentElement;
   const nextBlock = block.nextElementSibling;
   if (nextBlock && nextBlock.classList.contains('device_content')) {
@@ -21,7 +21,7 @@ function moveRight(button, complex_id) {
   }
 }
 
-function activateEdit(complex_id) {
+function activateEdit() {
   var additionalButtons = document.getElementsByClassName("btn btn-outline-dark hidden");
   for (let i = 0; i < additionalButtons.length; i++) {
     if (additionalButtons[i].style.display === 'none' || additionalButtons[i].style.display === "") {
@@ -37,4 +37,22 @@ function activateEdit(complex_id) {
     } else {
       editButton.style.display = 'none';
     }
+}
+
+function sendOrderToServer() {
+  const blocks = document.getElementsByClassName('device_content');
+  const order = [];
+  for (let i = 0; i < blocks.length; i++) {
+    order.push(blocks[i].id.slice(3));
+  }
+  fetch('/update_index', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ order: order })
+  })
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
 }

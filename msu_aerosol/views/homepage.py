@@ -1,12 +1,40 @@
 from datetime import datetime
+import json
+from pathlib import Path
 
-from flask import render_template
+from flask import jsonify, render_template, request, Response
 from flask.views import MethodView
 from flask_login import current_user
 
 from msu_aerosol.admin import get_complexes_dict
 
 __all__: list = []
+ORDER_FILE = 'block_order.json'
+
+
+class BlockOrderHandler:
+    """
+    Обработчик файла с настройками главной страницы.
+    """
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    def load_order(self) -> list:
+        """
+        Загрузка файла.
+
+        :return: Загруженный json файл
+        """
+        try:
+            with Path(self.filename).open('r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return []
+
+    def save_order(self, order):
+        with Path(self.filename).open('w') as f:
+            json.dump(order, f)
 
 
 class Home(MethodView):
@@ -21,7 +49,25 @@ class Home(MethodView):
         :return: Шаблон главной страницы
         """
 
-        complex_to_device = get_complexes_dict()
+        order_handler = BlockOrderHandler('block_order.json')
+        order = order_handler.load_order()
+        complex_to_device_unsorted = get_complexes_dict()
+        complex_to_device: dict = {}
+        for key, value in complex_to_device_unsorted.items():
+            order_list: list = order[: len(value)]
+            devices_list: list = []
+            for i in order_list:
+                device = list(
+                    filter(
+                        lambda x: x.id == int(i),
+                        complex_to_device_unsorted[key],
+                    ),
+                )[0]
+                devices_list.append(device)
+
+            complex_to_device[key] = devices_list
+            for _ in range(len(value)):
+                del order[0]
         return render_template(
             'home/homepage.html',
             now=datetime.now(),
@@ -29,3 +75,23 @@ class Home(MethodView):
             complex_to_device=complex_to_device,
             user=current_user,
         )
+
+
+class UpdateIndex(MethodView):
+    """
+    Класс, благодаря которому будет сохраняться порядок
+    расположения приборов на главной странице.
+    """
+
+    def post(self) -> Response:
+        """
+        Метод POST, только он доступен.
+
+        :return:
+        """
+
+        order_handler = BlockOrderHandler(ORDER_FILE)
+        data = request.get_json()
+        order = data.get('order')
+        order_handler.save_order(order)
+        return jsonify(success=True)
