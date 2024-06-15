@@ -421,14 +421,14 @@ def init_schedule(mapper, connection, target, app=None) -> None:
     global application
     if app:
         application = app
-    links = [i.link for i in Device.query.all() if i.show]
+    links = [i.link for i in Device.query.all() if i.show or i.archived]
     if scheduler.running or not (mapper and connection and target):
         scheduler.remove_all_jobs()
 
         scheduler.add_job(
             func=download_last_modified_file,
             trigger='interval',
-            seconds=30,
+            seconds=300,
             id='downloader',
             args=[links],
             kwargs={'app': application},
