@@ -2,21 +2,34 @@
 {% block title %}Аэрозольные комплексы МГУ{% endblock %}
 {% block content %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/home/homepage.css') }}">
+  <script src="{{ url_for('static', filename='js/home/move_graphs.js') }}"></script>
   <div class="mx-auto head">
     <h1>Аэрозольные комплексы МГУ</h1>
   </div>
   {% for complex, devices in complex_to_device.items() %}
     <div id="com{{ complex.id }}">
-      <h2 class="ms-3 mb-2">{{ complex }}</h2>
+      <h2 class="ms-3 mb-2">{{ complex }}
+        {% if user and user.is_authenticated and user.role.can_access_admin %}
+          <button class="btn btn-outline-dark edit_button" onclick="activateEdit({{ complex.id }})" id="edit" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 30 30" style="margin-left: -5px;">
+              <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+              <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+            </svg>
+          </button>
+        {% endif %}
+        <button type="submit" class="btn btn-outline-success accept">Подтвердить</button>
+      </h2>
     </div>
     <div class="pt-0 my-5 ms-3">
       <div class="container-fluid">
-        <div class="row">
+        <div class="row device-container" id="device-container-{{ complex.id }}">
           {% for device in devices %}
             {% if device.show %}
               <div id="dev{{ device.id }}" class="device_content">
                 <h4>{{ device.name }}</h4>
                 <hr>
+                <button class="btn btn-outline-dark hidden" onclick="moveLeft(this, {{ complex.id }})">←</button>
+                <button class="btn btn-outline-dark hidden" onclick="moveRight(this, {{ complex.id }})">→</button>
                 {% include "includes/devices/recent/graph_" ~ device.full_name ~ ".html" %}
                 <a class="btn btn-dark device_link"
                    href="{{ url_for('device', device_id=device.id) }}">

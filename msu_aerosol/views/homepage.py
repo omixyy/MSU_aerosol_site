@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import render_template
+from flask import render_template, request
 from flask.views import MethodView
 from flask_login import current_user
 

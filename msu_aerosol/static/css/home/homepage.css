@@ -16,6 +16,7 @@ h4 {
   width: 700px;
   height: 600px;
   text-align: center;
+  margin-bottom: 30px;
 }
 
 .row_new {
@@ -24,4 +25,21 @@ h4 {
   justify-content: center;
   align-items: center;
   gap: 10px;
+}
+
+.edit_button {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 7px;
+}
+
+.hidden {
+  display: none;
+}
+
+.accept {
+  height: 30px;
+  margin-bottom: 7px;
+  display: none;
+  align-items: center;
 }
