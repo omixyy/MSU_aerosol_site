@@ -2,9 +2,8 @@ from datetime import timedelta
 from io import BytesIO
 import os
 from pathlib import Path
+import re
 
-from hsluv import hsluv_to_rgb
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
@@ -93,11 +92,13 @@ def download_device_data(full_name: str, link: str) -> None:
             )
 
 
-def preprocess_device_data(name_folder: str) -> None:
+def preprocess_device_data(name_folder: str, app=None) -> None:
+    print(app.app_context())
     for name_file in os.listdir(f'{main_path}/{name_folder}'):
         preprocessing_one_file(
             name_folder,
             f'{main_path}/{name_folder}/{name_file}',
+            app=app,
         )
 
 
@@ -224,21 +225,24 @@ def choose_range(device: str, app=None) -> tuple[pd.Timestamp, pd.Timestamp]:
     return min_date, max_date
 
 
-def get_spaced_colors(n: int) -> list:
-    color_h = np.random.uniform(low=0, high=360, size=(1, n))
-    color_l = np.random.normal(loc=66, scale=10, size=(1, n))
-    color_s = np.random.uniform(low=80, high=100, size=(1, n))
+def rgb_to_hex(rgb_string):
+    match = re.match(r'rgb\((\d+),\s*(\d+),\s*(\d+)\)', rgb_string)
+    if not match:
+        raise ValueError('Неправильный формат строки')
+    r, g, b = map(int, match.groups())
+    return f'#{r:02X}{g:02X}{b:02X}'
 
-    image = np.dstack((color_h, color_s, color_l))
-    image = np.apply_along_axis(hsluv_to_rgb, 2, image)
-    return [
-        '#{:02x}{:02x}{:02x}'.format(
-            int(rgb[0] * 255),
-            int(rgb[1] * 255),
-            int(rgb[2] * 255),
-        )
-        for rgb in image[0]
-    ]
+
+def get_spaced_colors(n):
+    swatches = px.colors.qualitative.swatches()
+    combined_palette = []
+    for palette in swatches.data:
+        for color in palette['marker.color']:
+            if color.startswith('#'):
+                combined_palette.append(color)
+            else:
+                combined_palette.append(rgb_to_hex(color))
+    return (combined_palette * (n // len(combined_palette) + 1))[:n:]
 
 
 def make_graph(

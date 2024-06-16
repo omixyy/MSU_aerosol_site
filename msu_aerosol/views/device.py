@@ -12,6 +12,7 @@ from flask.views import MethodView
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 
+from forms.file_form import FileForm
 from msu_aerosol.admin import get_complexes_dict
 from msu_aerosol.config import allowed_extensions, upload_folder
 from msu_aerosol.exceptions import FileExtensionError
@@ -35,6 +36,7 @@ def get_device_template(device_id: int, **kwargs) -> str:
 
     message = kwargs.get('message')
     error = kwargs.get('error')
+    form = kwargs.get('form')
     device_orm_obj = Device.query.get_or_404(device_id)
     complex_orm_obj = Complex.query.get(device_orm_obj.complex_id)
     complex_to_device = get_complexes_dict()
@@ -53,6 +55,7 @@ def get_device_template(device_id: int, **kwargs) -> str:
         max_date=str(max_date).replace(' ', 'T'),
         message=message,
         error=error,
+        form=form,
     )
 
 
@@ -68,7 +71,8 @@ class DevicePage(MethodView):
         :return: Шаблон страницы прибора
         """
 
-        return get_device_template(device_id)
+        form = FileForm()
+        return get_device_template(device_id, form=form)
 
 
 class DeviceDownload(MethodView):
@@ -128,6 +132,7 @@ class DeviceUpload(MethodView):
         :return: Шаблон страницы прибора
         """
 
+        form = FileForm()
         file = request.files['file']
         filename = secure_filename(file.filename)
 
@@ -152,10 +157,12 @@ class DeviceUpload(MethodView):
             return get_device_template(
                 device_id,
                 message='Файл успешно получен',
+                form=form,
             )
 
         except (Exception, FileExtensionError):
             return get_device_template(
                 device_id,
                 error='Ошибка при загрузке файла',
+                form=form,
             )

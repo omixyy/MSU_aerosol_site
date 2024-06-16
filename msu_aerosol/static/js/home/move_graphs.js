@@ -8,7 +8,6 @@ function moveLeft(button) {
   const previousBlock = block.previousElementSibling;
   if (previousBlock && previousBlock.classList.contains('device_content')) {
     block.parentNode.insertBefore(block, previousBlock);
-    const newIndex = getBlockIndex(block);
   }
 }
 
@@ -17,7 +16,6 @@ function moveRight(button) {
   const nextBlock = block.nextElementSibling;
   if (nextBlock && nextBlock.classList.contains('device_content')) {
     block.parentNode.insertBefore(nextBlock, block);
-    const newIndex = getBlockIndex(block);
   }
 }
 

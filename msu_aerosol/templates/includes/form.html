@@ -18,7 +18,11 @@
       <div class="mb-3">
         {% if field.name != 'submit' %}
           <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-          {{ field(class="form-control") }}
+          {% if view_name != 'device' %}
+            {{ field(class="form-control") }}
+          {% else %}
+            {{ field(class="form-control", style="width: 475px; margin-bottom: -50px;") }}
+          {% endif %}
           {% if field.help_text %}
             <div class="form-text">{{ field.help_text }}</div>
           {% endif %}

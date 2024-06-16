@@ -11,7 +11,7 @@ load_dotenv()
 basedir = Path(os.path.dirname(__file__)).resolve().parent
 yadisk_token = os.getenv('YADISK_TOKEN', default='FAKE_TOKEN')
 upload_folder = 'received_data'
-allowed_extensions = {'csv', 'xlsx'}
+allowed_extensions = ['csv', 'xlsx']
 
 
 class Config:
