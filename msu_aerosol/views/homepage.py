@@ -63,12 +63,18 @@ class Home(MethodView):
                             lambda x: x.id == int(i),
                             complex_to_device_unsorted[key],
                         ),
-                    )[0]
-                    devices_list.append(device)
+                    )
+                    if device:
+                        devices_list.append(device[0])
+                    else:
+                        for j in complex_to_device_unsorted[key]:
+                            if j not in devices_list:
+                                devices_list.append(j)
 
                 complex_to_device[key] = devices_list
                 for _ in range(len(value)):
-                    del order[0]
+                    if order:
+                        del order[0]
         else:
             complex_to_device = get_complexes_dict()
         return render_template(
