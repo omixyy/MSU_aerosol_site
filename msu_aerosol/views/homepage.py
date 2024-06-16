@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import datetime
 import json
 from pathlib import Path
@@ -64,12 +65,19 @@ class Home(MethodView):
                             complex_to_device_unsorted[key],
                         ),
                     )
+
                     if device:
                         devices_list.append(device[0])
-                    else:
-                        for j in complex_to_device_unsorted[key]:
-                            if j not in devices_list:
-                                devices_list.append(j)
+
+                if len(complex_to_device_unsorted[key]) > len(devices_list):
+                    devices_list.extend(
+                        list(
+                            (
+                                Counter(complex_to_device_unsorted[key])
+                                - Counter(devices_list)
+                            ).elements(),
+                        ),
+                    )
 
                 complex_to_device[key] = devices_list
                 for _ in range(len(value)):
