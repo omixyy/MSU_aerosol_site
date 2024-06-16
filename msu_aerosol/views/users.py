@@ -37,10 +37,9 @@ def is_safe(password: str) -> bool:
     """
 
     return not (
-        len(password) < 10
-        or len(re.findall(r'\d', password)) < 4
-        or len(re.findall(r'[a-zA-Z]', password)) < 4
-        or len(re.findall(r'[!@#$%^&*()-_+=]', password)) < 2
+        len(password) < 8
+        or len(re.findall(r'\d', password)) < 2
+        or len(re.findall(r'[a-zA-Z]', password)) < 6
     )
 
 
@@ -246,7 +245,7 @@ class Register(MethodView):
         if not is_safe(password):
             return get_registration_template(
                 'Пароль должен содержать не менее двух цифр и '
-                'не менее четырёх букв',
+                'не менее шести букв',
             )
 
         if User.query.filter_by(login=user_login).first():
