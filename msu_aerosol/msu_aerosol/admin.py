@@ -225,12 +225,12 @@ class AdminHomeView(AdminIndexView):
                             'по выбранным столбцам',
                         )
 
-                    except Exception as e:
-                        error = e.__class__.__name__
-                        return get_admin_template(
-                            self,
-                            error=f'Непредвиденная ошибка: {error}',
-                        )
+                    # except Exception as e:
+                    #     error = e.__class__.__name__
+                    #     return get_admin_template(
+                    #         self,
+                    #         error=f'Непредвиденная ошибка: {error}',
+                    #    )
                 else:
                     return get_admin_template(
                         self,
@@ -329,21 +329,25 @@ def after_insert(mapper, connection, target) -> None:
 
         for column, color in zip(header, colors):
             if 'time' in column.lower() or 'date' in column.lower():
-                col = DeviceTimeColumn(
+                time_col = DeviceTimeColumn(
                     name=column,
                     device_id=target.id,
-                )
-
-                db.session.add(col)
-
-            elif 'time' not in column.lower() or 'date' not in column.lower():
-                time_col = DeviceDataColumn(
-                    name=column,
-                    device_id=target.id,
-                    color=color,
                 )
 
                 db.session.add(time_col)
+
+            else:
+                col = DeviceDataColumn(
+                    name=column,
+                    device_id=target.id,
+                    color=(
+                        '#ffba42'
+                        if column == 'BCbb'
+                        else '#3D3C3C' if column == 'BCff' else color
+                    ),
+                )
+
+                db.session.add(col)
 
 
 def remove_device_data(full_name: str) -> None:
@@ -434,7 +438,7 @@ def init_schedule(mapper, connection, target, app=None) -> None:
         scheduler.add_job(
             func=download_last_modified_file,
             trigger='interval',
-            seconds=300,
+            seconds=30,
             id='downloader',
             args=[name_to_link],
             kwargs={'app': application},

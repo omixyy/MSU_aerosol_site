@@ -10,7 +10,7 @@ from flask_login import current_user
 from msu_aerosol.admin import get_complexes_dict
 
 __all__: list = []
-ORDER_FILE = 'block_order.json'
+ORDER_FILE = 'schema/block_order.json'
 
 
 class BlockOrderHandler:
@@ -50,7 +50,7 @@ class Home(MethodView):
         :return: Шаблон главной страницы
         """
 
-        order_handler = BlockOrderHandler('block_order.json')
+        order_handler = BlockOrderHandler('schema/block_order.json')
         order = order_handler.load_order()
         complex_to_device_unsorted = get_complexes_dict()
         complex_to_device: dict = {}

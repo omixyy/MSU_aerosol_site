@@ -1,8 +1,8 @@
 from datetime import timedelta
 from io import BytesIO
+import json
 import os
 from pathlib import Path
-import re
 
 import pandas as pd
 import plotly.express as px
@@ -31,6 +31,11 @@ base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?'
 
 def make_format_date(date: str) -> str:
     return ''.join(['%' + i if i.isalpha() else i for i in list(date)])
+
+
+def load_colors() -> list:
+    with Path('schema/colors.json').open('r') as colors:
+        return json.load(colors)
 
 
 def make_visible_date_format(date: str) -> str:
@@ -93,7 +98,6 @@ def download_device_data(full_name: str, link: str) -> None:
 
 
 def preprocess_device_data(name_folder: str, app=None) -> None:
-    print(app.app_context())
     for name_file in os.listdir(f'{main_path}/{name_folder}'):
         preprocessing_one_file(
             name_folder,
@@ -225,23 +229,8 @@ def choose_range(device: str, app=None) -> tuple[pd.Timestamp, pd.Timestamp]:
     return min_date, max_date
 
 
-def rgb_to_hex(rgb_string):
-    match = re.match(r'rgb\((\d+),\s*(\d+),\s*(\d+)\)', rgb_string)
-    if not match:
-        raise ValueError('Неправильный формат строки')
-    r, g, b = map(int, match.groups())
-    return f'#{r:02X}{g:02X}{b:02X}'
-
-
 def get_spaced_colors(n):
-    swatches = px.colors.qualitative.swatches()
-    combined_palette = []
-    for palette in swatches.data:
-        for color in palette['marker.color']:
-            if color.startswith('#'):
-                combined_palette.append(color)
-            else:
-                combined_palette.append(rgb_to_hex(color))
+    combined_palette = load_colors()
     return (combined_palette * (n // len(combined_palette) + 1))[:n:]
 
 
@@ -346,6 +335,7 @@ def make_graph(
         combined_data,
         x=time_col,
         y=[i.name for i in device_obj.columns if i.use],
+        color_discrete_sequence=[i.color for i in device_obj.columns if i.use]
     )
     if app:
         with app.app_context():
