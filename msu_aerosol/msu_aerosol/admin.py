@@ -131,6 +131,7 @@ class AdminHomeView(AdminIndexView):
                 db.session.add(new_device)
                 db.session.commit()
                 download_device_data(new_device.full_name, new_device.link)
+                init_schedule(None, None, None)
                 return get_admin_template(
                     self,
                     success='Данные успешно обновлены',
