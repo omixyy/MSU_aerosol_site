@@ -225,12 +225,12 @@ class AdminHomeView(AdminIndexView):
                             'по выбранным столбцам',
                         )
 
-                    # except Exception as e:
-                    #     error = e.__class__.__name__
-                    #     return get_admin_template(
-                    #         self,
-                    #         error=f'Непредвиденная ошибка: {error}',
-                    #    )
+                    except Exception as e:
+                        error = e.__class__.__name__
+                        return get_admin_template(
+                            self,
+                            error=f'Непредвиденная ошибка: {error}',
+                        )
                 else:
                     return get_admin_template(
                         self,

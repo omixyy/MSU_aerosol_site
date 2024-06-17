@@ -335,7 +335,7 @@ def make_graph(
         combined_data,
         x=time_col,
         y=[i.name for i in device_obj.columns if i.use],
-        color_discrete_sequence=[i.color for i in device_obj.columns if i.use]
+        color_discrete_sequence=[i.color for i in device_obj.columns if i.use],
     )
     if app:
         with app.app_context():
