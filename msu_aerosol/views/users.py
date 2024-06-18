@@ -22,7 +22,11 @@ from werkzeug.security import (
 
 from forms.auth_forms import LoginForm, RegisterForm
 from forms.profile_form import ProfileForm
-from msu_aerosol.admin import get_complexes_dict, get_unique_devices, login_manager
+from msu_aerosol.admin import (
+    get_complexes_dict,
+    get_unique_devices,
+    login_manager,
+)
 from msu_aerosol.models import db, User
 
 __all__: list = []
