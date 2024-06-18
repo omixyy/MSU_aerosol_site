@@ -22,7 +22,7 @@ from werkzeug.security import (
 
 from forms.auth_forms import LoginForm, RegisterForm
 from forms.profile_form import ProfileForm
-from msu_aerosol.admin import get_complexes_dict, login_manager
+from msu_aerosol.admin import get_complexes_dict, get_unique_devices, login_manager
 from msu_aerosol.models import db, User
 
 __all__: list = []
@@ -61,6 +61,7 @@ def get_registration_template(error: str | None) -> str:
         user=current_user,
         now=datetime.now(),
         view_name='registration',
+        unique=get_unique_devices(),
     )
 
 
@@ -82,6 +83,7 @@ def get_profile_template(message: str | None, form: ProfileForm) -> str:
         user=current_user,
         form=form,
         message_success=message,
+        unique=get_unique_devices(),
     )
 
 
@@ -103,6 +105,7 @@ def get_login_template(error: str | None) -> str:
         now=datetime.now(),
         view_name='login',
         user=current_user,
+        unique=get_unique_devices(),
     )
 
 

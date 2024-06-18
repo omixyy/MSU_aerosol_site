@@ -262,6 +262,19 @@ def get_complexes_dict() -> dict[Complex, list[Device]]:
     }
 
 
+def get_unique_devices():
+    complex_to_device: dict = {}
+    for key, value in get_complexes_dict().items():
+        new_value: list = []
+        for i in value:
+            if i.link not in [x.link for x in new_value]:
+                new_value.append(i)
+        complex_to_device[key] = new_value.copy()
+        new_value.clear()
+
+    return complex_to_device
+
+
 def csv_exists(path: str) -> bool:
     return all(i.endswith('.csv') for i in os.listdir(path))
 

@@ -4,7 +4,7 @@ from flask import render_template
 from flask.views import MethodView
 from flask_login import current_user
 
-from msu_aerosol.admin import get_complexes_dict
+from msu_aerosol.admin import get_complexes_dict, get_unique_devices
 
 __all__: list = []
 
@@ -28,4 +28,5 @@ class About(MethodView):
             view_name='about',
             complex_to_device=complex_to_device,
             user=current_user,
+            unique=get_unique_devices(),
         )

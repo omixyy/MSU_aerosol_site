@@ -14,7 +14,7 @@ from flask_login import current_user
 from werkzeug.utils import secure_filename
 
 from forms.file_form import FileForm
-from msu_aerosol.admin import get_complexes_dict
+from msu_aerosol.admin import get_complexes_dict, get_unique_devices
 from msu_aerosol.config import allowed_extensions, upload_folder
 from msu_aerosol.exceptions import FileExtensionError
 from msu_aerosol.graph_funcs import choose_range, preprocessing_one_file
@@ -57,6 +57,7 @@ def get_device_template(device_id: int, **kwargs) -> str:
         message=message,
         error=error,
         form=form,
+        uniquie=get_unique_devices(),
     )
 
 

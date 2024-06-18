@@ -55,9 +55,9 @@
                 Приборы
               </a>
               <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-                {% for _, devices in complex_to_device.items() %}
+                {% for _, devices in unique.items() %}
                   {% for dev in devices %}
-                    {% if dev.show %}
+                    {% if dev.show and not dev.archived %}
                       <li>
                         <a class="dropdown-item"
                            href="{{ url_for('device', device_id=dev.id) }}">{{ dev }}

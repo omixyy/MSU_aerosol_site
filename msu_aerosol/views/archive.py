@@ -8,7 +8,7 @@ from flask import render_template, request, Response, send_file
 from flask.views import MethodView
 from flask_login import current_user
 
-from msu_aerosol.admin import get_complexes_dict
+from msu_aerosol.admin import get_complexes_dict, get_unique_devices
 from msu_aerosol.models import Device
 
 __all__: list = []
@@ -26,14 +26,8 @@ class Archive(MethodView):
         :return: Шаблон страницы "Архив"
         """
 
-        complex_to_device: dict = {}
-        for key, value in get_complexes_dict().items():
-            new_value: list = []
-            for i in value:
-                if i.link not in [x.link for x in new_value]:
-                    new_value.append(i)
-            complex_to_device[key] = new_value.copy()
-            new_value.clear()
+        complex_to_device: dict = get_unique_devices()
+
         return render_template(
             'archive/archive.html',
             now=datetime.now(),
@@ -41,6 +35,7 @@ class Archive(MethodView):
             complex_to_device=complex_to_device,
             archived=Device.query.filter_by(archived=True),
             user=current_user,
+            unique=get_unique_devices(),
         )
 
 
@@ -86,6 +81,7 @@ class DeviceArchive(MethodView):
             device=device,
             user=current_user,
             complex_to_device=complex_to_device,
+            unique=get_unique_devices(),
             files=files,
         )
 
