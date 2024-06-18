@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 from pathlib import Path
 
+from flask import abort
 from flask import (
     render_template,
     request,
@@ -38,7 +39,7 @@ def get_device_template(device_id: int, **kwargs) -> str:
     error = kwargs.get('error')
     form = kwargs.get('form')
     device_orm_obj = Device.query.get_or_404(device_id)
-    complex_orm_obj = Complex.query.get(device_orm_obj.complex_id)
+    complex_orm_obj = Complex.query.get_or_404(device_orm_obj.complex_id)
     complex_to_device = get_complexes_dict()
     device_to_name = {dev.name: dev.full_name for dev in Device.query.all()}
     min_date, max_date = choose_range(device_to_name[device_orm_obj.name])
@@ -71,8 +72,12 @@ class DevicePage(MethodView):
         :return: Шаблон страницы прибора
         """
 
-        form = FileForm()
-        return get_device_template(device_id, form=form)
+        try:
+            form = FileForm()
+            return get_device_template(device_id, form=form)
+
+        except IndexError:
+            abort(404)
 
 
 class DeviceDownload(MethodView):
