@@ -57,7 +57,7 @@ def get_device_template(device_id: int, **kwargs) -> str:
         message=message,
         error=error,
         form=form,
-        uniquie=get_unique_devices(),
+        unique=get_unique_devices(),
     )
 
 
