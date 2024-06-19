@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from zipfile import ZipFile
 
-from flask import abort, render_template, request, Response, send_file
+from flask import render_template, request, Response, send_file
 from flask.views import MethodView
 from flask_login import current_user, login_required
 
