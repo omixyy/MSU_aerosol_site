@@ -4,9 +4,9 @@ import os
 from pathlib import Path
 from zipfile import ZipFile
 
-from flask import render_template, request, Response, send_file
+from flask import abort, render_template, request, Response, send_file
 from flask.views import MethodView
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from msu_aerosol.admin import get_complexes_dict, get_unique_devices
 from msu_aerosol.models import Device
@@ -19,6 +19,7 @@ class Archive(MethodView):
     Представление страницы "Архив".
     """
 
+    @login_required
     def get(self) -> str:
         """
         Метод GET для страницы архива, только он доступен.
@@ -27,7 +28,6 @@ class Archive(MethodView):
         """
 
         complex_to_device: dict = get_unique_devices()
-
         return render_template(
             'archive/archive.html',
             now=datetime.now(),
@@ -44,6 +44,7 @@ class DeviceArchive(MethodView):
     Представление Страницы архива прибора.
     """
 
+    @login_required
     def get(self, device_id: int) -> str:
         """
         Метод GET для страницы архива прибора.
@@ -85,6 +86,7 @@ class DeviceArchive(MethodView):
             files=files,
         )
 
+    @login_required
     def post(self, device_id: int) -> Response:
         """
         Метод POST для страницы архива прибора.
