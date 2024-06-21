@@ -247,6 +247,7 @@ class AdminHomeView(AdminIndexView):
 
             for graph in all_graphs:
                 graph.device.show = True
+                graph.created = True
                 db.session.commit()
 
         return get_admin_template(self)

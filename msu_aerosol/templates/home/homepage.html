@@ -24,7 +24,7 @@
       <div class="container-fluid">
         <div class="row device-container" id="device-container-{{ complex.id }}">
           {% for graph in graphs %}
-            {% if graph.device.show %}
+            {% if graph.device.show and graph.created %}
               <div id="dev{{ graph.id }}" class="device_content">
                 <h4>{{ graph.device.name }}</h4>
                 <hr>
