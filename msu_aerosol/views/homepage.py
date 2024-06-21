@@ -7,7 +7,7 @@ from flask import jsonify, render_template, request, Response
 from flask.views import MethodView
 from flask_login import current_user
 
-from msu_aerosol.admin import get_complexes_dict, get_unique_devices
+from msu_aerosol.admin import get_complexes_dict
 
 __all__: list = []
 ORDER_FILE = 'schema/block_order.json'
@@ -53,45 +53,44 @@ class Home(MethodView):
         order_handler = BlockOrderHandler('schema/block_order.json')
         order = order_handler.load_order()
         complex_to_device_unsorted = get_complexes_dict()
-        complex_to_device: dict = {}
+        complex_to_graphs: dict = {}
         if order:
             for key, value in complex_to_device_unsorted.items():
                 order_list: list = order[: len(value)]
-                devices_list: list = []
+                graphs_list: list = []
                 for i in order_list:
-                    device = list(
+                    graph = list(
                         filter(
                             lambda x: x.id == int(i),
                             complex_to_device_unsorted[key],
                         ),
                     )
 
-                    if device:
-                        devices_list.append(device[0])
+                    if graph:
+                        graphs_list.append(graph[0])
 
-                if len(complex_to_device_unsorted[key]) > len(devices_list):
-                    devices_list.extend(
+                if len(complex_to_device_unsorted[key]) > len(graphs_list):
+                    graphs_list.extend(
                         list(
                             (
                                 Counter(complex_to_device_unsorted[key])
-                                - Counter(devices_list)
+                                - Counter(graphs_list)
                             ).elements(),
                         ),
                     )
 
-                complex_to_device[key] = devices_list
+                complex_to_graphs[key] = graphs_list
                 for _ in range(len(value)):
                     if order:
                         del order[0]
         else:
-            complex_to_device = get_complexes_dict()
+            complex_to_graphs = get_complexes_dict()
         return render_template(
             'home/homepage.html',
             now=datetime.now(),
             view_name='homepage',
-            complex_to_device=complex_to_device,
+            complex_to_graphs=complex_to_graphs,
             user=current_user,
-            unique=get_unique_devices(),
         )
 
 

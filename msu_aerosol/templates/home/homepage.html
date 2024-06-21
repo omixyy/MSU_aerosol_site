@@ -6,7 +6,7 @@
   <div class="mx-auto head">
     <h1>Аэрозольные комплексы МГУ</h1>
   </div>
-  {% for complex, devices in complex_to_device.items() %}
+  {% for complex, graphs in complex_to_graphs.items() %}
     <div class="default" id="com{{ complex.id }}">
       <h2 class="ms-3 mb-2">{{ complex }}
         {% if user and user.is_authenticated and user.role.can_access_admin %}
@@ -23,16 +23,16 @@
     <div class="pt-0 my-5 ms-3">
       <div class="container-fluid">
         <div class="row device-container" id="device-container-{{ complex.id }}">
-          {% for device in devices %}
-            {% if device.show %}
-              <div id="dev{{ device.id }}" class="device_content">
-                <h4>{{ device.name }}</h4>
+          {% for graph in graphs %}
+            {% if graph.device.show %}
+              <div id="dev{{ graph.id }}" class="device_content">
+                <h4>{{ graph.device.name }}</h4>
                 <hr>
                 <button class="btn btn-outline-dark hidden" onclick="moveLeft(this)">←</button>
                 <button class="btn btn-outline-dark hidden" onclick="moveRight(this)">→</button>
-                {% include "includes/devices/recent/graph_" ~ device.full_name ~ ".html" %}
+                {% include "includes/devices/recent/graph_" ~ graph.name ~ ".html" %}
                 <a class="btn btn-dark device_link"
-                   href="{{ url_for('device', device_id=device.id) }}">
+                   href="{{ url_for('device', graph_id=graph.id) }}">
                   Подробнее
                 </a>
               </div>

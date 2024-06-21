@@ -9,8 +9,8 @@ from flask import render_template, request, Response, send_file
 from flask.views import MethodView
 from flask_login import current_user, login_required
 
-from msu_aerosol.admin import get_complexes_dict, get_unique_devices
-from msu_aerosol.models import Device
+from msu_aerosol.admin import get_complexes_dict
+from msu_aerosol.models import Complex, Device
 
 __all__: list = []
 
@@ -28,15 +28,19 @@ class Archive(MethodView):
         :return: Шаблон страницы "Архив"
         """
 
-        complex_to_device: dict = get_unique_devices()
+        complex_to_graphs: dict = get_complexes_dict()
+        complex_to_devices: dict = {
+            com: Device.query.filter_by(complex_id=com.id)
+            for com in Complex.query.all()
+        }
         return render_template(
             'archive/archive.html',
             now=datetime.now(),
             view_name='archive',
-            complex_to_device=complex_to_device,
+            complex_to_graphs=complex_to_graphs,
+            complex_to_devices=complex_to_devices,
             archived=Device.query.filter_by(archived=True),
             user=current_user,
-            unique=get_unique_devices(),
         )
 
 
@@ -56,7 +60,7 @@ class DeviceArchive(MethodView):
         :return: Шаблон страницы архива прибора
         """
 
-        complex_to_device = get_complexes_dict()
+        complex_to_graphs = get_complexes_dict()
         device = Device.query.get_or_404(device_id)
         path = f'data/{device.full_name}'
         listdir = os.listdir(path)
@@ -82,8 +86,7 @@ class DeviceArchive(MethodView):
             view_name='device_archive',
             device=device,
             user=current_user,
-            complex_to_device=complex_to_device,
-            unique=get_unique_devices(),
+            complex_to_graphs=complex_to_graphs,
             files=files,
         )
 

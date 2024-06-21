@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block title %}{{ device }}{% endblock %}
+{% block title %}{{ graph.device.name }}{% endblock %}
 {% block content %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/device/device.css') }}">
   <script type="text/javascript" src="{{ url_for('static', filename='js/device/handlers.js') }}"></script>
   <div class="content">
     <div class="mx-auto head">
-      <h1>Данные с прибора {{ device }}</h1>
+      <h1>Данные с прибора {{ graph.device.name }}</h1>
     </div>
-    <h3 class="text">{{ device.name }}{% if device.serial_number %}, {{ device.serial_number }} {% endif %}</h3>
+    <h3 class="text">{{ graph.device.name }}{% if graph.device.serial_number %}, {{ graph.device.serial_number }} {% endif %}</h3>
     <h5 class="text">Состоит в комплексе "{{ complex }}"</h5>
-    <h5 class="text up"><a href="{{ url_for('device_archive', device_id=device.id) }}">Перейти в архив</a></h5>
+    <h5 class="text up"><a href="{{ url_for('device_archive', device_id=graph.device.id) }}">Перейти в архив</a></h5>
     {% if error %}
       <div class="alert alert-danger message" role="alert">
         {{ error }}
@@ -22,7 +22,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right"></button>
       </div>
     {% endif %}
-    <form method="POST" id="form_download" action="{{ url_for('device_download', device_id=device.id) }}">
+    <form method="POST" id="form_download" action="{{ url_for('device_download', graph_id=graph.id) }}">
       <div class="row">
         <div class="col">
           <label for="datetime_picker_start" class="control-label">Начало</label>
@@ -67,7 +67,7 @@
       {% include "includes/form.html" %}
     {% endif %}
   </div>
-  <div class="graph_container" id="#{{ device }}">
-    {% include "includes/devices/full/graph_" ~ device.full_name ~ ".html"  %}
+  <div class="graph_container" id="#{{ graph.device }}">
+    {% include "includes/devices/full/graph_" ~ graph.name ~ ".html"  %}
   </div>
 {% endblock %}

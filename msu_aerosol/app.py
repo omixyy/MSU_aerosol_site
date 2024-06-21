@@ -10,7 +10,7 @@ from msu_aerosol.models import db
 from views.about import About
 from views.archive import Archive, DeviceArchive
 from views.contacts import ACContacts, DevelopersContacts
-from views.device import DeviceDownload, DevicePage, DeviceUpload
+from views.device import DeviceDownload, DevicePage
 from views.homepage import Home, UpdateIndex
 from views.users import Login, Logout, Profile, Register
 
@@ -60,16 +60,12 @@ app.add_url_rule(
     view_func=ACContacts.as_view('ac_contacts'),
 )
 app.add_url_rule(
-    '/devices/<int:device_id>',
+    '/devices/<int:graph_id>',
     view_func=DevicePage.as_view('device'),
 )
 app.add_url_rule(
-    '/devices/<int:device_id>/download',
+    '/devices/<int:graph_id>/download',
     view_func=DeviceDownload.as_view('device_download'),
-)
-app.add_url_rule(
-    '/devices/<int:device_id>/upload',
-    view_func=DeviceUpload.as_view('device_upload'),
 )
 app.add_url_rule(
     '/profile',

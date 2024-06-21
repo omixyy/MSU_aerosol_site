@@ -11,7 +11,7 @@ from yadisk import YaDisk
 
 from msu_aerosol.config import yadisk_token
 from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
-from msu_aerosol.models import Device, DeviceTimeColumn
+from msu_aerosol.models import Device, Graph, TimeColumn
 
 __all__ = []
 
@@ -75,9 +75,10 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
             dev = Device.query.filter_by(full_name=i[0]).first()
         if not dev.archived:
             try:
-                preprocessing_one_file(i[0], i[1], app=app)
-                make_graph(i[0], spec_act='full', app=app)
-                make_graph(i[0], spec_act='recent', app=app)
+                for j in Graph.query.filter_by(device_id=dev.id).all():
+                    preprocessing_one_file(j, i[1], app=app)
+                    make_graph(j, spec_act='full', app=app)
+                    make_graph(j, spec_act='recent', app=app)
 
             except (KeyError, Exception):
                 pass
@@ -97,28 +98,24 @@ def download_device_data(full_name: str, link: str) -> None:
             )
 
 
-def preprocess_device_data(name_folder: str, app=None) -> None:
+def preprocess_device_data(name_folder: str, graph: Graph, app=None) -> None:
     for name_file in os.listdir(f'{main_path}/{name_folder}'):
         preprocessing_one_file(
-            name_folder,
+            graph,
             f'{main_path}/{name_folder}/{name_file}',
             app=app,
         )
 
 
-def get_time_col(device_obj):
+def get_time_col(graph_obj):
     return (
-        DeviceTimeColumn.query.filter_by(
+        TimeColumn.query.filter_by(
             use=True,
-            device_id=device_obj.id,
+            graph_id=graph_obj.id,
         )
         .first()
         .name
     )
-
-
-def get_columns(device_obj):
-    return Device.query.filter_by(id=device_obj.id).first().columns
 
 
 def proc_spaces(df, time_col):
@@ -137,7 +134,7 @@ def proc_spaces(df, time_col):
 
 
 def preprocessing_one_file(
-    device: str,
+    graph: Graph,
     path: str,
     user_upload=False,
     app=None,
@@ -160,28 +157,28 @@ def preprocessing_one_file(
         )
     if df.shape[0] == 0:
         return
-    device_obj = get_device_by_name(device, app=app)
+
     if app:
         with app.app_context():
-            time_col = get_time_col(device_obj)
+            time_col = get_time_col(graph)
     else:
-        time_col = get_time_col(device_obj)
-    columns = [j.name for j in device_obj.columns if j.use]
+        time_col = get_time_col(graph)
+    columns = [j.name for j in graph.columns if j.use]
     if any(
         (i not in list(df.columns) for i in [time_col] + columns),
     ):
         raise ColumnsMatchError('Проблемы с совпадением столбцов')
     df = df[[time_col] + columns]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
-    if not Path(f'proc_data/{device}').exists():
-        Path(f'proc_data/{device}').mkdir(parents=True)
+    if not Path(f'proc_data/{graph.name}').exists():
+        Path(f'proc_data/{graph.name}').mkdir(parents=True)
     try:
         if time_col == 'timestamp':
             df[time_col] = pd.to_datetime(df[time_col], unit='s')
         else:
             df[time_col] = pd.to_datetime(
                 df[time_col],
-                format=make_format_date(device_obj.time_format),
+                format=make_format_date(graph.time_format),
             )
     except (TypeError, ValueError):
         if not app:
@@ -197,7 +194,7 @@ def preprocessing_one_file(
                 )
             ]
             month = '0' + str(month) if month < 10 else str(month)
-            file_path = f'proc_data/{device}/{year}_{month}.csv'
+            file_path = f'proc_data/{graph.name}/{year}_{month}.csv'
             if Path(file_path).exists() or user_upload:
                 df_help = pd.read_csv(file_path)
                 df_help[time_col] = pd.to_datetime(df_help[time_col])
@@ -211,17 +208,14 @@ def preprocessing_one_file(
             df_month = df_month.sort_values(by=time_col).drop_duplicates(
                 subset=[time_col],
             )
+            df_month = df_month[[time_col] + columns]
             df_month.to_csv(file_path, index=False)
 
 
-def choose_range(device: str, app=None) -> tuple[pd.Timestamp, pd.Timestamp]:
-    time_col = [
-        i.name
-        for i in get_device_by_name(device, app=app).time_columns
-        if i.use
-    ][0]
-    list_files = os.listdir(f'proc_data/{device}')
-    proc_data = f'proc_data/{device}/{max(list_files)}'
+def choose_range(graph: Graph) -> tuple[pd.Timestamp, pd.Timestamp]:
+    time_col = [i.name for i in graph.time_columns if i.use][0]
+    list_files = os.listdir(f'proc_data/{graph.name}')
+    proc_data = f'proc_data/{graph.name}/{max(list_files)}'
     max_date = pd.to_datetime(
         pd.read_csv(proc_data)[time_col].iloc[-1],
     )
@@ -235,7 +229,7 @@ def get_spaced_colors(n):
 
 
 def make_graph(
-    device: str,
+    graph: Graph,
     spec_act: str,
     begin_record_date=None,
     end_record_date=None,
@@ -258,10 +252,27 @@ def make_graph(
                 else '%Y-%m-%dT%H:%M:%S'
             ),
         )
-    device_obj = get_device_by_name(device, app=app)
-    time_col = list(filter(lambda x: x.use, device_obj.time_columns))[0].name
+    if app:
+        with app.app_context():
+            time_col = (
+                TimeColumn.query.filter_by(
+                    graph_id=graph.id,
+                    use=True,
+                )
+                .first()
+                .name
+            )
+    else:
+        time_col = (
+            TimeColumn.query.filter_by(
+                graph_id=graph.id,
+                use=True,
+            )
+            .first()
+            .name
+        )
     if not begin_record_date or not end_record_date:
-        begin_record_date, end_record_date = choose_range(device, app=app)
+        begin_record_date, end_record_date = choose_range(graph)
     if spec_act == 'full':
         begin_record_date = end_record_date - timedelta(days=15)
     if spec_act == 'recent':
@@ -271,7 +282,7 @@ def make_graph(
         try:
             data = pd.read_csv(
                 f'proc_data/'
-                f'{device}/'
+                f'{graph.name}/'
                 f'{current_date.strftime("%Y_%m")}.csv',
             )
             combined_data = pd.concat([combined_data, data], ignore_index=True)
@@ -334,14 +345,10 @@ def make_graph(
     fig = px.line(
         combined_data,
         x=time_col,
-        y=[i.name for i in device_obj.columns if i.use],
-        color_discrete_sequence=[i.color for i in device_obj.columns if i.use],
+        y=[i.name for i in graph.columns if i.use],
+        color_discrete_sequence=[i.color for i in graph.columns if i.use],
     )
-    if app:
-        with app.app_context():
-            cols = get_columns(device_obj)
-    else:
-        cols = get_columns(device_obj)
+    cols = graph.columns
     for trace in fig.data:
         for i in cols:
             if i.name == trace['name']:
@@ -349,8 +356,8 @@ def make_graph(
                 break
 
     fig.update_layout(
-        title=str(device),
-        xaxis={'title': [i.name for i in device_obj.time_columns if i.use][0]},
+        title=str(graph.device.full_name),
+        xaxis={'title': [i.name for i in graph.time_columns if i.use][0]},
         plot_bgcolor='white',
         paper_bgcolor='white',
         showlegend=True,
@@ -379,7 +386,7 @@ def make_graph(
             f'includes/'
             f'devices/'
             f'{spec_act}'
-            f'/graph_{device}.html'
+            f'/graph_{graph.name}.html'
         ),
         auto_open=False,
         include_plotlyjs=False,

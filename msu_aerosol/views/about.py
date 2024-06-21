@@ -4,7 +4,7 @@ from flask import render_template
 from flask.views import MethodView
 from flask_login import current_user
 
-from msu_aerosol.admin import get_complexes_dict, get_unique_devices
+from msu_aerosol.admin import get_complexes_dict
 
 __all__: list = []
 
@@ -21,12 +21,11 @@ class About(MethodView):
         :return: Шаблон страницы "О сайте"
         """
 
-        complex_to_device = get_complexes_dict()
+        complex_to_graphs = get_complexes_dict()
         return render_template(
             'about/about.html',
             now=datetime.now(),
             view_name='about',
-            complex_to_device=complex_to_device,
+            complex_to_graphs=complex_to_graphs,
             user=current_user,
-            unique=get_unique_devices(),
         )

@@ -25,15 +25,18 @@ from msu_aerosol.graph_funcs import (
 )
 from msu_aerosol.models import (
     Complex,
+    ComplexView,
     db,
     Device,
-    DeviceDataColumn,
-    DeviceTimeColumn,
     DeviceView,
+    Graph,
+    GraphView,
     ProtectedView,
     Role,
+    TimeColumn,
     User,
     UserFieldView,
+    VariableColumn,
 )
 
 __all__ = []
@@ -58,8 +61,10 @@ def get_admin_template(
     return obj.render(
         'admin/admin_home.html',
         name_to_device={
-            dev.full_name: dev
-            for dev in Device.query.filter_by(archived=False).all()
+            graph.name: graph
+            for graph in Graph.query.join(Device)
+            .filter(Device.archived == bool(0))
+            .all()
         },
         message_error=error,
         message_success=success,
@@ -89,9 +94,7 @@ class AdminHomeView(AdminIndexView):
         """
 
         downloaded: list[str] = os.listdir('data')
-        all_devices: list[Device] = Device.query.filter_by(
-            archived=False,
-        ).all()
+        all_graphs: list[Device] = Graph.query.all()
         downloaded.remove('.gitignore')
 
         if request.method == 'POST':
@@ -113,11 +116,11 @@ class AdminHomeView(AdminIndexView):
                 complex_id = device.complex_id
                 device_record.delete()
 
-                cols = DeviceDataColumn.query.filter_by(device_id=dev_id)
-                time_cols = DeviceTimeColumn.query.filter_by(device_id=dev_id)
-                cols.delete()
-                time_cols.delete()
+                for graph in Graph.query.filter_by(device_id=dev_id):
+                    VariableColumn.query.filter_by(graph_id=graph.id).delete()
+                    TimeColumn.query.filter_by(graph_id=graph.id).delete()
 
+                Graph.query.filter_by(device_id=dev_id).delete()
                 new_device: Device = Device(
                     id=dev_id,
                     name=name,
@@ -138,74 +141,78 @@ class AdminHomeView(AdminIndexView):
                 )
 
             changed: list[Device] = []
-            for dev in all_devices:
-                full_name = dev.full_name
-                usable_cols = [i.name for i in dev.columns if i.use]
-                time_col = [i.name for i in dev.time_columns if i.use]
+            for graph in all_graphs:
+                usable_cols = [i.name for i in graph.columns if i.use]
+                time_col = [i.name for i in graph.time_columns if i.use]
                 default_cols = [
                     i.name
-                    for i in DeviceDataColumn.query.filter_by(
+                    for i in VariableColumn.query.filter_by(
                         default=True,
-                        device_id=dev.id,
+                        graph_id=graph.id,
                     ).all()
                 ]
                 if (
-                    request.form.getlist(f'{full_name}_cb') != usable_cols
+                    request.form.getlist(f'{graph.name}_cb') != usable_cols
                     or not usable_cols
                     or not time_col
-                    or request.form.get(f'{full_name}_rb') != time_col[0]
-                    or request.form.getlist(f'{full_name}_cb_def')
+                    or request.form.get(f'{graph.name}_rb') != time_col[0]
+                    or request.form.getlist(f'{graph.name}_cb_def')
                     != default_cols
-                    or request.form.get(f'datetime_format_{full_name}')
-                    != dev.time_format
+                    or request.form.get(f'datetime_format_{graph.name}')
+                    != graph.time_format
                     or not Path(
                         f'templates/'
                         f'includes/'
                         f'devices/'
                         f'full/'
-                        f'graph_{full_name}.html',
+                        f'graph_{graph.name}.html',
                     ).exists()
                 ):
-                    changed.append(dev)
+                    changed.append(graph)
 
-            for dev in changed:
-                full_name = dev.full_name
-                checkboxes = request.form.getlist(f'{full_name}_cb')
-                radio = request.form.get(f'{full_name}_rb')
-                defaults = request.form.getlist(f'{full_name}_cb_def')
-                time_format = request.form.get(f'datetime_format_{full_name}')
+            for graph in changed:
+                checkboxes = request.form.getlist(f'{graph.name}_cb')
+                radio = request.form.get(f'{graph.name}_rb')
+                defaults = request.form.getlist(f'{graph.name}_cb_def')
+                time_format = request.form.get(f'datetime_format_{graph.name}')
                 if set(defaults).issubset(set(checkboxes)):
-                    for col in DeviceDataColumn.query.filter_by(
+                    for col in VariableColumn.query.filter_by(
                         use=True,
-                        device_id=dev.id,
+                        graph_id=graph.id,
                     ):
                         col.use = False
                         col.default = False
-                    time_cols = DeviceTimeColumn.query.filter_by(
+
+                    time_cols = TimeColumn.query.filter_by(
                         use=True,
-                        device_id=dev.id,
+                        graph_id=graph.id,
                     ).all()
                     for i in time_cols:
                         i.use = False
                     for i in checkboxes:
-                        for k in DeviceDataColumn.query.filter_by(
+                        for k in VariableColumn.query.filter_by(
                             name=i,
-                            device_id=dev.id,
+                            graph_id=graph.id,
                         ):
                             k.use = True
                             if i in defaults:
                                 k.default = True
-                    for j in DeviceTimeColumn.query.filter_by(
+                    for j in TimeColumn.query.filter_by(
                         name=radio,
-                        device_id=dev.id,
+                        graph_id=graph.id,
                     ):
                         j.use = True
-                    dev.time_format = time_format
+                    graph.time_format = time_format
                     db.session.commit()
                     try:
-                        preprocess_device_data(full_name)
-                        make_graph(full_name, 'full')
-                        make_graph(full_name, 'recent')
+                        full_name = (
+                            Device.query.filter_by(id=graph.device_id)
+                            .first()
+                            .full_name
+                        )
+                        preprocess_device_data(full_name, graph)
+                        make_graph(graph, 'full')
+                        make_graph(graph, 'recent')
 
                     except TimeFormatError:
                         return get_admin_template(
@@ -238,8 +245,8 @@ class AdminHomeView(AdminIndexView):
                         error='Не совпадают списки столбцов.',
                     )
 
-            for dev in all_devices:
-                dev.show = True
+            for graph in all_graphs:
+                graph.device.show = True
                 db.session.commit()
 
         return get_admin_template(self)
@@ -254,25 +261,14 @@ def get_complexes_dict() -> dict[Complex, list[Device]]:
     """
 
     return {
-        com: Device.query.filter_by(
-            complex_id=com.id,
-            archived=False,
-        ).all()
+        com: Graph.query.join(Device)
+        .filter(
+            Device.complex_id == com.id,
+            Device.archived == bool(0),
+        )
+        .all()
         for com in Complex.query.all()
     }
-
-
-def get_unique_devices():
-    complex_to_device: dict = {}
-    for key, value in get_complexes_dict().items():
-        new_value: list = []
-        for i in value:
-            if i.link not in [x.link for x in new_value]:
-                new_value.append(i)
-        complex_to_device[key] = new_value.copy()
-        new_value.clear()
-
-    return complex_to_device
 
 
 def csv_exists(path: str) -> bool:
@@ -294,8 +290,58 @@ def get_dialect(path: str) -> Type[csv.Dialect | csv.Dialect]:
         return csv.Sniffer().sniff(f.readline())
 
 
+def add_columns(graph: Graph, full_name=None) -> None:
+    if not full_name:
+        full_name = graph.device.full_name
+    file = [
+        x
+        for x in os.listdir(
+            f'data/{full_name}',
+        )
+        if x.endswith('.csv') or x.endswith('.txt')
+    ][0]
+    dialect = get_dialect(f'data/{full_name}/{file}')
+    with Path(f'data/{full_name}/{file}').open(
+        'r',
+        encoding='utf8' if csv_exists(f'data/{full_name}') else 'latin',
+    ) as csv_file:
+        header = list(csv.reader(csv_file, dialect=dialect))[0]
+        colors = get_spaced_colors(len(header))
+    for column, color in zip(header, colors):
+        if 'time' in column.lower() or 'date' in column.lower():
+            time_col = TimeColumn(
+                name=column,
+                graph_id=graph.id,
+            )
+
+            db.session.add(time_col)
+
+        else:
+            col = VariableColumn(
+                name=column,
+                graph_id=graph.id,
+                color=(
+                    '#ffba42'
+                    if column == 'BCbb'
+                    else '#3D3C3C' if column == 'BCff' else color
+                ),
+            )
+
+            db.session.add(col)
+
+
+@listens_for(Graph, 'after_insert')
+def graph_after_insert(mapper, connection, target) -> None:
+    @listens_for(db.session, 'after_flush', once=True)
+    def receive_after_flush(session, context) -> None:
+        add_columns(
+            target,
+            full_name=Device.query.get(target.device_id).full_name,
+        )
+
+
 @listens_for(Device, 'after_insert')
-def after_insert(mapper, connection, target) -> None:
+def device_after_insert(mapper, connection, target) -> None:
     """
     Функция, срабатывающая после того,
     как в таблицу devices в БД была добавлена запись.
@@ -313,21 +359,6 @@ def after_insert(mapper, connection, target) -> None:
     """
 
     download_device_data(target.full_name, target.link)
-    full_name = target.full_name
-    file = [
-        x
-        for x in os.listdir(
-            f'data/{full_name}',
-        )
-        if x.endswith('.csv') or x.endswith('.txt')
-    ][0]
-    dialect = get_dialect(f'data/{full_name}/{file}')
-    with Path(f'data/{full_name}/{file}').open(
-        'r',
-        encoding='utf8' if csv_exists(f'data/{full_name}') else 'latin',
-    ) as csv_file:
-        header = list(csv.reader(csv_file, dialect=dialect))[0]
-        colors = get_spaced_colors(len(header))
 
     @listens_for(db.session, 'after_flush', once=True)
     def receive_after_flush(session, context) -> None:
@@ -341,27 +372,12 @@ def after_insert(mapper, connection, target) -> None:
         :return: None
         """
 
-        for column, color in zip(header, colors):
-            if 'time' in column.lower() or 'date' in column.lower():
-                time_col = DeviceTimeColumn(
-                    name=column,
-                    device_id=target.id,
-                )
-
-                db.session.add(time_col)
-
-            else:
-                col = DeviceDataColumn(
-                    name=column,
-                    device_id=target.id,
-                    color=(
-                        '#ffba42'
-                        if column == 'BCbb'
-                        else '#3D3C3C' if column == 'BCff' else color
-                    ),
-                )
-
-                db.session.add(col)
+        if not target.archived or target.show:
+            graph = Graph(
+                name=target.full_name,
+                device_id=target.id,
+            )
+            db.session.add(graph)
 
 
 def remove_device_data(full_name: str) -> None:
@@ -472,7 +488,8 @@ def init_admin(app: Flask) -> None:
 
     login_manager.init_app(app)
     admin.init_app(app)
-    admin.add_view(ProtectedView(Complex, db.session))
+    admin.add_view(ComplexView(Complex, db.session))
     admin.add_view(DeviceView(Device, db.session))
     admin.add_view(UserFieldView(User, db.session))
     admin.add_view(ProtectedView(Role, db.session))
+    admin.add_view(GraphView(Graph, db.session))

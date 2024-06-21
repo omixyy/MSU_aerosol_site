@@ -40,7 +40,7 @@ class BaseColumnModel(db.Model):
     use = db.Column(db.Boolean, nullable=False, default=False)
 
     @declared_attr
-    def device_id(self) -> sqlalchemy.Column:
+    def graph_id(self) -> sqlalchemy.Column:
         """
         Поле, связанное с id прибора.
 
@@ -49,7 +49,7 @@ class BaseColumnModel(db.Model):
 
         return db.Column(
             db.Integer,
-            db.ForeignKey('devices.id'),
+            db.ForeignKey('graphs.id'),
             nullable=False,
         )
 
@@ -67,10 +67,10 @@ class Complex(BaseModel):
         cascade='all, delete-orphan',
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.name
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -84,8 +84,13 @@ class Device(BaseModel):
     serial_number = db.Column(db.String, default='')
     show = db.Column(db.Boolean, nullable=True, default=False)
     link = db.Column(db.String, nullable=False)
-    time_format = db.Column(db.String, nullable=True)
     archived = db.Column(db.Boolean, default=False)
+    graphs = db.relationship(
+        'Graph',
+        backref='device',
+        lazy='subquery',
+        cascade='all, delete-orphan',
+    )
     full_name = db.Column(
         db.String,
         default=lambda context: (
@@ -95,29 +100,16 @@ class Device(BaseModel):
             else f'{context.get_current_parameters()["name"]}'
         ),
     )
-
-    columns = db.relationship(
-        'DeviceDataColumn',
-        backref='device',
-        lazy='subquery',
-        cascade='all, delete-orphan',
-    )
-    time_columns = db.relationship(
-        'DeviceTimeColumn',
-        backref='device',
-        lazy='subquery',
-        cascade='all, delete-orphan',
-    )
     complex_id = db.Column(
         db.Integer,
         db.ForeignKey('complexes.id'),
         nullable=True,
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.name
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -139,7 +131,7 @@ class User(BaseModel, UserMixin):
         default=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.login
 
 
@@ -159,26 +151,56 @@ class Role(BaseModel):
         cascade='all, delete-orphan',
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.name
 
 
-class DeviceDataColumn(BaseColumnModel):
+class Graph(BaseModel):
+    __tablename__ = 'graphs'
+
+    device_id = db.Column(
+        db.Integer,
+        db.ForeignKey('devices.id'),
+        nullable=True,
+    )
+    time_format = db.Column(db.String, nullable=True)
+    created = db.Column(
+        db.Boolean,
+        default=False,
+    )
+    columns = db.relationship(
+        'VariableColumn',
+        backref='graph',
+        lazy='subquery',
+        cascade='all, delete-orphan',
+    )
+    time_columns = db.relationship(
+        'TimeColumn',
+        backref='graph',
+        lazy='subquery',
+        cascade='all, delete-orphan',
+    )
+
+    def __repr__(self) -> str:
+        return self.name
+
+
+class VariableColumn(BaseColumnModel):
     """
     Таблица столбцов.
     """
 
-    __tablename__ = 'column'
+    __tablename__ = 'columns'
     color = db.Column(db.String)
     default = db.Column(db.Boolean, default=False)
 
 
-class DeviceTimeColumn(BaseColumnModel):
+class TimeColumn(BaseColumnModel):
     """
     Таблица столбцов времени.
     """
 
-    __tablename__ = 'time_column'
+    __tablename__ = 'time_columns'
 
 
 class UserFieldView(ProtectedView):
@@ -186,14 +208,14 @@ class UserFieldView(ProtectedView):
     Эти поля бут отображаться в админке в таблице пользователей.
     """
 
-    column_list = (
+    column_list = [
         'id',
         'login',
         'name',
         'surname',
         'email',
         'created_date',
-    )
+    ]
 
     form_excluded_columns = ('password',)
 
@@ -203,17 +225,34 @@ class DeviceView(ProtectedView):
     Эти поля бут отображаться в админке в таблице приборов.
     """
 
-    column_list = (
+    column_list = [
         'id',
         'name',
         'full_name',
         'serial_number',
         'complex_id',
-    )
+        'graphs',
+    ]
     form_excluded_columns = (
         'show',
         'columns',
         'time_format',
         'time_columns',
         'full_name',
+    )
+
+
+class ComplexView(ProtectedView):
+    column_list = [
+        'id',
+        'name',
+        'devices',
+    ]
+
+
+class GraphView(ProtectedView):
+    form_excluded_columns = (
+        'created',
+        'time_columns',
+        'columns',
     )

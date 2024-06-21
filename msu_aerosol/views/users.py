@@ -24,7 +24,6 @@ from forms.auth_forms import LoginForm, RegisterForm
 from forms.profile_form import ProfileForm
 from msu_aerosol.admin import (
     get_complexes_dict,
-    get_unique_devices,
     login_manager,
 )
 from msu_aerosol.models import db, User
@@ -55,17 +54,16 @@ def get_registration_template(error: str | None) -> str:
     :return: Шаблон страницы регистрации
     """
 
-    complex_to_device = get_complexes_dict()
+    complex_to_graphs = get_complexes_dict()
     form = RegisterForm()
     return render_template(
         'users/register.html',
         form=form,
         message_error=error,
-        complex_to_device=complex_to_device,
+        complex_to_graphs=complex_to_graphs,
         user=current_user,
         now=datetime.now(),
         view_name='registration',
-        unique=get_unique_devices(),
     )
 
 
@@ -78,16 +76,15 @@ def get_profile_template(message: str | None, form: ProfileForm) -> str:
     :return: Шаблон страницы профиля
     """
 
-    complex_to_device = get_complexes_dict()
+    complex_to_graphs = get_complexes_dict()
     return render_template(
         'users/profile.html',
         now=datetime.now(),
-        complex_to_device=complex_to_device,
+        complex_to_graphs=complex_to_graphs,
         view_name='profile',
         user=current_user,
         form=form,
         message_success=message,
-        unique=get_unique_devices(),
     )
 
 
@@ -99,17 +96,16 @@ def get_login_template(error: str | None) -> str:
     :return: Шаблон страницы входа
     """
 
-    complex_to_device = get_complexes_dict()
+    complex_to_graphs = get_complexes_dict()
     form = LoginForm()
     return render_template(
         'users/login.html',
         form=form,
         message_error=error,
-        complex_to_device=complex_to_device,
+        complex_to_graphs=complex_to_graphs,
         now=datetime.now(),
         view_name='login',
         user=current_user,
-        unique=get_unique_devices(),
     )
 
 
