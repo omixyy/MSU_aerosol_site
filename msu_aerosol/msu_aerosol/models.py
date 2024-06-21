@@ -255,4 +255,5 @@ class GraphView(ProtectedView):
         'created',
         'time_columns',
         'columns',
+        'time_format',
     )
