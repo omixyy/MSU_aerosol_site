@@ -1,3 +1,4 @@
+import asyncio
 import atexit
 import csv
 import os
@@ -63,7 +64,7 @@ def get_admin_template(
         name_to_device={
             graph.name: graph
             for graph in Graph.query.join(Device)
-            .filter(Device.archived == bool(0))
+            .filter(Device.archived == 0)
             .all()
         },
         message_error=error,
@@ -133,7 +134,16 @@ class AdminHomeView(AdminIndexView):
                 )
                 db.session.add(new_device)
                 db.session.commit()
-                download_device_data(new_device.full_name, new_device.link)
+                if os.name == 'nt':
+                    asyncio.set_event_loop_policy(
+                        asyncio.WindowsSelectorEventLoopPolicy(),
+                    )
+                asyncio.run(
+                    download_device_data(
+                        new_device.full_name,
+                        new_device.link,
+                    ),
+                )
                 init_schedule(None, None, None)
                 return get_admin_template(
                     self,
@@ -210,7 +220,12 @@ class AdminHomeView(AdminIndexView):
                             .first()
                             .full_name
                         )
-                        preprocess_device_data(full_name, graph)
+                        asyncio.run(
+                            preprocess_device_data(
+                                full_name,
+                                graph,
+                            ),
+                        )
                         make_graph(graph, 'full')
                         make_graph(graph, 'recent')
 
@@ -265,7 +280,7 @@ def get_complexes_dict() -> dict[Complex, list[Device]]:
         com: Graph.query.join(Device)
         .filter(
             Device.complex_id == com.id,
-            Device.archived == bool(0),
+            Device.archived == 0,
         )
         .all()
         for com in Complex.query.all()
@@ -359,7 +374,9 @@ def device_after_insert(mapper, connection, target) -> None:
     :return: None
     """
 
-    download_device_data(target.full_name, target.link)
+    if os.name == 'nt':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.run(download_device_data(target.full_name, target.link))
 
     @listens_for(db.session, 'after_flush', once=True)
     def receive_after_flush(session, context) -> None:

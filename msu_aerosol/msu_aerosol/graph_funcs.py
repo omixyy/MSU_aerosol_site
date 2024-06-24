@@ -1,3 +1,4 @@
+import asyncio
 from datetime import timedelta
 from io import BytesIO
 import json
@@ -7,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
-from yadisk import YaDisk
+from yadisk import AsyncYaDisk, YaDisk
 
 from msu_aerosol.config import yadisk_token
 from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
@@ -25,8 +26,8 @@ def get_device_by_name(name: str, app=None) -> Device | None:
 
 
 main_path = 'data'
-disk = YaDisk(token=yadisk_token)
-base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?'
+disk_async = AsyncYaDisk(token=yadisk_token)
+disk_sync = YaDisk(token=yadisk_token)
 
 
 def make_format_date(date: str) -> str:
@@ -45,7 +46,9 @@ def make_visible_date_format(date: str) -> str:
 def no_csv(link: str) -> bool:
     return all(
         not i['name'].endswith('.csv')
-        for i in disk.get_public_meta(link, limit=1000)['embedded']['items']
+        for i in disk_sync.get_public_meta(link, limit=1000)['embedded'][
+            'items'
+        ]
     )
 
 
@@ -57,12 +60,14 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
                 lambda y: y['name'].endswith(
                     '.txt' if no_csv(link) else '.csv',
                 ),
-                disk.get_public_meta(link, limit=1000)['embedded']['items'],
+                disk_sync.get_public_meta(link, limit=1000)['embedded'][
+                    'items'
+                ],
             ),
             key=lambda x: x['modified'],
         )[-1]
         file_path = f'data/{full_name}/{last_modified_file["name"]}'
-        disk.download_by_link(
+        disk_sync.download_by_link(
             last_modified_file['file'],
             f'{main_path}/{full_name}/{last_modified_file["name"]}',
         )
@@ -84,18 +89,29 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
                 pass
 
 
-def download_device_data(full_name: str, link: str) -> None:
-    items = disk.get_public_meta(link, limit=1000)
+async def download_file(full_name: str, element: dict) -> None:
+    loop = asyncio.get_event_loop()
+    async with disk_async:
+        await loop.run_in_executor(
+            None,
+            disk_sync.download_by_link,
+            element['file'],
+            f'{main_path}/{full_name}/{element["name"]}',
+        )
+
+
+async def download_device_data(full_name: str, link: str) -> None:
+    tasks: list = []
+    items = disk_sync.get_public_meta(link, limit=1000)
     for i in items['embedded']['items']:
         if not Path(f'{main_path}/{full_name}').exists():
             Path(f'{main_path}/{full_name}').mkdir(parents=True)
         if i['name'].endswith('.csv') or (
             i['name'].endswith('.txt') and no_csv(link)
         ):
-            disk.download_by_link(
-                i['file'],
-                f'{main_path}/{full_name}/{i["name"]}',
-            )
+            tasks.append(download_file(full_name, i))
+
+    await asyncio.gather(*tasks)
 
 
 def preprocess_device_data(name_folder: str, graph: Graph, app=None) -> None:
