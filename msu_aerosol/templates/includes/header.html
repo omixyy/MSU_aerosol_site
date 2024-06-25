@@ -2,7 +2,7 @@
 <header>
   <nav class="navbar navbar-expand navbar-light bg-light">
     <a class="navbar-brand"
-       href="{% if view_name != 'homepage' %} {{ url_for('home') }} {% else %} # {% endif %}">
+       href="{{ url_for('home') }}}">
       <img src="{{ url_for('static', filename='img/MSU_logo.png') }}" width="30" height="30" alt=""
            style="margin-left: 15px;">
     </a>
@@ -14,19 +14,19 @@
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'homepage' %} active {% endif %}"
-             href="{% if view_name != 'homepage' %} {{ url_for('home') }} {% else %} # {% endif %}">
+             href="{{ url_for('home') }}" id="home-link">
             Главная
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'about' %} active {% endif %}"
-             href="{% if view_name != 'about' %} {{ url_for('about') }} {% else %} # {% endif %}">
+             href="{{ url_for('about') }}">
             О сайте
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if view_name == 'ac_contacts' %} active {% endif %}"
-             href="{% if view_name != 'ac_contacts' %} {{ url_for('ac_contacts') }} {% else %} # {% endif %}">
+             href="{{ url_for('ac_contacts') }}">
             Контакты
           </a>
         </li>
@@ -111,10 +111,7 @@
     {% endif %}
     {% if user and not user.is_authenticated %}
       <a type="button"
-         href="{% if view_name not in ['registration', 'login'] %}
-         {{ url_for('login') }}
-         {% else %} #
-         {% endif %}"
+         href="{{ url_for('login') }}"
          class="btn btn-outline-dark ml-5"
          style="margin-right: 15px">
         Войти
