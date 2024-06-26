@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
   const links = document.querySelectorAll('a');
-  console.log(links)
   const currentPath = window.location.pathname;
 
   links.forEach(link => {
