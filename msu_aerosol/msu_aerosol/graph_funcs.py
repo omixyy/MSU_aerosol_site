@@ -380,6 +380,8 @@ def make_graph(
     )
     fig.update_traces(line={'width': 2})
     fig.update_xaxes(
+        zerolinecolor='grey',
+        zerolinewidth=1,
         gridcolor='grey',
         showline=True,
         linewidth=1,
@@ -389,6 +391,8 @@ def make_graph(
         minor_griddash='dot',
     )
     fig.update_yaxes(
+        zerolinecolor='grey',
+        zerolinewidth=1,
         gridcolor='grey',
         showline=True,
         linewidth=1,
