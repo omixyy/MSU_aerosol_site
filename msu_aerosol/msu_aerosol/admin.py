@@ -214,46 +214,44 @@ class AdminHomeView(AdminIndexView):
                         j.use = True
                     graph.time_format = time_format
                     db.session.commit()
-                    try:
-                        full_name = (
-                            Device.query.filter_by(id=graph.device_id)
-                            .first()
-                            .full_name
-                        )
-                        asyncio.run(
-                            preprocess_device_data(
-                                full_name,
-                                graph,
-                            ),
-                        )
-                        make_graph(graph, 'full')
-                        make_graph(graph, 'recent')
+                    # try:
+                    full_name = (
+                        Device.query.filter_by(id=graph.device_id)
+                        .first()
+                        .full_name
+                    )
+                    preprocess_device_data(
+                        full_name,
+                        graph,
+                    )
+                    make_graph(graph, 'full')
+                    make_graph(graph, 'recent')
 
-                    except TimeFormatError:
-                        return get_admin_template(
-                            self,
-                            error='Формат времени не подходит под столбец',
-                        )
-
-                    except ColumnsMatchError:
-                        return get_admin_template(
-                            self,
-                            error='Обнаружено несовпадение столбцов',
-                        )
-
-                    except ValueError:
-                        return get_admin_template(
-                            self,
-                            error='Невозможно предобработать данные '
-                            'по выбранным столбцам',
-                        )
-
-                    except Exception as e:
-                        error = e.__class__.__name__
-                        return get_admin_template(
-                            self,
-                            error=f'Непредвиденная ошибка: {error}',
-                        )
+                    # except TimeFormatError:
+                    #     return get_admin_template(
+                    #         self,
+                    #         error='Формат времени не подходит под столбец',
+                    #     )
+                    #
+                    # except ColumnsMatchError:
+                    #     return get_admin_template(
+                    #         self,
+                    #         error='Обнаружено несовпадение столбцов',
+                    #     )
+                    #
+                    # except ValueError:
+                    #     return get_admin_template(
+                    #         self,
+                    #         error='Невозможно предобработать данные '
+                    #         'по выбранным столбцам',
+                    #     )
+                    #
+                    # except Exception as e:
+                    #     error = e.__class__.__name__
+                    #     return get_admin_template(
+                    #         self,
+                    #         error=f'Непредвиденная ошибка: {error}',
+                    #     )
                 else:
                     return get_admin_template(
                         self,
