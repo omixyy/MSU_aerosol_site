@@ -80,6 +80,84 @@ class AdminHomeView(AdminIndexView):
     def __init__(self, name=None, url=None) -> None:
         super().__init__(name=name, url=url, template='admin/admin_home.html')
 
+    @classmethod
+    def check_if_graph_changed(cls, graph: Graph) -> bool:
+        usable_cols = [i.name for i in graph.columns if i.use]
+        time_col = [i.name for i in graph.time_columns if i.use]
+        default_cols = [
+            i.name
+            for i in VariableColumn.query.filter_by(
+                default=True,
+                graph_id=graph.id,
+            )
+        ]
+        return (
+            request.form.getlist(f'{graph.name}_cb') != usable_cols
+            or not usable_cols
+            or not time_col
+            or request.form.get(f'{graph.name}_rb') != time_col[0]
+            or request.form.getlist(f'{graph.name}_cb_def') != default_cols
+            or request.form.get(f'datetime_format_{graph.name}')
+            != graph.time_format
+            or not Path(
+                f'templates/'
+                f'includes/'
+                f'devices/'
+                f'full/'
+                f'graph_{graph.name}.html',
+            ).exists()
+        )
+
+    def recreate_device(self, full_name_reloaded: str) -> str:
+        device_record = Device.query.filter_by(
+            full_name=full_name_reloaded,
+        )
+        device = device_record.first()
+        remove_device_data(full_name_reloaded)
+
+        dev_id = device.id
+        name = device.name
+        full_name = device.full_name
+        link = device.link
+        show = device.show
+        serial_number = device.serial_number
+        archived = device.archived
+        complex_id = device.complex_id
+        device_record.delete()
+
+        for graph in Graph.query.filter_by(device_id=dev_id):
+            VariableColumn.query.filter_by(graph_id=graph.id).delete()
+            TimeColumn.query.filter_by(graph_id=graph.id).delete()
+
+        Graph.query.filter_by(device_id=dev_id).delete()
+        new_device: Device = Device(
+            id=dev_id,
+            name=name,
+            full_name=full_name,
+            link=link,
+            show=show,
+            serial_number=serial_number,
+            archived=archived,
+            complex_id=complex_id,
+        )
+        db.session.add(new_device)
+        db.session.commit()
+        if os.name == 'nt':
+            asyncio.set_event_loop_policy(
+                asyncio.WindowsSelectorEventLoopPolicy(),
+            )
+        asyncio.run(
+            download_device_data(
+                new_device.full_name,
+                new_device.link,
+            ),
+        )
+        init_schedule(None, None, None)
+        return get_admin_template(
+            self,
+            success='Данные успешно обновлены',
+        )
+
     def is_accessible(self) -> bool:
         return (
             current_user.is_authenticated
@@ -89,7 +167,8 @@ class AdminHomeView(AdminIndexView):
     @expose('/', methods=['GET', 'POST'])
     def admin_index(self) -> str:
         """
-        Функция, срабатывающая при нажатии на кнопку "подтвердить" в админке.
+        Функция, срабатывающая при нажатии на кнопку "подтвердить"
+        в админке или перезагрузке прибора.
 
         :return: Шаблон домашней страницы админки
         """
@@ -101,83 +180,11 @@ class AdminHomeView(AdminIndexView):
         if request.method == 'POST':
             full_name_reloaded: str = request.form.get('device')
             if full_name_reloaded:
-                device_record = Device.query.filter_by(
-                    full_name=full_name_reloaded,
-                )
-                device = device_record.first()
-                remove_device_data(full_name_reloaded)
-
-                dev_id = device.id
-                name = device.name
-                full_name = device.full_name
-                link = device.link
-                show = device.show
-                serial_number = device.serial_number
-                archived = device.archived
-                complex_id = device.complex_id
-                device_record.delete()
-
-                for graph in Graph.query.filter_by(device_id=dev_id):
-                    VariableColumn.query.filter_by(graph_id=graph.id).delete()
-                    TimeColumn.query.filter_by(graph_id=graph.id).delete()
-
-                Graph.query.filter_by(device_id=dev_id).delete()
-                new_device: Device = Device(
-                    id=dev_id,
-                    name=name,
-                    full_name=full_name,
-                    link=link,
-                    show=show,
-                    serial_number=serial_number,
-                    archived=archived,
-                    complex_id=complex_id,
-                )
-                db.session.add(new_device)
-                db.session.commit()
-                if os.name == 'nt':
-                    asyncio.set_event_loop_policy(
-                        asyncio.WindowsSelectorEventLoopPolicy(),
-                    )
-                asyncio.run(
-                    download_device_data(
-                        new_device.full_name,
-                        new_device.link,
-                    ),
-                )
-                init_schedule(None, None, None)
-                return get_admin_template(
-                    self,
-                    success='Данные успешно обновлены',
-                )
+                self.recreate_device(full_name_reloaded)
 
             changed: list[Device] = []
             for graph in all_graphs:
-                usable_cols = [i.name for i in graph.columns if i.use]
-                time_col = [i.name for i in graph.time_columns if i.use]
-                default_cols = [
-                    i.name
-                    for i in VariableColumn.query.filter_by(
-                        default=True,
-                        graph_id=graph.id,
-                    ).all()
-                ]
-                if (
-                    request.form.getlist(f'{graph.name}_cb') != usable_cols
-                    or not usable_cols
-                    or not time_col
-                    or request.form.get(f'{graph.name}_rb') != time_col[0]
-                    or request.form.getlist(f'{graph.name}_cb_def')
-                    != default_cols
-                    or request.form.get(f'datetime_format_{graph.name}')
-                    != graph.time_format
-                    or not Path(
-                        f'templates/'
-                        f'includes/'
-                        f'devices/'
-                        f'full/'
-                        f'graph_{graph.name}.html',
-                    ).exists()
-                ):
+                if self.check_if_graph_changed(graph):
                     changed.append(graph)
 
             for graph in changed:
@@ -187,31 +194,15 @@ class AdminHomeView(AdminIndexView):
                 time_format = request.form.get(f'datetime_format_{graph.name}')
                 if set(defaults).issubset(set(checkboxes)):
                     for col in VariableColumn.query.filter_by(
-                        use=True,
                         graph_id=graph.id,
                     ):
-                        col.use = False
-                        col.default = False
+                        col.use = col.name in checkboxes
+                        col.default = col.name in defaults
 
-                    time_cols = TimeColumn.query.filter_by(
-                        use=True,
-                        graph_id=graph.id,
-                    ).all()
-                    for i in time_cols:
-                        i.use = False
-                    for i in checkboxes:
-                        for k in VariableColumn.query.filter_by(
-                            name=i,
-                            graph_id=graph.id,
-                        ):
-                            k.use = True
-                            if i in defaults:
-                                k.default = True
-                    for j in TimeColumn.query.filter_by(
-                        name=radio,
+                    for time_col in TimeColumn.query.filter_by(
                         graph_id=graph.id,
                     ):
-                        j.use = True
+                        time_col.use = time_col.name in radio
                     graph.time_format = time_format
                     db.session.commit()
                     try:
