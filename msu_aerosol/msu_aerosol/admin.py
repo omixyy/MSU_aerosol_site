@@ -42,34 +42,11 @@ from msu_aerosol.models import (
 
 __all__ = []
 
+# В эту переменную попадёт объект Flask,
+# если будет вызываться функция обновления данных.
+# Это необходимо для получения контекста приложения,
+# поскольку APScheduler запускает эту функцию в отдельном потоке
 application = None
-
-
-def get_admin_template(
-    obj: AdminIndexView,
-    error: str | None = None,
-    success: str | None = None,
-) -> str:
-    """
-    Функция, возвращающая шаблон домашней страницы админки.
-
-    :param obj: Объект представления админки
-    :param error: Сообщение на странице (ошибка)
-    :param success: Сообщение на странице (успех)
-    :return: Шаблон админки
-    """
-
-    return obj.render(
-        'admin/admin_home.html',
-        name_to_device={
-            graph.name: graph
-            for graph in Graph.query.join(Device)
-            .filter(Device.archived == 0)
-            .all()
-        },
-        message_error=error,
-        message_success=success,
-    )
 
 
 class AdminHomeView(AdminIndexView):
@@ -80,10 +57,36 @@ class AdminHomeView(AdminIndexView):
     def __init__(self, name=None, url=None) -> None:
         super().__init__(name=name, url=url, template='admin/admin_home.html')
 
+    def get_admin_template(
+        self,
+        error: str | None = None,
+        success: str | None = None,
+    ) -> str:
+        """
+        Функция, возвращающая шаблон домашней страницы админки.
+
+        :param error: Сообщение на странице (ошибка)
+        :param success: Сообщение на странице (успех)
+        :return: Шаблон админки
+        """
+
+        return self.render(
+            'admin/admin_home.html',
+            name_to_device={
+                graph.name: graph
+                for graph in Graph.query.join(Device)
+                .filter(Device.archived == 0)
+                .all()
+            },
+            message_error=error,
+            message_success=success,
+        )
+
     @classmethod
     def check_if_graph_changed(cls, graph: Graph) -> bool:
         usable_cols = [i.name for i in graph.columns if i.use]
         time_col = [i.name for i in graph.time_columns if i.use]
+        colors = [i.color.lower() for i in graph.columns]
         default_cols = [
             i.name
             for i in VariableColumn.query.filter_by(
@@ -95,6 +98,7 @@ class AdminHomeView(AdminIndexView):
             request.form.getlist(f'{graph.name}_cb') != usable_cols
             or not usable_cols
             or not time_col
+            or colors != request.form.getlist(f'color_{graph.name}')
             or request.form.get(f'{graph.name}_rb') != time_col[0]
             or request.form.getlist(f'{graph.name}_cb_def') != default_cols
             or request.form.get(f'datetime_format_{graph.name}')
@@ -153,8 +157,7 @@ class AdminHomeView(AdminIndexView):
             ),
         )
         init_schedule(None, None, None)
-        return get_admin_template(
-            self,
+        return self.get_admin_template(
             success='Данные успешно обновлены',
         )
 
@@ -192,12 +195,17 @@ class AdminHomeView(AdminIndexView):
                 radio = request.form.get(f'{graph.name}_rb')
                 defaults = request.form.getlist(f'{graph.name}_cb_def')
                 time_format = request.form.get(f'datetime_format_{graph.name}')
+                colors = request.form.getlist(f'color_{graph.name}')
                 if set(defaults).issubset(set(checkboxes)):
-                    for col in VariableColumn.query.filter_by(
-                        graph_id=graph.id,
+                    for col, color in zip(
+                        VariableColumn.query.filter_by(
+                            graph_id=graph.id,
+                        ),
+                        colors,
                     ):
                         col.use = col.name in checkboxes
                         col.default = col.name in defaults
+                        col.color = color
 
                     for time_col in TimeColumn.query.filter_by(
                         graph_id=graph.id,
@@ -219,33 +227,28 @@ class AdminHomeView(AdminIndexView):
                         make_graph(graph, 'recent')
 
                     except TimeFormatError:
-                        return get_admin_template(
-                            self,
+                        return self.get_admin_template(
                             error='Формат времени не подходит под столбец',
                         )
 
                     except ColumnsMatchError:
-                        return get_admin_template(
-                            self,
+                        return self.get_admin_template(
                             error='Обнаружено несовпадение столбцов',
                         )
 
                     except ValueError:
-                        return get_admin_template(
-                            self,
+                        return self.get_admin_template(
                             error='Невозможно предобработать данные '
                             'по выбранным столбцам',
                         )
 
                     except Exception as e:
                         error = e.__class__.__name__
-                        return get_admin_template(
-                            self,
+                        return self.get_admin_template(
                             error=f'Непредвиденная ошибка: {error}',
                         )
                 else:
-                    return get_admin_template(
-                        self,
+                    return self.get_admin_template(
                         error='Не совпадают списки столбцов.',
                     )
 
@@ -254,7 +257,7 @@ class AdminHomeView(AdminIndexView):
                 graph.created = True
                 db.session.commit()
 
-        return get_admin_template(self)
+        return self.get_admin_template()
 
 
 def get_complexes_dict() -> dict[Complex, list[Device]]:

@@ -1,5 +1,6 @@
 {% extends 'admin/master.html' %}
 {% block body %}
+<script src="{{ url_for('static', filename='js/admin/color_manager.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_style.css') }}">
 <a href="{{ url_for('home') }}">На главную</a>
 {% for name, _ in name_to_device.items() %}
@@ -56,7 +57,7 @@
     <div class="container">
       <div class="row">
         <div style="width: 30%;">
-          <h6>Выберите столбцы, которые будут отображаться на графике</h6>
+          <h6>Выберите столбцы</h6>
           {% for column in graph.columns %}
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name='{{ name ~ "_cb" }}' id='{{ "flexCheckDefault" ~ name ~ loop.index }}' value="{{ column.name }}" {% if column.use %} checked {% endif %}>
@@ -67,7 +68,7 @@
           {% endfor %}
         </div>
         <div style="width: 30%;">
-        <h6>Выберите столбцы, отображающиеся по умолчанию</h6>
+        <h6>Выберите столбцы по умолчанию</h6>
           {% for column in graph.columns %}
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name='{{ name ~ "_cb_def" }}' id="default_{{ 'flexCheckDefault' ~ name ~ loop.index }}" value="{{ column.name }}" {% if column.default %} checked {% endif %}>
@@ -76,6 +77,15 @@
               </label>
             </div>
           {% endfor %}
+        </div>
+        <div style="width: 30%;">
+          <h6>Выберите цвет переменной</h6>
+            {% for column in graph.columns %}
+              <div class="form-group" style="margin-bottom: 0px;">
+                <input type="color" name="color_{{ graph.name }}" id="colorPicker" class="form-control" style="width: 40px; display: inline-block; padding: 0px; height: 20px;" value="{{ column.color.upper() }}">
+                <label for="colorPicker" style="margin-bottom: 0px;">Цвет переменной {{ column.name }}</label>
+              </div>
+            {% endfor %}
         </div>
       </div>
     </div>
