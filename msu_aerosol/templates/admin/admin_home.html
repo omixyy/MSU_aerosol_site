@@ -55,7 +55,7 @@
     <br>
     <div class="container">
       <div class="row">
-        <div style="width: 30%;">
+        <div style="width: 25%;">
           <h6>Выберите столбцы</h6>
           {% for column in graph.columns %}
             <div class="form-check">
@@ -66,7 +66,7 @@
             </div>
           {% endfor %}
         </div>
-        <div style="width: 30%;">
+        <div style="width: 25%;">
         <h6>Выберите столбцы по умолчанию</h6>
           {% for column in graph.columns %}
             <div class="form-check">
@@ -77,12 +77,21 @@
             </div>
           {% endfor %}
         </div>
-        <div style="width: 30%;">
-          <h6>Выберите цвет переменной</h6>
+        <div style="width: 25%;">
+          <h6>Выберите коэффициент</h6>
+            {% for column in graph.columns %}
+              <div class="form-group" style="margin-bottom: 0px;">
+                <input type="number" name="coeff_{{ graph.name }}" id="typeNumber" class="form-control" step="any" style="width: 50px; display: inline-block; padding: 0px; height: 20px;" value="{{ column.coefficient }}">
+                <label for="typeNumber" style="margin-bottom: 0px;">{{ column.name }}</label>
+              </div>
+            {% endfor %}
+        </div>
+        <div style="width: 25%;">
+          <h6>Выберите цвет</h6>
             {% for column in graph.columns %}
               <div class="form-group" style="margin-bottom: 0px;">
                 <input type="color" name="color_{{ graph.name }}" id="colorPicker" class="form-control" style="width: 40px; display: inline-block; padding: 0px; height: 20px;" value="{{ column.color.upper() }}">
-                <label for="colorPicker" style="margin-bottom: 0px;">Цвет переменной {{ column.name }}</label>
+                <label for="colorPicker" style="margin-bottom: 0px;">{{ column.name }}</label>
               </div>
             {% endfor %}
         </div>

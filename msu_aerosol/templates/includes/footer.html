@@ -1,7 +1,7 @@
 {% block footer %}
 <footer>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts/font-awesome.min.css') }}">
-  <div class="footer">
+  <div class="footer" {% if view_name == 'profile' %} style="margin-top: 4.2%;" {% endif %}>
     <img src="{{ url_for('static', filename='img/MSU_logo.png') }}" width="120" height="120" alt=""
            style="float: right; margin-right: 3%; margin-top: 1%">
     <div class="container-fluid">

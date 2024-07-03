@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from zipfile import ZipFile
 
-from flask import render_template, request, Response, send_file
+from flask import abort, render_template, request, Response, send_file
 from flask.views import MethodView
 from flask_login import current_user, login_required
 
@@ -27,6 +27,13 @@ class Archive(MethodView):
 
         :return: Шаблон страницы "Архив"
         """
+
+        if not (
+            current_user
+            and current_user.role
+            and current_user.role.can_download_data
+        ):
+            abort(403)
 
         complex_to_graphs: dict = get_complexes_dict()
         complex_to_devices: dict = {
@@ -59,6 +66,9 @@ class DeviceArchive(MethodView):
         :param device_id: Идентификатор прибора
         :return: Шаблон страницы архива прибора
         """
+
+        if not current_user.role.can_download_data:
+            abort(403)
 
         complex_to_graphs = get_complexes_dict()
         device = Device.query.get_or_404(device_id)
@@ -100,6 +110,9 @@ class DeviceArchive(MethodView):
         :param device_id: Идентификатор прибора
         :return: zip-архив файлов прибора.
         """
+
+        if not current_user.role.can_download_data:
+            abort(403)
 
         device = Device.query.get_or_404(device_id)
         if request.form['button'] == 'download_all':

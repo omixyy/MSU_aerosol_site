@@ -12,7 +12,7 @@ from yadisk import AsyncYaDisk, YaDisk
 
 from msu_aerosol.config import yadisk_token
 from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
-from msu_aerosol.models import Device, Graph, TimeColumn
+from msu_aerosol.models import Device, Graph, TimeColumn, VariableColumn
 
 __all__ = []
 
@@ -358,6 +358,9 @@ def make_graph(
     combined_data.reset_index(inplace=True)
     combined_data = combined_data.drop_duplicates(subset=[time_col])
     combined_data = combined_data.sort_values(by=time_col)
+    # for col in combined_data.columns:
+    for i in VariableColumn.query.filter_by(graph_id=graph.id, use=True):
+        combined_data[i.name] = combined_data[i.name] * i.coefficient
     fig = px.line(
         combined_data,
         x=time_col,

@@ -143,6 +143,7 @@ class Role(BaseModel):
     __tablename__ = 'roles'
     can_access_admin = db.Column(db.Boolean, default=False)
     can_upload_data = db.Column(db.Boolean, default=False)
+    can_download_data = db.Column(db.Boolean, default=False)
 
     users = db.relationship(
         'User',
@@ -193,6 +194,7 @@ class VariableColumn(BaseColumnModel):
     __tablename__ = 'columns'
     color = db.Column(db.String)
     default = db.Column(db.Boolean, default=False)
+    coefficient = db.Column(db.Integer, default=1)
 
 
 class TimeColumn(BaseColumnModel):

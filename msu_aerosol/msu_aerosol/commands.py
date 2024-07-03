@@ -34,6 +34,7 @@ def create_superuser(login: str, email: str, password: str) -> None:
             name='Admin',
             can_access_admin=True,
             can_upload_data=True,
+            can_download_data=True,
         )
         db.session.add(admin_role)
         db.session.commit()

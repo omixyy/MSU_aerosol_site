@@ -84,9 +84,19 @@ class AdminHomeView(AdminIndexView):
 
     @classmethod
     def check_if_graph_changed(cls, graph: Graph) -> bool:
-        usable_cols = [i.name for i in graph.columns if i.use]
-        time_col = [i.name for i in graph.time_columns if i.use]
-        colors = [i.color.lower() for i in graph.columns]
+        coefficients: list = []
+        usable_cols: list = []
+        colors: list = []
+        for i in graph.columns:
+            if i.use:
+                colors.append(i)
+                coefficients.append(i)
+                usable_cols.append(i)
+
+        time_col = TimeColumn.query.filter_by(
+            use=True,
+            graph_id=graph.id,
+        ).first()
         default_cols = [
             i.name
             for i in VariableColumn.query.filter_by(
@@ -108,6 +118,13 @@ class AdminHomeView(AdminIndexView):
                 f'includes/'
                 f'devices/'
                 f'full/'
+                f'graph_{graph.name}.html',
+            ).exists()
+            or not Path(
+                f'templates/'
+                f'includes/'
+                f'devices/'
+                f'recent/'
                 f'graph_{graph.name}.html',
             ).exists()
         )
@@ -196,16 +213,19 @@ class AdminHomeView(AdminIndexView):
                 defaults = request.form.getlist(f'{graph.name}_cb_def')
                 time_format = request.form.get(f'datetime_format_{graph.name}')
                 colors = request.form.getlist(f'color_{graph.name}')
+                coefficients = request.form.getlist(f'coeff_{graph.name}')
                 if set(defaults).issubset(set(checkboxes)):
-                    for col, color in zip(
+                    for col, color, cf in zip(
                         VariableColumn.query.filter_by(
                             graph_id=graph.id,
                         ),
                         colors,
+                        coefficients,
                     ):
                         col.use = col.name in checkboxes
                         col.default = col.name in defaults
                         col.color = color
+                        col.coefficient = cf
 
                     for time_col in TimeColumn.query.filter_by(
                         graph_id=graph.id,
