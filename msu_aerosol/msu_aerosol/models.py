@@ -235,6 +235,25 @@ class DeviceView(ProtectedView):
         'complex_id',
         'graphs',
     ]
+
+    form_args = {
+        'name': {'label': 'Название прибора'},
+        'serial_number': {'label': 'Серийный номер'},
+        'link': {'label': 'Ссылка на папку в Я.Диске'},
+        'archived': {'label': 'Архивировать'},
+        'graphs': {'label': 'Графики'},
+        'complex_id': {'label': 'Комплекс'},
+    }
+
+    form_columns = (
+        'name',
+        'serial_number',
+        'link',
+        'archived',
+        'complex_id',
+        'graphs',
+    )
+
     form_excluded_columns = (
         'show',
         'columns',

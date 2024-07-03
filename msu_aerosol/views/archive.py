@@ -138,8 +138,8 @@ class DeviceArchive(MethodView):
 
         filename = request.form['button']
         logging.info(
-            f'User {current_user.login} '
-            f'downloaded {filename} for {device.full_name}',
+            f'Пользователь {current_user.login} '
+            f'скачал файл {filename} прибора {device.full_name} из архива',
         )
         return send_file(
             f'data/{device.full_name}/{filename}',

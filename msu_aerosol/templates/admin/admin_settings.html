@@ -5,6 +5,7 @@
 {% for name, _ in name_to_device.items() %}
   <a href="#{{ name }}">{{ name }}</a>
 {% endfor %}
+<hr>
 {% if message_error %}
   <div class="alert alert-danger" role="alert">
     {{ message_error }}

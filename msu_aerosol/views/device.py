@@ -148,24 +148,24 @@ class DeviceDownload(MethodView):
             request.form.get('datetime_picker_start'),
             request.form.get('datetime_picker_end'),
         )
-        graph_name = Graph.query.get(graph_id).name
+        graph = Graph.query.get(graph_id)
         buffer = make_graph(
-            graph_name,
+            graph,
             'download',
             begin_record_date=data_range[0],
             end_record_date=data_range[1],
         )
         logging.info(
-            f'{current_user.login} downloaded '
-            f'{graph_name} data for '
+            f'{current_user.login} скачал данные прибора '
+            f'{graph.device.name} по графику {graph.name} за период '
             f'{[i.replace("T", " ") for i in data_range]} '
-            f'period at {datetime.now()}',
+            f'в {datetime.now()}',
         )
         return send_file(
             buffer,
             as_attachment=True,
             attachment_filename=(
-                f'{graph_name}_{data_range[0]}-{data_range[1]}.csv'
+                f'{graph.name}_{data_range[0]}-{data_range[1]}.csv'
             ),
             mimetype='text/csv',
         )

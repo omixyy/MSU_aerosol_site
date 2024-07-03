@@ -24,16 +24,51 @@ app: Flask = config.initialize_flask_app(__name__)
 app.cli.add_command(create_superuser)
 app.logger.setLevel(logging.INFO)
 
-# Настройка логирования
+
+class NoErrorFilter(logging.Filter):
+    """
+    Фильтрует ошибки
+    """
+
+    def filter(self, record):
+        return record.levelno < logging.ERROR
+
+
+# Отключение логгеров
 logging.getLogger('werkzeug').disabled = True
 logging.getLogger('apscheduler').disabled = True
+logging.getLogger('apscheduler.scheduler').disabled = True
+logging.getLogger('apscheduler.executors.default').disabled = True
 logging.getLogger('waitress').disabled = True
-logging.basicConfig(
-    level=logging.INFO,
-    filename='download_log.log',
-    filemode='w',
+logging.getLogger('waitress.queue').disabled = True
+
+# Настройка логирования
+logger = logging.getLogger()  # Получаем корневой логгер
+logger.setLevel(
+    logging.DEBUG,
 )
 
+# Удаление всех существующих обработчиков
+for handler in logger.handlers[:]:
+    logger.removeHandler(handler)
+
+# Создание нового обработчика для записи логов в файл
+file_handler = logging.FileHandler(
+    'download_log.log',
+    mode='w',
+    encoding='utf-8',
+)
+file_handler.setLevel(logging.INFO)  # Устанавливаем уровень INFO
+file_handler.addFilter(NoErrorFilter())  # Добавляем кастомный фильтр
+
+# Форматирование логов
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+)
+file_handler.setFormatter(formatter)
+
+# Добавление обработчика к логгеру
+logger.addHandler(file_handler)
 # Связь URL адресов с классами их представления
 app.add_url_rule(
     '/',

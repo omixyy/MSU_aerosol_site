@@ -1,0 +1,11 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+  <a href="{{ url_for('home') }}">На главную</a>
+  {% for name, _ in name_to_device.items() %}
+    <a href="{{ url_for('admin.admin_settings') }}#{{ name }}">{{ name }}</a>
+  {% endfor %}
+  {% for line in file %}
+    <hr>
+    <h6>{{ line }}</h6>
+  {% endfor %}
+{% endblock %}

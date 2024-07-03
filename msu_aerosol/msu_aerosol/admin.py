@@ -9,7 +9,7 @@ from typing import Type
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, request
 from flask_admin import Admin
-from flask_admin import AdminIndexView, expose
+from flask_admin import AdminIndexView, BaseView, expose
 from flask_login import current_user, LoginManager
 from sqlalchemy.event import listens_for
 
@@ -49,13 +49,26 @@ __all__ = []
 application = None
 
 
-class AdminHomeView(AdminIndexView):
+def get_graph_name_to_obj() -> dict:
+    return {
+        graph.name: graph
+        for graph in Graph.query.join(Device)
+        .filter(Device.archived == 0)
+        .all()
+    }
+
+
+class AdminSettingsView(AdminIndexView):
     """
     Класс, выступающий в роли представления админки.
     """
 
     def __init__(self, name=None, url=None) -> None:
-        super().__init__(name=name, url=url, template='admin/admin_home.html')
+        super().__init__(
+            name=name,
+            url=url,
+            template='admin/admin_settings.html',
+        )
 
     def get_admin_template(
         self,
@@ -71,13 +84,8 @@ class AdminHomeView(AdminIndexView):
         """
 
         return self.render(
-            'admin/admin_home.html',
-            name_to_device={
-                graph.name: graph
-                for graph in Graph.query.join(Device)
-                .filter(Device.archived == 0)
-                .all()
-            },
+            'admin/admin_settings.html',
+            name_to_device=get_graph_name_to_obj(),
             message_error=error,
             message_success=success,
         )
@@ -185,7 +193,7 @@ class AdminHomeView(AdminIndexView):
         )
 
     @expose('/', methods=['GET', 'POST'])
-    def admin_index(self) -> str:
+    def admin_settings(self) -> str:
         """
         Функция, срабатывающая при нажатии на кнопку "подтвердить"
         в админке или перезагрузке прибора.
@@ -278,6 +286,24 @@ class AdminHomeView(AdminIndexView):
                 db.session.commit()
 
         return self.get_admin_template()
+
+
+class AdminLogsView(BaseView):
+    def is_accessible(self) -> bool:
+        return (
+            current_user.is_authenticated
+            and current_user.role.can_access_admin
+        )
+
+    @expose('/')
+    def admin_logs(self):
+        with Path('download_log.log').open('r', encoding='utf8') as f:
+            file = f.readlines()
+        return self.render(
+            'admin/admin_logs.html',
+            file=file,
+            name_to_device=get_graph_name_to_obj(),
+        )
 
 
 def get_complexes_dict() -> dict[Complex, list[Device]]:
@@ -454,13 +480,14 @@ def after_delete(mapper, connection, target) -> None:
     remove_device_data(full_name)
 
 
-admin: Admin = Admin(
+admin_settings: Admin = Admin(
     template_mode='bootstrap4',
-    index_view=AdminHomeView(
-        name='Home',
+    index_view=AdminSettingsView(
+        name='Настройки',
         url='/admin',
     ),
 )
+
 login_manager: LoginManager = LoginManager()
 scheduler: BackgroundScheduler = BackgroundScheduler()
 atexit.register(lambda: scheduler.shutdown())
@@ -517,9 +544,38 @@ def init_admin(app: Flask) -> None:
     """
 
     login_manager.init_app(app)
-    admin.init_app(app)
-    admin.add_view(ComplexView(Complex, db.session))
-    admin.add_view(DeviceView(Device, db.session))
-    admin.add_view(UserFieldView(User, db.session))
-    admin.add_view(ProtectedView(Role, db.session))
-    admin.add_view(GraphView(Graph, db.session))
+    admin_settings.init_app(app)
+    admin_settings.add_view(AdminLogsView(name='Логи', endpoint='/logs'))
+    admin_settings.add_view(ComplexView(Complex, db.session, name='Комплексы'))
+    admin_settings.add_view(
+        DeviceView(
+            Device,
+            db.session,
+            name='Приборы',
+            category='Приборы и графики',
+        ),
+    )
+    admin_settings.add_view(
+        GraphView(
+            Graph,
+            db.session,
+            name='Графики',
+            category='Приборы и графики',
+        ),
+    )
+    admin_settings.add_view(
+        UserFieldView(
+            User,
+            db.session,
+            name='Пользователи',
+            category='Управление пользователями',
+        ),
+    )
+    admin_settings.add_view(
+        ProtectedView(
+            Role,
+            db.session,
+            name='Роли',
+            category='Управление пользователями',
+        ),
+    )
