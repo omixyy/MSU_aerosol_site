@@ -1,6 +1,5 @@
 {% extends 'admin/master.html' %}
 {% block body %}
-<script src="{{ url_for('static', filename='js/admin/color_manager.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_style.css') }}">
 <a href="{{ url_for('home') }}">На главную</a>
 {% for name, _ in name_to_device.items() %}
