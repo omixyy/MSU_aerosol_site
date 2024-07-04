@@ -37,7 +37,7 @@
       </h3>
     </div>
     <h6>Выберите столбец со временем</h6>
-    <div name="{{ name }}">
+    <div>
       {% for col in graph.time_columns %}
         <div class="form-check">
           <input class="form-check-input" type="radio" name="{{ name ~ '_rb' }}" id="{{ 'flexRadioDefault1' ~ name ~ loop.index }}" value="{{ col.name }}" {% if col.use %} checked {% endif %}>
@@ -49,8 +49,8 @@
       </div>
     <br>
     <h6>Опишите формат времени в файлах с данными</h6>
-    <input type="datetime_format" class="datetime_input form-control" name='{{ "datetime_format_" ~ name }}' id={{ "datetime_format" ~ graph.device.id }} placeholder="Datetime format" value={% if not graph.time_format %} "" {% else %} "{{ graph.time_format }}" {% endif %}>
-    <label class="input_label form-control-label mb-4" for={{ "datetime_format" ~ graph.device.id }}>
+    <input class="datetime_input form-control" name='{{ "datetime_format_" ~ name }}' id={{ "datetime_format" ~ graph.device.id }} placeholder="Datetime format" value={% if not graph.time_format %} "" {% else %} "{{ graph.time_format }}" {% endif %}>
+    <label class="input_label form-control-label mb-4" for='{{ "datetime_format" ~ graph.device.id }}'>
       Например d-m-Y H:M:S
     </label>
     <br>
@@ -98,8 +98,8 @@
         </div>
       </div>
     </div>
+    <button type="submit" class="btn btn-primary mb-3 button_accept">Подтвердить</button>
     <hr>
   {% endfor %}
-  <button type="submit" class="btn btn-primary mb-3 button_accept">Подтвердить</button>
 </form>
 {% endblock %}

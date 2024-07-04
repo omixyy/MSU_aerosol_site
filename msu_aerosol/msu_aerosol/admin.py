@@ -96,10 +96,10 @@ class AdminSettingsView(AdminIndexView):
         usable_cols: list = []
         colors: list = []
         for i in graph.columns:
+            colors.append(i.color)
+            coefficients.append(i.coefficient)
             if i.use:
-                colors.append(i)
-                coefficients.append(i)
-                usable_cols.append(i)
+                usable_cols.append(i.name)
 
         time_col = TimeColumn.query.filter_by(
             use=True,
@@ -117,7 +117,7 @@ class AdminSettingsView(AdminIndexView):
             or not usable_cols
             or not time_col
             or colors != request.form.getlist(f'color_{graph.name}')
-            or request.form.get(f'{graph.name}_rb') != time_col[0]
+            or request.form.get(f'{graph.name}_rb') != time_col.name
             or request.form.getlist(f'{graph.name}_cb_def') != default_cols
             or request.form.get(f'datetime_format_{graph.name}')
             != graph.time_format
