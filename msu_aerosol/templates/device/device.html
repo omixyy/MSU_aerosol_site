@@ -22,7 +22,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right"></button>
       </div>
     {% endif %}
-    <form method="POST" id="form_download" action="{{ url_for('device_download', graph_id=graph.id) }}">
+    <form method="POST" id="form_download" action="{{ url_for('graph_download', graph_id=graph.id) }}">
       <div class="row">
         <div class="col">
           <label for="datetime_picker_start" class="control-label">Начало</label>
@@ -68,6 +68,6 @@
     {% endif %}
   </div>
   <div class="graph_container" id="#{{ graph.device }}">
-    {% include "includes/devices/full/graph_" ~ graph.name ~ ".html"  %}
+    {% include "includes/graphs/full/graph_" ~ graph.name ~ ".html"  %}
   </div>
 {% endblock %}

@@ -60,7 +60,7 @@ def get_device_template(graph_id: int, **kwargs) -> str:
     )
 
 
-class DevicePage(MethodView):
+class GraphPage(MethodView):
     """
     Представление страницы прибора.
     """
@@ -129,7 +129,7 @@ class DevicePage(MethodView):
         return redirect(url_for('home'))
 
 
-class DeviceDownload(MethodView):
+class GraphDownload(MethodView):
     """
     Представление страницы скачивания файла прибора по выбранному диапазону.
     """

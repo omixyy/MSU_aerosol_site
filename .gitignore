@@ -86,7 +86,7 @@ ipython_config.py
 # Large files
 proc_data
 external_data
-includes/devices
+includes/graphs
 yandex_disk_folder.zip
 
 # Page settings

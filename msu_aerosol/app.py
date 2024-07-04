@@ -10,7 +10,7 @@ from msu_aerosol.models import db
 from views.about import About
 from views.archive import Archive, DeviceArchive
 from views.contacts import ACContacts, DevelopersContacts
-from views.device import DeviceDownload, DevicePage
+from views.graph import GraphDownload, GraphPage
 from views.homepage import Home, UpdateIndex
 from views.users import Login, Logout, Profile, Register
 
@@ -44,9 +44,7 @@ logging.getLogger('waitress.queue').disabled = True
 
 # Настройка логирования
 logger = logging.getLogger()  # Получаем корневой логгер
-logger.setLevel(
-    logging.DEBUG,
-)
+logger.setLevel(logging.DEBUG)
 
 # Удаление всех существующих обработчиков
 for handler in logger.handlers[:]:
@@ -58,17 +56,15 @@ file_handler = logging.FileHandler(
     mode='w',
     encoding='utf-8',
 )
-file_handler.setLevel(logging.INFO)  # Устанавливаем уровень INFO
-file_handler.addFilter(NoErrorFilter())  # Добавляем кастомный фильтр
-
-# Форматирование логов
+file_handler.setLevel(logging.INFO)
+file_handler.addFilter(NoErrorFilter())
 formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 )
-file_handler.setFormatter(formatter)
 
-# Добавление обработчика к логгеру
+file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
+
 # Связь URL адресов с классами их представления
 app.add_url_rule(
     '/',
@@ -95,12 +91,12 @@ app.add_url_rule(
     view_func=ACContacts.as_view('ac_contacts'),
 )
 app.add_url_rule(
-    '/devices/<int:graph_id>',
-    view_func=DevicePage.as_view('device'),
+    '/graphs/<int:graph_id>',
+    view_func=GraphPage.as_view('graph'),
 )
 app.add_url_rule(
-    '/devices/<int:graph_id>/download',
-    view_func=DeviceDownload.as_view('device_download'),
+    '/graphs/<int:graph_id>/download',
+    view_func=GraphDownload.as_view('graph_download'),
 )
 app.add_url_rule(
     '/profile',

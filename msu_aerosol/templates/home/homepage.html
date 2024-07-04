@@ -30,9 +30,9 @@
                 <hr>
                 <button class="btn btn-outline-dark hidden" onclick="moveLeft(this)">←</button>
                 <button class="btn btn-outline-dark hidden" onclick="moveRight(this)">→</button>
-                {% include "includes/devices/recent/graph_" ~ graph.name ~ ".html" %}
+                {% include "includes/graphs/recent/graph_" ~ graph.name ~ ".html" %}
                 <a class="btn btn-dark device_link"
-                   href="{{ url_for('device', graph_id=graph.id) }}">
+                   href="{{ url_for('graph', graph_id=graph.id) }}">
                   Подробнее
                 </a>
               </div>

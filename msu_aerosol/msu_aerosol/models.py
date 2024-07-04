@@ -267,7 +267,7 @@ class ComplexView(ProtectedView):
     column_list = [
         'id',
         'name',
-        'devices',
+        'graphs',
     ]
 
 

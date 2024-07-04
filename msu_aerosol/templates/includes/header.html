@@ -62,7 +62,7 @@
                     {% if graph.device.show and not graph.device.archived %}
                       <li>
                         <a class="dropdown-item"
-                           href="{{ url_for('device', graph_id=graph.id) }}">{{ graph }}
+                           href="{{ url_for('graph', graph_id=graph.id) }}">{{ graph }}
                         </a>
                       </li>
                     {% endif %}

@@ -124,14 +124,14 @@ class AdminSettingsView(AdminIndexView):
             or not Path(
                 f'templates/'
                 f'includes/'
-                f'devices/'
+                f'graphs/'
                 f'full/'
                 f'graph_{graph.name}.html',
             ).exists()
             or not Path(
                 f'templates/'
                 f'includes/'
-                f'devices/'
+                f'graphs/'
                 f'recent/'
                 f'graph_{graph.name}.html',
             ).exists()
@@ -398,7 +398,7 @@ def graph_after_insert(mapper, connection, target) -> None:
 def device_after_insert(mapper, connection, target) -> None:
     """
     Функция, срабатывающая после того,
-    как в таблицу devices в БД была добавлена запись.
+    как в таблицу graphs в БД была добавлена запись.
 
     Определяет полное название прибора через Яндекс диск,
     добавляет столбцам прибора цвета (нужно для Телеграм-бота).
@@ -444,8 +444,8 @@ def remove_device_data(full_name: str) -> None:
     :return: None
     """
 
-    graph_full = f'templates/includes/devices/full/graph_{full_name}.html'
-    graph_rec = f'templates/includes/devices/recent/graph_{full_name}.html'
+    graph_full = f'templates/includes/graphs/full/graph_{full_name}.html'
+    graph_rec = f'templates/includes/graphs/recent/graph_{full_name}.html'
     proc_data = f'proc_data/{full_name}'
     data = f'data/{full_name}'
     if Path(graph_full).exists():
@@ -464,7 +464,7 @@ def remove_device_data(full_name: str) -> None:
 @listens_for(Device, 'after_delete')
 def after_delete(mapper, connection, target) -> None:
     """
-    Функция, срабатывающая после удаления записи из таблицы devices.
+    Функция, срабатывающая после удаления записи из таблицы graphs.
     Удаляет все файлы удаленного прибора.
 
     :param mapper: Необходимый аргумент для декоратора listens_for,
@@ -498,7 +498,7 @@ atexit.register(lambda: scheduler.shutdown())
 def init_schedule(mapper, connection, target, app=None) -> None:
     """
     Функция, срабатывающая при удалении или
-    добавлении записи в таблицу devices.
+    добавлении записи в таблицу graphs.
     Перезапускает scheduler для избежания ошибок,
     связанных с обновлением несуществующих приборов.
 
