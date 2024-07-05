@@ -245,15 +245,6 @@ class DeviceView(ProtectedView):
         'complex_id': {'label': 'Комплекс'},
     }
 
-    form_columns = (
-        'name',
-        'serial_number',
-        'link',
-        'archived',
-        'complex_id',
-        'graphs',
-    )
-
     form_excluded_columns = (
         'show',
         'columns',

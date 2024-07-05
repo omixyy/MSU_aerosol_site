@@ -361,13 +361,24 @@ def make_graph(
     for i in VariableColumn.query.filter_by(graph_id=graph.id, use=True):
         combined_data[i.name] = combined_data[i.name] * i.coefficient
     cols_to_draw = [i.name for i in graph.columns if i.use]
-    cols_to_draw = combined_data[cols_to_draw].mean().sort_values(ascending=False).index.tolist()
+    cols_to_draw = (
+        combined_data[cols_to_draw]
+        .mean()
+        .sort_values(ascending=False)
+        .index.tolist()
+    )
     index_dict = {value: index for index, value in enumerate(cols_to_draw)}
     fig = px.line(
         combined_data,
         x=time_col,
         y=cols_to_draw,
-        color_discrete_sequence=[i.color for i in sorted([j for j in graph.columns if j.use], key=lambda x: index_dict[x.name])],
+        color_discrete_sequence=[
+            i.color
+            for i in sorted(
+                [j for j in graph.columns if j.use],
+                key=lambda x: index_dict[x.name],
+            )
+        ],
     )
     cols = graph.columns
     for trace in fig.data:
@@ -385,7 +396,10 @@ def make_graph(
     )
     fig.update_traces(line={'width': 2})
     fig.update_xaxes(
-        range=[datetime.now() - timedelta(2 if spec_act == 'recent' else 14), datetime.now()],
+        range=[
+            datetime.now() - timedelta(2 if spec_act == 'recent' else 14),
+            datetime.now(),
+        ],
         zerolinecolor='grey',
         zerolinewidth=1,
         gridcolor='grey',
