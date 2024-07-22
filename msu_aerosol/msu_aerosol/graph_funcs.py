@@ -214,7 +214,7 @@ def preprocessing_one_file(
             file_path = f'proc_data/{graph.device.name}/{year}_{month}.csv'
             if Path(file_path).exists() or user_upload:
                 df_help = pd.read_csv(file_path)
-                df_month[time_col] = pd.to_datetime(df_month[time_col])
+                df_month.loc[:, time_col] = pd.to_datetime(df_month.loc[:, time_col])
                 df_help[time_col] = pd.to_datetime(df_help[time_col])
                 result = pd.merge(df_month, df_help, on=time_col, how='outer')
                 for column in df_month.columns:
@@ -228,7 +228,11 @@ def preprocessing_one_file(
             df_month = df_month.sort_values(by=time_col).drop_duplicates(
                 subset=[time_col],
             )
-            df_month = df_month[[time_col] + columns]
+
+            res = [time_col]
+            for i in [[col.name for col in g.columns if col.use == 1] for g in graph.device.graphs]:
+                res += i
+            df_month = df_month[res]
             df_month.to_csv(file_path, index=False)
 
 
