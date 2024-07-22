@@ -186,20 +186,21 @@ def preprocessing_one_file(
         raise ColumnsMatchError('Проблемы с совпадением столбцов')
     df = df[[time_col] + columns]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
-    if not Path(f'proc_data/{graph.name}').exists():
-        Path(f'proc_data/{graph.name}').mkdir(parents=True)
+    if not Path(f'proc_data/{graph.device.name}').exists():
+        Path(f'proc_data/{graph.device.name}').mkdir(parents=True)
     try:
         if time_col == 'timestamp':
-            df[time_col] = pd.to_datetime(df[time_col], unit='s')
+            df['timestamp'] = pd.to_datetime(df[time_col], unit='s')
         else:
-            df[time_col] = pd.to_datetime(
+            df['timestamp'] = pd.to_datetime(
                 df[time_col],
-                format=make_format_date(graph.time_format),
+                format=make_format_date(graph.time_format)
             )
     except (TypeError, ValueError):
         if not app:
             raise TimeFormatError('Проблемы с форматом времени')
         return
+    time_col = 'timestamp'
     df = proc_spaces(df, time_col)
     for year in df[time_col].dt.year.unique():
         for month in df[time_col].dt.month.unique():
@@ -210,15 +211,18 @@ def preprocessing_one_file(
                 )
             ]
             month = '0' + str(month) if month < 10 else str(month)
-            file_path = f'proc_data/{graph.name}/{year}_{month}.csv'
+            file_path = f'proc_data/{graph.device.name}/{year}_{month}.csv'
             if Path(file_path).exists() or user_upload:
                 df_help = pd.read_csv(file_path)
+                df_month[time_col] = pd.to_datetime(df_month[time_col])
                 df_help[time_col] = pd.to_datetime(df_help[time_col])
-                df_month = pd.concat(
-                    [df_help, df_month],
-                    ignore_index=True,
-                )
-                df_month.drop_duplicates()
+                result = pd.merge(df_month, df_help, on=time_col, how='outer')
+                for column in df_month.columns:
+                    if column in df_help.columns and column != time_col:
+                        result[column] = result[column + '_x'].combine_first(result[column + '_y'])
+                        result.drop(columns=[column + '_x', column + '_y'], inplace=True)
+                result.drop_duplicates()
+                df_month = result
             if len(df_month) == 0:
                 continue
             df_month = df_month.sort_values(by=time_col).drop_duplicates(
@@ -229,11 +233,10 @@ def preprocessing_one_file(
 
 
 def choose_range(graph: Graph) -> tuple[pd.Timestamp, pd.Timestamp]:
-    time_col = [i.name for i in graph.time_columns if i.use][0]
-    list_files = os.listdir(f'proc_data/{graph.name}')
-    proc_data = f'proc_data/{graph.name}/{max(list_files)}'
+    list_files = os.listdir(f'proc_data/{graph.device.name}')
+    proc_data = f'proc_data/{graph.device.name}/{max(list_files)}'
     max_date = pd.to_datetime(
-        pd.read_csv(proc_data)[time_col].iloc[-1],
+        pd.read_csv(proc_data)['timestamp'].iloc[-1],
     )
     min_date = max_date - timedelta(days=14)
     return min_date, max_date
@@ -268,25 +271,7 @@ def make_graph(
                 else '%Y-%m-%dT%H:%M:%S'
             ),
         )
-    if app:
-        with app.app_context():
-            time_col = (
-                TimeColumn.query.filter_by(
-                    graph_id=graph.id,
-                    use=True,
-                )
-                .first()
-                .name
-            )
-    else:
-        time_col = (
-            TimeColumn.query.filter_by(
-                graph_id=graph.id,
-                use=True,
-            )
-            .first()
-            .name
-        )
+    time_col = 'timestamp'
     if not begin_record_date or not end_record_date:
         begin_record_date, end_record_date = choose_range(graph)
     if spec_act == 'full':
@@ -298,7 +283,7 @@ def make_graph(
         try:
             data = pd.read_csv(
                 f'proc_data/'
-                f'{graph.name}/'
+                f'{graph.device.name}/'
                 f'{current_date.strftime("%Y_%m")}.csv',
             )
             combined_data = pd.concat([combined_data, data], ignore_index=True)
