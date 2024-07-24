@@ -1,12 +1,14 @@
 import asyncio
 import atexit
 import csv
+from datetime import datetime
 import os
 from pathlib import Path
 import shutil
 from typing import Type
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.date import DateTrigger
 from flask import Flask, request
 from flask_admin import Admin
 from flask_admin import AdminIndexView, BaseView, expose
@@ -532,7 +534,9 @@ def init_schedule(mapper, connection, target, app=None) -> None:
         scheduler.remove_all_jobs()
         scheduler.add_job(
             func=download_last_modified_file,
-            trigger='interval',
+            trigger=DateTrigger(
+                run_date=datetime.now(),
+            ),
             seconds=300,
             id='downloader',
             args=[name_to_link],
