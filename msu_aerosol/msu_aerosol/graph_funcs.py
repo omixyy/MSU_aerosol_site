@@ -372,8 +372,13 @@ def make_graph(
     combined_data.reset_index(inplace=True)
     combined_data = combined_data.drop_duplicates(subset=[time_col])
     combined_data = combined_data.sort_values(by=time_col)
-    for i in VariableColumn.query.filter_by(graph_id=graph.id, use=True):
-        combined_data[i.name] = combined_data[i.name] * i.coefficient
+    if app:
+        with app.app_context():
+            for i in VariableColumn.query.filter_by(graph_id=graph.id, use=True):
+                combined_data[i.name] = combined_data[i.name] * i.coefficient
+    else:
+        for i in VariableColumn.query.filter_by(graph_id=graph.id, use=True):
+            combined_data[i.name] = combined_data[i.name] * i.coefficient
     cols_to_draw = [i.name for i in graph.columns if i.use]
     cols_to_draw = (
         combined_data[cols_to_draw]
