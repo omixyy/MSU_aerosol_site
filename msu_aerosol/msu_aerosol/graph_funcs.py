@@ -260,9 +260,9 @@ def choose_range(graph: Graph, app=None) -> tuple[pd.Timestamp, pd.Timestamp]:
     list_files = os.listdir(f'proc_data/{graph.device.name}')
     if app:
         with app.app_context():
-            name = Device.query.filter_by(id=graph.device_id)
+            name = Device.query.filter_by(id=graph.device_id).first().name
     else:
-        name = Device.query.filter_by(id=graph.device_id)
+        name = Device.query.filter_by(id=graph.device_id).first().name
     proc_data = f'proc_data/{name}/{max(list_files)}'
     max_date = pd.to_datetime(
         pd.read_csv(proc_data)['timestamp'].iloc[-1],
