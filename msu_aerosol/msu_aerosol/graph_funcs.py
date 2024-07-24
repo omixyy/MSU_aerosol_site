@@ -80,7 +80,12 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
             dev = Device.query.filter_by(full_name=i[0]).first()
         if not dev.archived:
             try:
-                for j in dev.graphs:
+                if app:
+                    with app.app_context():
+                        graphs = Graph.query.filter_by(device_id=dev.id)
+                else:
+                    graphs = Graph.query.filter_by(device_id=dev.id)
+                for j in graphs:
                     preprocessing_one_file(j, i[1], app=app)
                     make_graph(j, spec_act='full', app=app)
                     make_graph(j, spec_act='recent', app=app)
@@ -251,9 +256,14 @@ def preprocessing_one_file(
             df_month.to_csv(file_path, index=False)
 
 
-def choose_range(graph: Graph) -> tuple[pd.Timestamp, pd.Timestamp]:
+def choose_range(graph: Graph, app=None) -> tuple[pd.Timestamp, pd.Timestamp]:
     list_files = os.listdir(f'proc_data/{graph.device.name}')
-    proc_data = f'proc_data/{graph.device.name}/{max(list_files)}'
+    if app:
+        with app.app_context():
+            name = Device.query.filter_by(id=graph.device_id)
+    else:
+        name = Device.query.filter_by(id=graph.device_id)
+    proc_data = f'proc_data/{name}/{max(list_files)}'
     max_date = pd.to_datetime(
         pd.read_csv(proc_data)['timestamp'].iloc[-1],
     )
@@ -292,7 +302,7 @@ def make_graph(
         )
     time_col = 'timestamp'
     if not begin_record_date or not end_record_date:
-        begin_record_date, end_record_date = choose_range(graph)
+        begin_record_date, end_record_date = choose_range(graph, app=app)
     if spec_act == 'full':
         begin_record_date = end_record_date - timedelta(days=15)
     if spec_act == 'recent':
