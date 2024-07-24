@@ -16,7 +16,7 @@ allowed_extensions = ['csv', 'xlsx']
 
 class Config:
     SECRET_KEY = str(uuid.uuid4())
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db?check_same_thread=False'
     SESSION_COOKIE_NAME = os.getenv(
         'SESSION_COOKIE_NAME',
         default='FAKE_SESSION_COOKIE_NAME',
