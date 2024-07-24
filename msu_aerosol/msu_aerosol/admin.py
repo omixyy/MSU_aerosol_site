@@ -522,7 +522,7 @@ def init_schedule(mapper, connection, target, app=None) -> None:
     }
     if scheduler.running or not (mapper and connection and target):
         scheduler.remove_all_jobs()
-
+        download_last_modified_file(name_to_link)
         scheduler.add_job(
             func=download_last_modified_file,
             trigger='interval',

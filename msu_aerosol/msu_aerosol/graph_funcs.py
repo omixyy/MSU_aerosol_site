@@ -194,7 +194,7 @@ def preprocessing_one_file(
         else:
             df['timestamp'] = pd.to_datetime(
                 df[time_col],
-                format=make_format_date(graph.time_format)
+                format=make_format_date(graph.time_format),
             )
     except (TypeError, ValueError):
         if not app:
@@ -214,13 +214,20 @@ def preprocessing_one_file(
             file_path = f'proc_data/{graph.device.name}/{year}_{month}.csv'
             if Path(file_path).exists() or user_upload:
                 df_help = pd.read_csv(file_path)
-                df_month.loc[:, time_col] = pd.to_datetime(df_month.loc[:, time_col])
+                df_month.loc[:, time_col] = pd.to_datetime(
+                    df_month.loc[:, time_col],
+                )
                 df_help[time_col] = pd.to_datetime(df_help[time_col])
                 result = pd.merge(df_month, df_help, on=time_col, how='outer')
                 for column in df_month.columns:
                     if column in df_help.columns and column != time_col:
-                        result[column] = result[column + '_x'].combine_first(result[column + '_y'])
-                        result.drop(columns=[column + '_x', column + '_y'], inplace=True)
+                        result[column] = result[column + '_x'].combine_first(
+                            result[column + '_y'],
+                        )
+                        result.drop(
+                            columns=[column + '_x', column + '_y'],
+                            inplace=True,
+                        )
                 result.drop_duplicates()
                 df_month = result
             if len(df_month) == 0:
@@ -230,7 +237,10 @@ def preprocessing_one_file(
             )
 
             res = [time_col]
-            for i in [[col.name for col in g.columns if col.use == 1] for g in graph.device.graphs]:
+            for i in [
+                [col.name for col in g.columns if col.use == 1]
+                for g in graph.device.graphs
+            ]:
                 res += i
             df_month = df_month[res]
             df_month.to_csv(file_path, index=False)
@@ -379,12 +389,23 @@ def make_graph(
     if app:
         with app.app_context():
             full_name = (
-                Device.query.filter_by(id=graph.device_id).first().full_name
+                Device.query.filter_by(
+                    id=graph.device_id,
+                )
+                .first()
+                .full_name
             )
     else:
         full_name = (
-            Device.query.filter_by(id=graph.device_id).first().full_name
+            Device.query.filter_by(
+                id=graph.device_id,
+            )
+            .first()
+            .full_name
         )
+    fig.update_traces(fill='tozeroy', line={'width': 2})
+
+    # Настройка макета
     fig.update_layout(
         title=str(full_name),
         xaxis={'title': [i.name for i in graph.time_columns if i.use][0]},
@@ -392,7 +413,8 @@ def make_graph(
         paper_bgcolor='white',
         showlegend=True,
     )
-    fig.update_traces(line={'width': 2})
+
+    # Настройка осей
     fig.update_xaxes(
         range=[
             datetime.now() - timedelta(2 if spec_act == 'recent' else 14),
@@ -417,6 +439,8 @@ def make_graph(
         linecolor='black',
         mirror=True,
     )
+
+    # Сохранение графика в файл
     offline.plot(
         fig,
         filename=(
