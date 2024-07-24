@@ -406,7 +406,6 @@ def make_graph(
 
     columns = [i.name for i in graph.columns if i.use]
     if 'BCbb' in columns or 'BCff' in columns:
-        print('IOUJHB')
         fig.update_traces(fill='tozeroy', line={'width': 2})
 
     # Настройка макета
