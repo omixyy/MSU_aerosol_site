@@ -281,7 +281,8 @@ class AdminSettingsView(AdminIndexView):
                     )
 
             for graph in all_graphs:
-                graph.device.show = True
+                device = Device.query.filter_by(id=graph.device_id).first()
+                device.show = True
                 graph.created = True
                 db.session.commit()
 
@@ -545,8 +546,19 @@ def init_admin(app: Flask) -> None:
 
     login_manager.init_app(app)
     admin_settings.init_app(app)
-    admin_settings.add_view(AdminLogsView(name='Логи', endpoint='/logs'))
-    admin_settings.add_view(ComplexView(Complex, db.session, name='Комплексы'))
+    admin_settings.add_view(
+        AdminLogsView(
+            name='Логи',
+            endpoint='/logs',
+        ),
+    )
+    admin_settings.add_view(
+        ComplexView(
+            Complex,
+            db.session,
+            name='Комплексы',
+        ),
+    )
     admin_settings.add_view(
         DeviceView(
             Device,

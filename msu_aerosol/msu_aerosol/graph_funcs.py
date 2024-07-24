@@ -387,8 +387,17 @@ def make_graph(
                 trace.visible = True if i.default else 'legendonly'
                 break
 
+    if app:
+        with app.app_context():
+            full_name = (
+                Device.query.filter_by(id=graph.device_id).first().full_name
+            )
+    else:
+        full_name = (
+            Device.query.filter_by(id=graph.device_id).first().full_name
+        )
     fig.update_layout(
-        title=str(graph.device.full_name),
+        title=str(full_name),
         xaxis={'title': [i.name for i in graph.time_columns if i.use][0]},
         plot_bgcolor='white',
         paper_bgcolor='white',
