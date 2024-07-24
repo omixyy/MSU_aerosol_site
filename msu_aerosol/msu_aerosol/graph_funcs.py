@@ -200,7 +200,9 @@ def preprocessing_one_file(
         Path(f'proc_data/{device.name}').mkdir(parents=True)
     try:
         if time_col == 'timestamp':
-            df['timestamp'] = pd.to_datetime(df[time_col], unit='s')
+            df['timestamp'] = df['timestamp'].apply(
+                lambda x: datetime.fromtimestamp(x),
+            )
         else:
             df['timestamp'] = pd.to_datetime(
                 df[time_col],
@@ -374,7 +376,10 @@ def make_graph(
     combined_data = combined_data.sort_values(by=time_col)
     if app:
         with app.app_context():
-            for i in VariableColumn.query.filter_by(graph_id=graph.id, use=True):
+            for i in VariableColumn.query.filter_by(
+                graph_id=graph.id,
+                use=True,
+            ):
                 combined_data[i.name] = combined_data[i.name] * i.coefficient
     else:
         for i in VariableColumn.query.filter_by(graph_id=graph.id, use=True):
