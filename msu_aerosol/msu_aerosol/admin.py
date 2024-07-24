@@ -210,81 +210,84 @@ class AdminSettingsView(AdminIndexView):
             if full_name_reloaded:
                 self.recreate_device(full_name_reloaded)
 
-            changed: list[Device] = []
-            for graph in all_graphs:
-                if self.check_if_graph_changed(graph):
-                    changed.append(graph)
+            else:
+                changed: list[Device] = []
+                for graph in all_graphs:
+                    if self.check_if_graph_changed(graph):
+                        changed.append(graph)
 
-            for graph in changed:
-                checkboxes = request.form.getlist(f'{graph.name}_cb')
-                radio = request.form.get(f'{graph.name}_rb')
-                defaults = request.form.getlist(f'{graph.name}_cb_def')
-                time_format = request.form.get(f'datetime_format_{graph.name}')
-                colors = request.form.getlist(f'color_{graph.name}')
-                coefficients = request.form.getlist(f'coeff_{graph.name}')
-                if set(defaults).issubset(set(checkboxes)):
-                    for col, color, cf in zip(
-                        VariableColumn.query.filter_by(
-                            graph_id=graph.id,
-                        ),
-                        colors,
-                        coefficients,
-                    ):
-                        col.use = col.name in checkboxes
-                        col.default = col.name in defaults
-                        col.color = color
-                        col.coefficient = cf
-
-                    for time_col in TimeColumn.query.filter_by(
-                        graph_id=graph.id,
-                    ):
-                        time_col.use = time_col.name in radio
-                    graph.time_format = time_format
-                    db.session.commit()
-                    try:
-                        full_name = (
-                            Device.query.filter_by(id=graph.device_id)
-                            .first()
-                            .full_name
-                        )
-                        preprocess_device_data(
-                            full_name,
-                            graph,
-                        )
-                        make_graph(graph, 'full')
-                        make_graph(graph, 'recent')
-
-                    except TimeFormatError:
-                        return self.get_admin_template(
-                            error='Формат времени не подходит под столбец',
-                        )
-
-                    except ColumnsMatchError:
-                        return self.get_admin_template(
-                            error='Обнаружено несовпадение столбцов',
-                        )
-
-                    except ValueError:
-                        return self.get_admin_template(
-                            error='Невозможно предобработать данные '
-                            'по выбранным столбцам',
-                        )
-
-                    except Exception as e:
-                        error = e.__class__.__name__
-                        return self.get_admin_template(
-                            error=f'Непредвиденная ошибка: {error}',
-                        )
-                else:
-                    return self.get_admin_template(
-                        error='Не совпадают списки столбцов.',
+                for graph in changed:
+                    checkboxes = request.form.getlist(f'{graph.name}_cb')
+                    radio = request.form.get(f'{graph.name}_rb')
+                    defaults = request.form.getlist(f'{graph.name}_cb_def')
+                    time_format = request.form.get(
+                        f'datetime_format_{graph.name}',
                     )
+                    colors = request.form.getlist(f'color_{graph.name}')
+                    coefficients = request.form.getlist(f'coeff_{graph.name}')
+                    if set(defaults).issubset(set(checkboxes)):
+                        for col, color, cf in zip(
+                            VariableColumn.query.filter_by(
+                                graph_id=graph.id,
+                            ),
+                            colors,
+                            coefficients,
+                        ):
+                            col.use = col.name in checkboxes
+                            col.default = col.name in defaults
+                            col.color = color
+                            col.coefficient = cf
 
-            for graph in all_graphs:
-                device = Device.query.filter_by(id=graph.device_id).first()
-                device.show = True
-                graph.created = True
-                db.session.commit()
+                        for time_col in TimeColumn.query.filter_by(
+                            graph_id=graph.id,
+                        ):
+                            time_col.use = time_col.name in radio
+                        graph.time_format = time_format
+                        db.session.commit()
+                        try:
+                            full_name = (
+                                Device.query.filter_by(id=graph.device_id)
+                                .first()
+                                .full_name
+                            )
+                            preprocess_device_data(
+                                full_name,
+                                graph,
+                            )
+                            make_graph(graph, 'full')
+                            make_graph(graph, 'recent')
+
+                        except TimeFormatError:
+                            return self.get_admin_template(
+                                error='Формат времени не подходит под столбец',
+                            )
+
+                        except ColumnsMatchError:
+                            return self.get_admin_template(
+                                error='Обнаружено несовпадение столбцов',
+                            )
+
+                        except ValueError:
+                            return self.get_admin_template(
+                                error='Невозможно предобработать данные '
+                                'по выбранным столбцам',
+                            )
+
+                        except Exception as e:
+                            error = e.__class__.__name__
+                            return self.get_admin_template(
+                                error=f'Непредвиденная ошибка: {error}',
+                            )
+                    else:
+                        return self.get_admin_template(
+                            error='Не совпадают списки столбцов.',
+                        )
+
+                for graph in all_graphs:
+                    device = Device.query.filter_by(id=graph.device_id).first()
+                    device.show = True
+                    graph.created = True
+                    db.session.commit()
 
         return self.get_admin_template()
 

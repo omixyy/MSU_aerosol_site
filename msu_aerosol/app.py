@@ -22,44 +22,8 @@ app: Flask = config.initialize_flask_app(__name__)
 
 # Настройка приложения
 app.cli.add_command(create_superuser)
-app.logger.setLevel(logging.INFO)
 
-
-class NoErrorFilter(logging.Filter):
-    """
-    Фильтрует ошибки
-    """
-
-    def filter(self, record):
-        return record.levelno < logging.ERROR
-
-
-# Отключение логгеров
-for name in logging.root.manager.loggerDict:
-    logging.getLogger(name).disabled = True
-
-# Настройка логирования
-logger = logging.getLogger()  # Получаем корневой логгер
-logger.setLevel(logging.DEBUG)
-
-# Удаление всех существующих обработчиков
-for handler in logger.handlers[:]:
-    logger.removeHandler(handler)
-
-# Создание нового обработчика для записи логов в файл
-file_handler = logging.FileHandler(
-    'download_log.log',
-    mode='w',
-    encoding='utf-8',
-)
-file_handler.setLevel(logging.INFO)
-file_handler.addFilter(NoErrorFilter())
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-)
-
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
+logging.getLogger('waitress.queue').disabled = True
 
 # Связь URL адресов с классами их представления
 app.add_url_rule(

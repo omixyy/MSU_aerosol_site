@@ -1,6 +1,5 @@
 from datetime import datetime
 from io import BytesIO
-import logging
 import os
 from pathlib import Path
 from zipfile import ZipFile
@@ -125,10 +124,11 @@ class DeviceArchive(MethodView):
                         zf.write(file_path, os.path.relpath(file_path, path))
 
             memory_file.seek(0)
-            logging.info(
-                f'User {current_user.login} '
-                f'downloaded all files for {device.full_name}',
-            )
+            with Path('download_log.log', encoding='utf8').open('w') as log:
+                log.write(
+                    f'User {current_user.login} '
+                    f'downloaded all files for {device.full_name}',
+                )
             return send_file(
                 memory_file,
                 mimetype='application/zip',
@@ -137,10 +137,11 @@ class DeviceArchive(MethodView):
             )
 
         filename = request.form['button']
-        logging.info(
-            f'Пользователь {current_user.login} '
-            f'скачал файл {filename} прибора {device.full_name} из архива',
-        )
+        with Path('download_log.log', encoding='utf8').open('w') as log:
+            log.write(
+                f'Пользователь {current_user.login} '
+                f'скачал файл {filename} прибора {device.full_name} из архива',
+            )
         return send_file(
             f'data/{device.full_name}/{filename}',
             mimetype='text/csv',

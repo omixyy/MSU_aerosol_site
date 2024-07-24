@@ -49,7 +49,7 @@
       </div>
     <br>
     <h6>Опишите формат времени в файлах с данными</h6>
-    <input required class="datetime_input form-control" name='{{ "datetime_format_" ~ name }}' id={{ "datetime_format" ~ graph.device.id }} placeholder="Datetime format" value={% if not graph.time_format %} "" {% else %} "{{ graph.time_format }}" {% endif %}>
+    <input class="datetime_input form-control" name='{{ "datetime_format_" ~ name }}' id={{ "datetime_format" ~ graph.device.id }} placeholder="Datetime format" value={% if not graph.time_format %} "" {% else %} "{{ graph.time_format }}" {% endif %}>
     <label class="input_label form-control-label mb-4" for='{{ "datetime_format" ~ graph.device.id }}'>
       Например d-m-Y H:M:S
     </label>

@@ -1,5 +1,4 @@
 from datetime import datetime
-import logging
 from pathlib import Path
 
 from flask import abort, redirect, url_for
@@ -155,12 +154,13 @@ class GraphDownload(MethodView):
             begin_record_date=data_range[0],
             end_record_date=data_range[1],
         )
-        logging.info(
-            f'{current_user.login} скачал данные прибора '
-            f'{graph.device.name} по графику {graph.name} за период '
-            f'{[i.replace("T", " ") for i in data_range]} '
-            f'в {datetime.now()}',
-        )
+        with Path('download_log.log').open('w', encoding='utf8') as log:
+            log.write(
+                f'{current_user.login} скачал данные прибора '
+                f'{graph.device.name} по графику {graph.name} за период '
+                f'{[i.replace("T", " ") for i in data_range]} '
+                f'в {datetime.now()}',
+            )
         return send_file(
             buffer,
             as_attachment=True,

@@ -155,6 +155,7 @@ def preprocessing_one_file(
     user_upload=False,
     app=None,
 ) -> None:
+    device = Device.query.filter_by(id=graph.device_id).first()
     if path.endswith('.csv'):
         df = pd.read_csv(
             path,
@@ -186,8 +187,8 @@ def preprocessing_one_file(
         raise ColumnsMatchError('Проблемы с совпадением столбцов')
     df = df[[time_col] + columns]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
-    if not Path(f'proc_data/{graph.device.name}').exists():
-        Path(f'proc_data/{graph.device.name}').mkdir(parents=True)
+    if not Path(f'proc_data/{device.name}').exists():
+        Path(f'proc_data/{device.name}').mkdir(parents=True)
     try:
         if time_col == 'timestamp':
             df['timestamp'] = pd.to_datetime(df[time_col], unit='s')
@@ -211,7 +212,7 @@ def preprocessing_one_file(
                 )
             ]
             month = '0' + str(month) if month < 10 else str(month)
-            file_path = f'proc_data/{graph.device.name}/{year}_{month}.csv'
+            file_path = f'proc_data/{device.name}/{year}_{month}.csv'
             if Path(file_path).exists() or user_upload:
                 df_help = pd.read_csv(file_path)
                 df_month.loc[:, time_col] = pd.to_datetime(
@@ -239,7 +240,7 @@ def preprocessing_one_file(
             res = [time_col]
             for i in [
                 [col.name for col in g.columns if col.use == 1]
-                for g in graph.device.graphs
+                for g in device.graphs
             ]:
                 res += i
             df_month = df_month[res]
