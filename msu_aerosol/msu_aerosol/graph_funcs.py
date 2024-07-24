@@ -155,7 +155,11 @@ def preprocessing_one_file(
     user_upload=False,
     app=None,
 ) -> None:
-    device = Device.query.filter_by(id=graph.device_id).first()
+    if app:
+        with app.app_context():
+            device = Device.query.filter_by(id=graph.device_id).first()
+    else:
+        device = Device.query.filter_by(id=graph.device_id).first()
     if path.endswith('.csv'):
         df = pd.read_csv(
             path,
