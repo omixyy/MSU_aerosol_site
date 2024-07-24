@@ -116,7 +116,8 @@ class AdminSettingsView(AdminIndexView):
             request.form.getlist(f'{graph.name}_cb') != usable_cols
             or not usable_cols
             or not time_col
-            or request.form.getlist(f'coeff_{graph.name}') != coefficients
+            or request.form.getlist(f'coeff_{graph.name}')
+            != list(map(str, coefficients))
             or colors != request.form.getlist(f'color_{graph.name}')
             or request.form.get(f'{graph.name}_rb') != time_col.name
             or request.form.getlist(f'{graph.name}_cb_def') != default_cols
