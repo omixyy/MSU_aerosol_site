@@ -35,12 +35,8 @@ class NoErrorFilter(logging.Filter):
 
 
 # Отключение логгеров
-logging.getLogger('werkzeug').disabled = True
-logging.getLogger('apscheduler').disabled = True
-logging.getLogger('apscheduler.scheduler').disabled = True
-logging.getLogger('apscheduler.executors.default').disabled = True
-logging.getLogger('waitress').disabled = True
-logging.getLogger('waitress.queue').disabled = True
+for name in logging.root.manager.loggerDict:
+    logging.getLogger(name).disabled = True
 
 # Настройка логирования
 logger = logging.getLogger()  # Получаем корневой логгер
