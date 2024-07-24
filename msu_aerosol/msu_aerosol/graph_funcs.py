@@ -80,7 +80,7 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
             dev = Device.query.filter_by(full_name=i[0]).first()
         if not dev.archived:
             try:
-                for j in Graph.query.filter_by(device_id=dev.id).all():
+                for j in dev.graphs:
                     preprocessing_one_file(j, i[1], app=app)
                     make_graph(j, spec_act='full', app=app)
                     make_graph(j, spec_act='recent', app=app)
