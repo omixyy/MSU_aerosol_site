@@ -213,7 +213,10 @@ class AdminSettingsView(AdminIndexView):
             else:
                 changed: list[Device] = []
                 for graph in all_graphs:
-                    if not graph.device.archived and self.check_if_graph_changed(graph):
+                    if (
+                        not graph.device.archived
+                        and self.check_if_graph_changed(graph)
+                    ):
                         changed.append(graph)
 
                 for graph in changed:
