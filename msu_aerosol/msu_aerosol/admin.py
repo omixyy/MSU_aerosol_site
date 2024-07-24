@@ -534,9 +534,7 @@ def init_schedule(mapper, connection, target, app=None) -> None:
         scheduler.remove_all_jobs()
         scheduler.add_job(
             func=download_last_modified_file,
-            trigger=DateTrigger(
-                run_date=datetime.now(),
-            ),
+            trigger='interval',
             seconds=300,
             id='downloader',
             args=[name_to_link],
