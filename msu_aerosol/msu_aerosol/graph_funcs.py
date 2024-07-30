@@ -9,6 +9,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
 from yadisk import AsyncYaDisk, YaDisk
+from yadisk.exceptions import YaDiskConnectionError
 
 from msu_aerosol.config import yadisk_token
 from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
@@ -67,10 +68,14 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
             key=lambda x: x['modified'],
         )[-1]
         file_path = f'data/{full_name}/{last_modified_file["name"]}'
-        disk_sync.download_by_link(
-            last_modified_file['file'],
-            f'{main_path}/{full_name}/{last_modified_file["name"]}',
-        )
+        try:
+            disk_sync.download_by_link(
+                last_modified_file['file'],
+                f'{main_path}/{full_name}/{last_modified_file["name"]}',
+            )
+
+        except YaDiskConnectionError:
+            return
         list_data_path.append([full_name, file_path])
     for i in list_data_path:
         if app:
