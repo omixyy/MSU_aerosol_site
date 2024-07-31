@@ -35,7 +35,7 @@ body {
 
 .footer .row ul li {
   display: inline-block;
-  margin: 0px 30px;
+  margin: 0px 5px;
 }
 
 .footer .row a i {
@@ -47,3 +47,11 @@ body {
   margin: 0% 3%;
 }
 
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li.info {
+   width: 100%;
+}
