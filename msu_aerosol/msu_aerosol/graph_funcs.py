@@ -154,7 +154,7 @@ async def download_device_data(full_name: str, link: str) -> None:
         if not Path(f'{main_path}/{full_name}').exists():
             Path(f'{main_path}/{full_name}').mkdir(parents=True)
         if i['name'].endswith('.csv') or (
-                i['name'].endswith('.txt') and no_csv(link)
+            i['name'].endswith('.txt') and no_csv(link)
         ):
             tasks.append(download_file(full_name, i))
 
@@ -214,10 +214,10 @@ def proc_spaces(df: pd.DataFrame, time_col: str) -> pd.DataFrame:
 
 
 def preprocessing_one_file(
-        graph: Graph,
-        path: str,
-        user_upload=False,
-        app=None,
+    graph: Graph,
+    path: str,
+    user_upload=False,
+    app=None,
 ) -> None:
     """
     Функция для пред обработки файла прибора
@@ -261,7 +261,7 @@ def preprocessing_one_file(
     # Получение всех столбцов прибора
     columns = [j.name for j in graph.columns if j.use]
     if any(
-            (i not in list(df.columns) for i in [time_col] + columns),
+        (i not in list(df.columns) for i in [time_col] + columns),
     ):
         raise ColumnsMatchError('Проблемы с совпадением столбцов')
     df = df[[time_col] + columns]
@@ -292,8 +292,8 @@ def preprocessing_one_file(
         for month in df[time_col].dt.month.unique():
             df_month = df.loc[
                 (
-                        (df[time_col].dt.month == month)
-                        & (df[time_col].dt.year == year)
+                    (df[time_col].dt.month == month)
+                    & (df[time_col].dt.year == year)
                 )
             ]
             month = '0' + str(month) if month < 10 else str(month)
@@ -365,11 +365,11 @@ def get_spaced_colors(n):
 
 
 def make_graph(
-        graph: Graph,
-        spec_act: str,
-        begin_record_date=None,
-        end_record_date=None,
-        app=None,
+    graph: Graph,
+    spec_act: str,
+    begin_record_date=None,
+    end_record_date=None,
+    app=None,
 ) -> None | BytesIO:
     """
     Функция для создания и отрисовки графика
@@ -433,12 +433,12 @@ def make_graph(
         com_data = com_data.loc[
             (last_48_hours[0] <= pd.to_datetime(com_data[time_col]))
             & (pd.to_datetime(com_data[time_col]) <= last_48_hours[1])
-            ]
+        ]
     if spec_act == 'full':
         com_data = com_data.loc[
             (last_2_weeks[0] <= pd.to_datetime(com_data[time_col]))
             & (pd.to_datetime(com_data[time_col]) <= last_2_weeks[1])
-            ]
+        ]
     com_data.set_index(time_col, inplace=True)
     com_data = com_data.replace(
         ',',
@@ -452,7 +452,7 @@ def make_graph(
         com_data = com_data.loc[
             (begin_record_date <= pd.to_datetime(com_data[time_col]))
             & (pd.to_datetime(com_data[time_col]) <= end_record_date)
-            ]
+        ]
         com_data.to_csv(buffer, index=False)
         buffer.seek(0)
         return buffer
@@ -464,18 +464,16 @@ def make_graph(
         iqr = com_data.quantile(0.9) - com_data.quantile(0.1)
         lower_bound, upper_bound = q1 - 1.5 * iqr, q3 + 1.5 * iqr
         filtered_df = com_data[
-            (
-                    (com_data >= lower_bound) & (com_data <= upper_bound)
-            ).all(axis=1)
+            ((com_data >= lower_bound) & (com_data <= upper_bound)).all(axis=1)
         ]
         std = filtered_df.std()
         mask = (com_data.diff().abs().div(std) <= 1).all(axis=1)
         consecutive_true = mask & mask.shift(1, fill_value=False)
         mask[(consecutive_true.cumsum() % 2 == 0) & consecutive_true] = False
         com_data.loc[mask, :] = (
-                (com_data.loc[mask, :].values
-                 + com_data.loc[mask.shift(-1, fill_value=False), :].values)
-                / 2)
+            com_data.loc[mask, :].values
+            + com_data.loc[mask.shift(-1, fill_value=False), :].values
+        ) / 2
         mask_shifted = mask.shift(-1, fill_value=False)
         com_data = com_data[~mask_shifted]
     com_data.reset_index(inplace=True)
@@ -485,8 +483,8 @@ def make_graph(
     if app:
         with app.app_context():
             for i in VariableColumn.query.filter_by(
-                    graph_id=graph.id,
-                    use=True,
+                graph_id=graph.id,
+                use=True,
             ):
                 com_data[i.name] = com_data[i.name] * i.coefficient
     else:
