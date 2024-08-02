@@ -55,7 +55,7 @@ def make_format_date(date: str) -> str:
 
 def load_colors() -> list:
     """
-    Загрузка цветов, которые используются для окрашивания столбцов, из json файла
+    Загрузка цветов, использующиеся в окрашивании столбцов, из json файла
     :return: список цветов
     """
     with Path('schema/colors.json').open('r') as colors:
@@ -77,7 +77,8 @@ def no_csv(link: str) -> bool:
 
 def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
     """
-    :param name_to_link: словарь, где ключ - имя прибора, значение - ссылка на его данные в Я.Диске
+    :param name_to_link: словарь, где ключ - имя прибора,
+    значение - ссылка на его данные в Я.Диске
     :param app: объект приложения Flask
     Функция, обновляющая последний измененный файл по каждому прибору
     """
@@ -97,7 +98,7 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
             key=lambda x: x['modified'],
         )[-1]
         # Путь для сохранения исходного файла.
-        file_path = f'{main_path}/{full_name}/{last_modified_file["name"]}'  # Путь для сохранения исходного файла.
+        file_path = f'{main_path}/{full_name}/{last_modified_file["name"]}'
         disk_sync.download_by_link(
             last_modified_file['file'],
             file_path,
@@ -114,9 +115,12 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
                 else:
                     graphs = Graph.query.filter_by(device_id=dev.id)
                 for j in graphs:
-                    preprocessing_one_file(j, i[1], app=app)  # Пред обработка обновленного файла
-                    make_graph(j, spec_act='full', app=app)  # Пересоздание полного графика
-                    make_graph(j, spec_act='recent', app=app)  # Пересоздание короткого графика
+                    # Пред обработка обновленного файла
+                    preprocessing_one_file(j, i[1], app=app)
+                    # Пересоздание полного графика
+                    make_graph(j, spec_act='full', app=app)
+                    # Пересоздание короткого графика
+                    make_graph(j, spec_act='recent', app=app)
 
             except (KeyError, Exception):
                 pass
@@ -150,7 +154,7 @@ async def download_device_data(full_name: str, link: str) -> None:
         if not Path(f'{main_path}/{full_name}').exists():
             Path(f'{main_path}/{full_name}').mkdir(parents=True)
         if i['name'].endswith('.csv') or (
-                i['name'].endswith('.txt') and no_csv(link)
+            i['name'].endswith('.txt') and no_csv(link)
         ):
             tasks.append(download_file(full_name, i))
 
@@ -189,19 +193,22 @@ def get_time_col(graph: Graph) -> str:
 
 def proc_spaces(df: pd.DataFrame, time_col: str) -> pd.DataFrame:
     """
-    Функция, которая удаляет пробелы между большими временными промежутками (такие промежутки не соединяются линиями).
+    Функция, удаляющая пробелы между большими временными промежутками.
     :param df: Датафрейм, в котором удаляются промежутки
     :param time_col: временной столбец
     """
     df = df.sort_values(by=time_col)
-    # diff_mode - временной промежуток между соседними по времени строками, после которого считается, что пробел большой
+    # diff_mode - временной промежуток между соседними по времени строками,
+    # после которого считается, что пробел большой
     diff_mode = df[time_col].diff().mode().values[0] * 1.1
     new_rows = []
     for i in range(len(df) - 1):
         diff = df.loc[i + 1, time_col] - df.loc[i, time_col]
         if diff > diff_mode:
-            new_row1 = {time_col: df.loc[i, time_col] + pd.Timedelta(seconds=1)}
-            new_row2 = {time_col: df.loc[i + 1, time_col] - pd.Timedelta(seconds=1)}
+            new_date1 = df.loc[i, time_col] + pd.Timedelta(seconds=1)
+            new_date2 = df.loc[i + 1, time_col] - pd.Timedelta(seconds=1)
+            new_row1 = {time_col: new_date1}
+            new_row2 = {time_col: new_date2}
             new_rows.extend([new_row1, new_row2])
     return pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True)
 
@@ -267,7 +274,8 @@ def preprocessing_one_file(
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
     if not Path(f'proc_data/{device.name}').exists():
         Path(f'proc_data/{device.name}').mkdir(parents=True)
-    # НЕ тривиально: я создаю столбец timestamp, тк дальше это основной временной столбец
+    # НЕ тривиально: я создаю столбец timestamp,
+    # тк дальше это основной временной столбец
     try:
         if time_col == 'timestamp':
             df['timestamp'] = df['timestamp'].apply(
@@ -290,8 +298,8 @@ def preprocessing_one_file(
         for month in df[time_col].dt.month.unique():
             df_month = df.loc[
                 (
-                        (df[time_col].dt.month == month)
-                        & (df[time_col].dt.year == year)
+                    (df[time_col].dt.month == month)
+                    & (df[time_col].dt.year == year)
                 )
             ]
             month = '0' + str(month) if month < 10 else str(month)
@@ -363,22 +371,24 @@ def get_spaced_colors(n):
 
 
 def make_graph(
-        graph: Graph,
-        spec_act: str,
-        begin_record_date=None,
-        end_record_date=None,
-        app=None,
+    graph: Graph,
+    spec_act: str,
+    begin_record_date=None,
+    end_record_date=None,
+    app=None,
 ) -> None | BytesIO:
     """
     Функция для создания и отрисовки графика
     :param graph: объект записи в БД из таблицы graphs
-    :param spec_act: full, recent, download - метка, которая отделяет действия только для определенных типов.
+    :param spec_act: full, recent, download - метка,
+    которая отделяет действия только для определенных типов.
     :param begin_record_date: Начальная дата отрисовки графика
     :param end_record_date: конечная дата отрисовки графика
     :param app: объект приложения Flask
     """
     # Если spec_act == 'download', то данные о загрузке поступают с сайта.
-    # А begin_record_date и end_record_date из календаря, поэтому необходимо обрабатывать формат времени
+    # А begin_record_date и end_record_date из календаря,
+    # поэтому необходимо обрабатывать формат времени
     if spec_act == 'download':
         begin_record_date = pd.to_datetime(
             begin_record_date,
@@ -407,7 +417,8 @@ def make_graph(
     if spec_act == 'recent':
         begin_record_date = end_record_date - timedelta(days=3)
     current_date, com_data = begin_record_date, pd.DataFrame()
-    # Считываем и объединяем файлы, которые могут содержать данные нужные для отрисовки
+    # Считываем и объединяем файлы,
+    # которые могут содержать данные нужные для отрисовки
     while current_date <= end_record_date + timedelta(days=100):
         try:
             data = pd.read_csv(
@@ -428,12 +439,12 @@ def make_graph(
         com_data = com_data.loc[
             (last_48_hours[0] <= pd.to_datetime(com_data[time_col]))
             & (pd.to_datetime(com_data[time_col]) <= last_48_hours[1])
-            ]
+        ]
     if spec_act == 'full':
         com_data = com_data.loc[
             (last_2_weeks[0] <= pd.to_datetime(com_data[time_col]))
             & (pd.to_datetime(com_data[time_col]) <= last_2_weeks[1])
-            ]
+        ]
     com_data.set_index(time_col, inplace=True)
     com_data = com_data.replace(
         ',',
@@ -447,30 +458,28 @@ def make_graph(
         com_data = com_data.loc[
             (begin_record_date <= pd.to_datetime(com_data[time_col]))
             & (pd.to_datetime(com_data[time_col]) <= end_record_date)
-            ]
+        ]
         com_data.to_csv(buffer, index=False)
         buffer.seek(0)
         return buffer
 
     if spec_act == 'recent':
-        # Для увеличения скорости загрузки и просты интерпретации удаляются выбросы и сглаживаются данные,
-        # удаляются промежуточные точки.
+        # Для увеличения скорости загрузки и просты интерпретации
+        # удаляются выбросы, промежуточные точки и сглаживаются данные
         q1, q3 = com_data.quantile(0.1), com_data.quantile(0.9)
         iqr = com_data.quantile(0.9) - com_data.quantile(0.1)
         lower_bound, upper_bound = q1 - 1.5 * iqr, q3 + 1.5 * iqr
         filtered_df = com_data[
-            (
-                    (com_data >= lower_bound) & (com_data <= upper_bound)
-            ).all(axis=1)
+            ((com_data >= lower_bound) & (com_data <= upper_bound)).all(axis=1)
         ]
         std = filtered_df.std()
         mask = (com_data.diff().abs().div(std) <= 1).all(axis=1)
         consecutive_true = mask & mask.shift(1, fill_value=False)
         mask[(consecutive_true.cumsum() % 2 == 0) & consecutive_true] = False
         com_data.loc[mask, :] = (
-                                        com_data.loc[mask, :].values
-                                        + com_data.loc[mask.shift(-1, fill_value=False), :].values
-                                ) / 2
+            com_data.loc[mask, :].values
+            + com_data.loc[mask.shift(-1, fill_value=False), :].values
+        ) / 2
         mask_shifted = mask.shift(-1, fill_value=False)
         com_data = com_data[~mask_shifted]
     com_data.reset_index(inplace=True)
@@ -480,8 +489,8 @@ def make_graph(
     if app:
         with app.app_context():
             for i in VariableColumn.query.filter_by(
-                    graph_id=graph.id,
-                    use=True,
+                graph_id=graph.id,
+                use=True,
             ):
                 com_data[i.name] = com_data[i.name] * i.coefficient
     else:
@@ -511,7 +520,7 @@ def make_graph(
         ],  # цвета столбцов
     )
     cols = graph.columns
-    # Если в настройках указано, что столбца изначально не видно, то 'legendonly'
+    # Если в настройках указано, что столбца изначально не видно, то legendonly
     for trace in fig.data:
         for i in cols:
             if i.name == trace['name']:
