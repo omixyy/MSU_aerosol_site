@@ -266,8 +266,7 @@ def preprocessing_one_file(
         raise ColumnsMatchError('Проблемы с совпадением столбцов')
     res = [time_col]
     for i in [
-        [col.name for col in g.columns if col.use == 1]
-        for g in device.graphs
+        [col.name for col in g.columns if col.use == 1] for g in device.graphs
     ]:
         res += i
     df = df[res]
