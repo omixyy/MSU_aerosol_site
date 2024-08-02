@@ -207,16 +207,17 @@ def proc_spaces(df: pd.DataFrame, time_col: str) -> pd.DataFrame:
 
 
 def preprocessing_one_file(
-        graph: Graph,
-        path: str,
-        user_upload=False,
-        app=None,
+    graph: Graph,
+    path: str,
+    user_upload=False,
+    app=None,
 ) -> None:
     """
     Функция для пред обработки файла прибора
     :param graph: объект записи в БД из таблицы graphs
     :param path: путь, по которому расположен исходный файл с данными.
-    :param user_upload: Флаг, который True, только если пользователь загружает свой файл со страницы сайта.
+    :param user_upload:
+    Флаг, отображающий, загружает ли пользователь свои данные
     :param app: Объект приложения Flask
     """
     if app:
@@ -253,10 +254,16 @@ def preprocessing_one_file(
     # Получение всех столбцов прибора
     columns = [j.name for j in graph.columns if j.use]
     if any(
-            (i not in list(df.columns) for i in [time_col] + columns),
+        (i not in list(df.columns) for i in [time_col] + columns),
     ):
         raise ColumnsMatchError('Проблемы с совпадением столбцов')
-    df = df[[time_col] + columns]
+    res = [time_col]
+    for i in [
+        [col.name for col in g.columns if col.use == 1]
+        for g in device.graphs
+    ]:
+        res += i
+    df = df[res]
     df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
     if not Path(f'proc_data/{device.name}').exists():
         Path(f'proc_data/{device.name}').mkdir(parents=True)
