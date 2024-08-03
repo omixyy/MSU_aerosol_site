@@ -315,7 +315,7 @@ def preprocessing_one_file(
                 for column in df_month.columns:
                     if column in df_help.columns and column != time_col:
                         result[column] = result[column + '_x'].fillna(
-                            result[column + '_y']
+                            result[column + '_y'],
                         )
                         result.drop(
                             columns=[column + '_x', column + '_y'],
