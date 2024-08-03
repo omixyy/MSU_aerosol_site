@@ -314,8 +314,8 @@ def preprocessing_one_file(
                 result = pd.merge(df_month, df_help, on=time_col, how='outer')
                 for column in df_month.columns:
                     if column in df_help.columns and column != time_col:
-                        result[column] = result[column + '_x'].combine_first(
-                            result[column + '_y'],
+                        result[column] = result[column + '_x'].fillna(
+                            result[column + '_y']
                         )
                         result.drop(
                             columns=[column + '_x', column + '_y'],
