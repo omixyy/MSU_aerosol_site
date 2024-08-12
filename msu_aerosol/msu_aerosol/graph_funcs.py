@@ -450,6 +450,8 @@ def make_graph(
         '.',
         regex=True,
     ).astype(float)
+    # Доступные столбцы для отрисовки
+    cols_to_draw = [i.name for i in graph.columns if i.use]
     # Если spec_act == 'download', то данные сохраняются в формате csv
     if spec_act == 'download':
         buffer = BytesIO()
@@ -462,7 +464,7 @@ def make_graph(
         buffer.seek(0)
         return buffer
 
-    if spec_act == 'recent':
+    if spec_act == 'recent' and len(com_data) * len(cols_to_draw) > 500:
         # Для увеличения скорости загрузки и просты интерпретации
         # удаляются выбросы, промежуточные точки и сглаживаются данные
         q1, q3 = com_data.quantile(0.1), com_data.quantile(0.9)
@@ -495,8 +497,6 @@ def make_graph(
     else:
         for i in VariableColumn.query.filter_by(graph_id=graph.id, use=True):
             com_data[i.name] = com_data[i.name] * i.coefficient
-    # Доступные столбцы для отрисовки
-    cols_to_draw = [i.name for i in graph.columns if i.use]
     # Сортируем столбцы таким образом, чтобы более маленькие рисовались позже
     cols_to_draw = (
         com_data[cols_to_draw]
