@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const currentPath = window.location.pathname;
 
   links.forEach(link => {
-    if (link.pathname === currentPath) {
+    if (link.pathname === currentPath && !(link.className === 'dropdown-item')) {
       link.addEventListener('click', function (event) {
           event.preventDefault();
       });
