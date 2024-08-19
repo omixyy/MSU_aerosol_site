@@ -200,7 +200,7 @@ def proc_spaces(df: pd.DataFrame, time_col: str) -> pd.DataFrame:
     df = df.sort_values(by=time_col)
     # diff_mode - временной промежуток между соседними по времени строками,
     # после которого считается, что пробел большой
-    diff_mode = df[time_col].diff().mode().values[0] * 1.1
+    diff_mode = df[time_col].diff().mode().values[0] * 1.3
     new_rows = []
     for i in range(len(df) - 1):
         diff = df.loc[i + 1, time_col] - df.loc[i, time_col]
