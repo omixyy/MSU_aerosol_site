@@ -16,6 +16,8 @@ from msu_aerosol.models import Device, Graph, TimeColumn, VariableColumn
 
 __all__ = []
 
+from yadisk.exceptions import YaDiskConnectionError
+
 main_path = 'data'
 disk_async = AsyncYaDisk(token=yadisk_token)
 disk_sync = YaDisk(token=yadisk_token)
@@ -99,10 +101,13 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
         )[-1]
         # Путь для сохранения исходного файла.
         file_path = f'{main_path}/{full_name}/{last_modified_file["name"]}'
-        disk_sync.download_by_link(
-            last_modified_file['file'],
-            file_path,
-        )
+        try:
+            disk_sync.download_by_link(
+                last_modified_file['file'],
+                file_path,
+            )
+        except YaDiskConnectionError:
+            return
         list_data_path.append([full_name, file_path])
     # Для каждого обновленного файла
     for i in list_data_path:
