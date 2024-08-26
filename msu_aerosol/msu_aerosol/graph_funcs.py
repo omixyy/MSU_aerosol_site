@@ -9,14 +9,13 @@ import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
 from yadisk import AsyncYaDisk, YaDisk
+from yadisk.exceptions import YaDiskConnectionError
 
 from msu_aerosol.config import yadisk_token
 from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
 from msu_aerosol.models import Device, Graph, TimeColumn, VariableColumn
 
 __all__ = []
-
-from yadisk.exceptions import YaDiskConnectionError
 
 main_path = 'data'
 disk_async = AsyncYaDisk(token=yadisk_token)
