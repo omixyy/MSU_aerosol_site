@@ -88,7 +88,7 @@ with app.app_context():
 
 
 def main() -> None:
-    serve(app, host='0.0.0.0', port=5000)
+    serve(app, host='0.0.0.0', port=5000, log_socket_errors=False)
 
 
 if __name__ == '__main__':
