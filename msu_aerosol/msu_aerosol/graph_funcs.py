@@ -9,7 +9,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
 from yadisk import AsyncYaDisk, YaDisk
-from yadisk.exceptions import YaDiskConnectionError, InternalServerError
+from yadisk.exceptions import InternalServerError, YaDiskConnectionError
 
 from msu_aerosol.config import yadisk_token
 from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
