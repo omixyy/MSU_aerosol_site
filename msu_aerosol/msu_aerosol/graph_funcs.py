@@ -9,7 +9,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.offline as offline
 from yadisk import AsyncYaDisk, YaDisk
-from yadisk.exceptions import YaDiskConnectionError
+from yadisk.exceptions import YaDiskConnectionError, InternalServerError
 
 from msu_aerosol.config import yadisk_token
 from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
@@ -63,17 +63,22 @@ def load_colors() -> list:
         return json.load(colors)
 
 
-def no_csv(link: str) -> bool:
+def no_csv(link: str) -> bool | None:
     """
     Функция, которая определяет, есть ли csv в полученных файлах прибора
     :param link: ссылка, на данные прибора в Я.Диске
     """
-    return all(
-        not i['name'].endswith('.csv')
-        for i in disk_sync.get_public_meta(link, limit=1000)['embedded'][
-            'items'
-        ]
-    )
+
+    try:
+        return all(
+            not i['name'].endswith('.csv')
+            for i in disk_sync.get_public_meta(link, limit=1000)['embedded'][
+                'items'
+            ]
+        )
+
+    except InternalServerError:
+        return None
 
 
 def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
@@ -87,17 +92,22 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
     # Выбор последнего измененного файла по каждому прибору
     for full_name, link in name_to_link.items():
         # Объект последнего измененного файла по прибору
-        last_modified_file = sorted(
-            filter(
-                lambda y: y['name'].endswith(
-                    '.txt' if no_csv(link) else '.csv',
+        csv_not_exists = no_csv(link)
+        if csv_not_exists:
+            last_modified_file = sorted(
+                filter(
+                    lambda y: y['name'].endswith(
+                        '.txt' if csv_not_exists else '.csv',
+                    ),
+                    disk_sync.get_public_meta(link, limit=1000)['embedded'][
+                        'items'
+                    ],
                 ),
-                disk_sync.get_public_meta(link, limit=1000)['embedded'][
-                    'items'
-                ],
-            ),
-            key=lambda x: x['modified'],
-        )[-1]
+                key=lambda x: x['modified'],
+            )[-1]
+
+        else:
+            return
         # Путь для сохранения исходного файла.
         file_path = f'{main_path}/{full_name}/{last_modified_file["name"]}'
         try:
