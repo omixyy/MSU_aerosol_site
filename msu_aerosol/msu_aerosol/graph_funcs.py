@@ -93,7 +93,7 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
     for full_name, link in name_to_link.items():
         # Объект последнего измененного файла по прибору
         csv_not_exists = no_csv(link)
-        if csv_not_exists:
+        if csv_not_exists is not None:
             last_modified_file = sorted(
                 filter(
                     lambda y: y['name'].endswith(
