@@ -538,7 +538,6 @@ def make_graph(
             )
         ],  # цвета столбцов
     )
-    fig.data = sorted(fig.data, key=lambda trace: trace.name)
     # Если в настройках указано, что столбца изначально не видно, то legendonly
     for trace in fig.data:
         for i in graph.columns:
