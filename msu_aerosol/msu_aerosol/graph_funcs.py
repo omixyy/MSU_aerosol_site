@@ -538,11 +538,16 @@ def make_graph(
             )
         ],  # цвета столбцов
     )
-    cols = graph.columns
+    fig.data = sorted(fig.data, key=lambda trace: trace.name)
     # Если в настройках указано, что столбца изначально не видно, то legendonly
     for trace in fig.data:
-        for i in cols:
+        for i in graph.columns:
             if i.name == trace['name']:
+                trace.name = (
+                    f'{i.name}'
+                    if i.coefficient == 1
+                    else f'{i.name} * {i.coefficient}'
+                )
                 trace.visible = True if i.default else 'legendonly'
                 break
 
