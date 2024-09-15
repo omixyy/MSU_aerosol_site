@@ -226,7 +226,9 @@ def proc_spaces(df: pd.DataFrame, time_col: str) -> pd.DataFrame:
             new_row1 = {time_col: new_date1}
             new_row2 = {time_col: new_date2}
             new_rows.extend([new_row1, new_row2])
-    return pd.concat([df.T.drop_duplicates().T, pd.DataFrame(new_rows)], ignore_index=True)
+    return pd.concat(
+        [df.T.drop_duplicates().T, pd.DataFrame(new_rows)], ignore_index=True
+    )
 
 
 def preprocessing_one_file(
