@@ -15,6 +15,8 @@ from msu_aerosol.config import yadisk_token
 from msu_aerosol.exceptions import ColumnsMatchError, TimeFormatError
 from msu_aerosol.models import Device, Graph, TimeColumn, VariableColumn
 
+pd.set_option('future.no_silent_downcasting', True)
+
 __all__ = []
 
 main_path = 'data'
@@ -224,7 +226,7 @@ def proc_spaces(df: pd.DataFrame, time_col: str) -> pd.DataFrame:
             new_row1 = {time_col: new_date1}
             new_row2 = {time_col: new_date2}
             new_rows.extend([new_row1, new_row2])
-    return pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True)
+    return pd.concat([df.T.drop_duplicates().T, pd.DataFrame(new_rows)], ignore_index=True)
 
 
 def preprocessing_one_file(
@@ -306,6 +308,7 @@ def preprocessing_one_file(
     time_col = 'timestamp'
     # Удаление пробелов
     df = proc_spaces(df, time_col)
+    df[time_col] = pd.to_datetime(df[time_col])
     # Перераспределение данных по файлам-месяцам (один файл - один месяц)
     for year in df[time_col].dt.year.unique():
         for month in df[time_col].dt.month.unique():
