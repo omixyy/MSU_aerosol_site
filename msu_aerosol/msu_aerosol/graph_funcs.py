@@ -527,11 +527,15 @@ def make_graph(
         .index.tolist()
     )
     index_dict = {value: index for index, value in enumerate(cols_to_draw)}
-    # Создание графика столбцов.
+
+    # Используем рендеринг без WebGL, если spec_act != 'recent'
+    use_webgl = not spec_act == 'recent'
+
     fig = px.line(
         com_data,
         x=time_col,
         y=cols_to_draw,
+        render_mode='webgl' if use_webgl else 'svg',
         color_discrete_sequence=[
             i.color
             for i in sorted(
