@@ -154,12 +154,12 @@ class GraphDownload(MethodView):
             begin_record_date=data_range[0],
             end_record_date=data_range[1],
         )
-        with Path('download_log.log').open('w', encoding='utf8') as log:
+        with Path('download_log.log').open('a', encoding='utf-8') as log:
             log.write(
-                f'{current_user.login} скачал данные прибора '
+                f'Пользователь {current_user.login} скачал данные прибора '
                 f'{graph.device.name} по графику {graph.name} за период '
                 f'{[i.replace("T", " ") for i in data_range]} '
-                f'в {datetime.now()}',
+                f'в {datetime.now()}\n',
             )
         return send_file(
             buffer,

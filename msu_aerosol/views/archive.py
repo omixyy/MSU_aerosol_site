@@ -124,10 +124,10 @@ class DeviceArchive(MethodView):
                         zf.write(file_path, os.path.relpath(file_path, path))
 
             memory_file.seek(0)
-            with Path('download_log.log', encoding='utf8').open('w') as log:
+            with Path('download_log.log').open('a', encoding='utf-8') as log:
                 log.write(
-                    f'User {current_user.login} '
-                    f'downloaded all files for {device.full_name}',
+                    f'Пользователь {current_user.login} скачал все файлы '
+                    f'прибора {device.full_name}\n',
                 )
             return send_file(
                 memory_file,
@@ -137,10 +137,10 @@ class DeviceArchive(MethodView):
             )
 
         filename = request.form['button']
-        with Path('download_log.log', encoding='utf8').open('w') as log:
+        with Path('download_log.log').open('a', encoding='utf-8') as log:
             log.write(
-                f'Пользователь {current_user.login} '
-                f'скачал файл {filename} прибора {device.full_name} из архива',
+                f'Пользователь {current_user.login} скачал файл '
+                f'{filename} прибора {device.full_name} из архива\n',
             )
         return send_file(
             f'data/{device.full_name}/{filename}',

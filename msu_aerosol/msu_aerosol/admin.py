@@ -306,8 +306,8 @@ class AdminLogsView(BaseView):
 
     @expose('/')
     def admin_logs(self):
-        with Path('download_log.log').open('r', encoding='utf8') as f:
-            file = f.readlines()
+        with Path('download_log.log').open('r', encoding='utf-8') as f:
+            file = reversed(f.readlines())
         return self.render(
             'admin/admin_logs.html',
             file=file,
