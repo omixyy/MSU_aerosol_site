@@ -124,7 +124,7 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
     for i in list_data_path:
         dev = get_device_by_name(i[0], app)
         if not dev.archived:  # Если не в архиве
-            # try:
+            try:
                 if app:
                     with app.app_context():
                         graphs = Graph.query.filter_by(device_id=dev.id)
@@ -138,8 +138,8 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
                     # Пересоздание короткого графика
                     make_graph(j, spec_act='recent', app=app)
 
-            # except (KeyError, Exception):
-            #     pass
+            except (KeyError, Exception):
+                pass
 
 
 async def download_file(full_name: str, element: dict) -> None:
@@ -357,7 +357,7 @@ def preprocessing_one_file(
                 res += i
             for column in res:
                 if column not in df_month.columns:
-                    df_month[column] = pd.NA 
+                    df_month[column] = pd.NA
             df_month = df_month[res]
             df_month.to_csv(file_path, index=False)
 
