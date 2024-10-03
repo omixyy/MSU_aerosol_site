@@ -66,7 +66,7 @@ class DeviceArchive(MethodView):
         :return: Шаблон страницы архива прибора
         """
 
-        if not current_user.role.can_download_data:
+        if not current_user.role or not current_user.role.can_download_data:
             abort(403)
 
         complex_to_graphs = get_complexes_dict()
