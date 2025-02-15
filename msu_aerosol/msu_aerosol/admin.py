@@ -530,10 +530,11 @@ def init_schedule(mapper, connection, target, app=None) -> None:
     }
     if scheduler.running or not (mapper and connection and target):
         scheduler.remove_all_jobs()
+        download_last_modified_file(name_to_link)
         scheduler.add_job(
             func=download_last_modified_file,
             trigger='interval',
-            seconds=120 * len(name_to_link.keys()),
+            seconds=300 * len(name_to_link.keys()),
             id='downloader',
             args=[name_to_link],
             kwargs={'app': application},
