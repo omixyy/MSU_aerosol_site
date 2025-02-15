@@ -137,9 +137,10 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
                     make_graph(j, spec_act='full', app=app)
                     # Пересоздание короткого графика
                     make_graph(j, spec_act='recent', app=app)
+                    print('DONE')
 
             except (KeyError, Exception) as e:
-                print(e)
+                ...
 
 
 async def download_file(full_name: str, element: dict) -> None:
