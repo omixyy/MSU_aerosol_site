@@ -137,9 +137,8 @@ def download_last_modified_file(name_to_link: dict[str:str], app=None) -> None:
                     make_graph(j, spec_act='full', app=app)
                     # Пересоздание короткого графика
                     make_graph(j, spec_act='recent', app=app)
-                    print('DONE')
 
-            except (KeyError, Exception) as e:
+            except (KeyError, Exception):
                 ...
 
 
@@ -449,13 +448,17 @@ def make_graph(
                 f'{current_date.strftime("%Y_%m")}.csv',
             )
             com_data = pd.concat([com_data, data], ignore_index=True)
-            current_date += timedelta(days=29)
+            current_date += timedelta(days=25)
+
         except FileNotFoundError:
-            current_date += timedelta(days=29)
+            current_date += timedelta(days=25)
+
+    com_data = com_data.drop_duplicates()
     com_data[time_col] = pd.to_datetime(com_data[time_col])
     m = max(com_data[time_col])
     last_48_hours = [m - timedelta(days=2), m]
     last_2_weeks = [m - timedelta(days=14), m]
+
     # Обрезаем com_data согласно временным рамкам в зависимости от spec_act
     if spec_act == 'recent':
         com_data = com_data.loc[
