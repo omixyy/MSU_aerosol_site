@@ -9,3 +9,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+
+function searchText() {
+    const searchString = document.getElementById('searchInput').value.trim();
+    if (!searchString) {
+        alert('Введите текст для поиска');
+        return;
+    }
+    const content = document.getElementsByClassName('default');
+    const regex = new RegExp(`(${searchString})`, 'gi');
+    const highlightedContent = content.replace(regex, '<mark>$1</mark>');
+    document.getElementsByClassName('default').innerHTML = highlightedContent;
+    const firstMatch = document.querySelector('mark');
+    if (firstMatch) {
+        firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
