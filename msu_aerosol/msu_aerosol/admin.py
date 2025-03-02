@@ -246,7 +246,7 @@ class AdminSettingsView(AdminIndexView):
                         for time_col in TimeColumn.query.filter_by(
                             graph_id=graph.id,
                         ):
-                            time_col.use = time_col.name in radio
+                            time_col.use = time_col.name == radio
                         graph.time_format = time_format
                         db.session.commit()
                         try:
