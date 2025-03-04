@@ -1,5 +1,5 @@
 .head {
-  width: 700px;
+  width: 80%;
   text-align: center;
 }
 
@@ -9,7 +9,7 @@ h4 {
 }
 
 .device_link {
-  width: 400px;
+  width: 60%;
 }
 
 .device_content {
