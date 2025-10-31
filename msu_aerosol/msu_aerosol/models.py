@@ -1,4 +1,5 @@
 from datetime import datetime
+import enum
 
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, UserMixin
@@ -52,6 +53,12 @@ class BaseColumnModel(db.Model):
             db.ForeignKey('graphs.id'),
             nullable=False,
         )
+
+
+class GraphAvailability(enum.Enum):
+    PUBLIC = 'public'
+    AUTHORIZED_ONLY = 'authorized_only'
+    ADMINS_ONLY = 'admins_only'
 
 
 class Complex(BaseModel):
@@ -169,6 +176,11 @@ class Graph(BaseModel):
         db.Boolean,
         default=False,
     )
+    available_for = db.Column(
+        db.Enum(GraphAvailability),
+        default=GraphAvailability.AUTHORIZED_ONLY,
+        nullable=False,
+    )
     columns = db.relationship(
         'VariableColumn',
         backref='graph',
@@ -205,6 +217,20 @@ class TimeColumn(BaseColumnModel):
     __tablename__ = 'time_columns'
 
 
+class RoleFieldView(ProtectedView):
+    """
+    Эти поля бут отображаться в админке в таблице ролей.
+    """
+
+    form_args = {
+        'users': {'label': 'Пользователи'},
+        'name': {'label': 'Название роли'},
+        'can_access_admin': {'label': 'Имеет ли доступ к админке'},
+        'can_upload_data': {'label': 'Может ли загружать данные для графиков'},
+        'can_download_data': {'label': 'Может ли скачивать данные'},
+    }
+
+
 class UserFieldView(ProtectedView):
     """
     Эти поля бут отображаться в админке в таблице пользователей.
@@ -218,6 +244,15 @@ class UserFieldView(ProtectedView):
         'email',
         'created_date',
     ]
+
+    form_args = {
+        'name': {'label': 'Имя'},
+        'surname': {'label': 'Фамилия'},
+        'login': {'label': 'Логин'},
+        'Email': {'label': 'Почта'},
+        'created_date': {'label': 'Дата создания аккаунта'},
+        'role': {'label': 'Роль'},
+    }
 
     form_excluded_columns = ('password',)
 
@@ -261,6 +296,11 @@ class ComplexView(ProtectedView):
         'graphs',
     ]
 
+    form_args = {
+        'name': {'label': 'Название комплекса'},
+        'devices': {'label': 'Приборы'},
+    }
+
 
 class GraphView(ProtectedView):
     form_excluded_columns = (
@@ -269,3 +309,9 @@ class GraphView(ProtectedView):
         'columns',
         'time_format',
     )
+
+    form_args = {
+        'name': {'label': 'Название графика'},
+        'device': {'label': 'Прибор'},
+        'available_for': {'label': 'Доступен для ролей'},
+    }

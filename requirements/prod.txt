@@ -17,4 +17,5 @@ requests==2.31.0
 SQLAlchemy==1.4.46
 waitress==3.0.0
 Werkzeug==2.2.2
+WTForms==3.1.2
 yadisk==2.1.0

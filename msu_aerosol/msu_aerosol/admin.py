@@ -32,8 +32,8 @@ from msu_aerosol.models import (
     DeviceView,
     Graph,
     GraphView,
-    ProtectedView,
     Role,
+    RoleFieldView,
     TimeColumn,
     User,
     UserFieldView,
@@ -567,6 +567,22 @@ def init_admin(app: Flask) -> None:
         ),
     )
     admin_settings.add_view(
+        RoleFieldView(
+            Role,
+            db.session,
+            name='Роли',
+            category='Управление пользователями',
+        ),
+    )
+    admin_settings.add_view(
+        UserFieldView(
+            User,
+            db.session,
+            name='Пользователи',
+            category='Управление пользователями',
+        ),
+    )
+    admin_settings.add_view(
         DeviceView(
             Device,
             db.session,
@@ -580,21 +596,5 @@ def init_admin(app: Flask) -> None:
             db.session,
             name='Графики',
             category='Приборы и графики',
-        ),
-    )
-    admin_settings.add_view(
-        UserFieldView(
-            User,
-            db.session,
-            name='Пользователи',
-            category='Управление пользователями',
-        ),
-    )
-    admin_settings.add_view(
-        ProtectedView(
-            Role,
-            db.session,
-            name='Роли',
-            category='Управление пользователями',
         ),
     )

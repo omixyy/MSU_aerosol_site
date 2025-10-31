@@ -24,7 +24,7 @@
       <div class="container-fluid">
         <div class="row device-container" id="device-container-{{ complex.id }}">
           {% for graph in graphs %}
-            {% if graph.device.show and graph.created %}
+            {% if graph.device.show and graph.created and (graph.available_for.name == "PUBLIC" or (graph.available_for.name == "ADMINS_ONLY" and user.role.can_access_admin) or (graph.available_for.name == "AUTHORIZED_ONLY" and user.is_authenticated)) %}
               <div id="dev{{ graph.id }}" class="device_content">
                 <h4>{{ graph.device.name }}</h4>
                 <hr>
